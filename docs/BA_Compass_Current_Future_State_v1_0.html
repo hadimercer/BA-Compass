@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BA Compass — Current State vs Future State Analysis v1.0</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:#1B2A4A;--accent:#2E75B6;--accent-lt:#D5E8F0;--accent-bg:#EAF2F8;
+    --bg:#FFFFFF;--surface:#F8FAFC;--border:#D1D5DB;--border-lt:#E5E7EB;
+    --text:#1E293B;--text-secondary:#64748B;--text-muted:#94A3B8;
+    --green:#16A34A;--green-lt:#DCFCE7;--green-bg:#F0FDF4;
+    --amber:#D97706;--amber-lt:#FEF3C7;--amber-bg:#FFFBEB;
+    --red:#DC2626;--red-lt:#FEE2E2;--red-bg:#FFF1F2;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'DM Sans',sans-serif;color:var(--text);background:#F1F5F9;line-height:1.6}
+  .page{max-width:1100px;margin:40px auto;background:var(--bg);border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.04);overflow:hidden}
+  .cover{background:linear-gradient(135deg,var(--navy) 0%,#243B67 100%);padding:80px 60px 60px;color:#fff}
+  .cover h1{font-size:42px;font-weight:700;letter-spacing:-0.5px;margin-bottom:4px}
+  .cover .subtitle{font-size:20px;font-weight:400;color:#93B5D6;margin-bottom:32px}
+  .cover .doc-type{display:inline-block;font-size:13px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent-lt);border:1px solid rgba(255,255,255,0.2);padding:6px 16px;border-radius:4px;margin-bottom:40px}
+  .cover-meta{display:flex;gap:40px;margin-top:24px;font-size:14px;color:#93B5D6}
+  .cover-meta strong{color:#B8D4EA;font-weight:500}
+  .content{padding:48px 60px 60px}
+  h2{font-size:24px;font-weight:700;color:var(--navy);margin:48px 0 8px;padding-bottom:8px;border-bottom:2px solid var(--accent)}
+  h2:first-child{margin-top:0}
+  h3{font-size:18px;font-weight:600;color:var(--accent);margin:32px 0 12px}
+  p{margin-bottom:12px;font-size:15px}
+  .note{border-left:4px solid var(--accent);background:var(--accent-bg);padding:12px 16px;margin:16px 0 24px;font-size:14px;color:var(--text-secondary);border-radius:0 6px 6px 0}
+  table{width:100%;border-collapse:collapse;margin:16px 0 24px;font-size:14px}
+  th{background:var(--navy);color:#fff;font-weight:600;text-align:left;padding:10px 14px;font-size:13px;letter-spacing:.3px}
+  th:first-child{border-radius:6px 0 0 0}th:last-child{border-radius:0 6px 0 0}
+  td{padding:10px 14px;border-bottom:1px solid var(--border-lt);vertical-align:top}
+  tr:nth-child(even) td{background:var(--surface)}
+  .signoff{margin-top:48px;padding-top:24px;border-top:2px solid var(--border)}
+  .signoff-line{margin-top:40px;padding-top:12px;border-top:1px solid var(--text-muted);display:inline-block;min-width:300px;font-size:14px;color:var(--text-muted)}
+
+  /* State comparison cards */
+  .state-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;margin:24px 0 32px;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+  .state-col{padding:28px 28px 24px}
+  .state-col.current{background:#FFF8F8;border-right:1px solid var(--border)}
+  .state-col.future{background:var(--green-bg)}
+  .state-col-header{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+  .state-col-header .icon{font-size:20px}
+  .state-col-header h4{font-size:15px;font-weight:700}
+  .state-col.current .state-col-header h4{color:var(--red)}
+  .state-col.future .state-col-header h4{color:var(--green)}
+  .state-item{display:flex;gap:10px;margin-bottom:10px;font-size:13.5px;line-height:1.5}
+  .state-item .bullet{flex-shrink:0;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;margin-top:1px}
+  .bullet-red{background:var(--red-lt);color:var(--red)}
+  .bullet-green{background:var(--green-lt);color:var(--green)}
+
+  /* Gap table highlight */
+  td.gap-cell{background:#FFFBEB;font-weight:500;color:#92400E}
+  td.current-cell{color:#7F1D1D}
+  td.future-cell{color:#14532D;font-weight:500}
+
+  /* Gap score bar */
+  .gap-bar-wrap{margin:24px 0 32px}
+  .gap-area{margin-bottom:20px}
+  .gap-area-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+  .gap-area-label{font-size:13px;font-weight:600;color:var(--navy)}
+  .gap-severity{font-size:11px;font-weight:700;padding:2px 10px;border-radius:10px}
+  .sev-critical{background:var(--red-lt);color:var(--red)}
+  .sev-high{background:var(--amber-lt);color:var(--amber)}
+  .sev-medium{background:#DBEAFE;color:#1E40AF}
+  .sev-low{background:var(--green-lt);color:var(--green)}
+  .bar-track{height:10px;background:var(--border-lt);border-radius:5px;overflow:hidden}
+  .bar-fill{height:100%;border-radius:5px;transition:width .3s}
+  .fill-critical{background:var(--red)}
+  .fill-high{background:var(--amber)}
+  .fill-medium{background:var(--accent)}
+  .fill-low{background:var(--green)}
+  .gap-sub{font-size:12px;color:var(--text-secondary);margin-top:4px}
+
+  /* Feature mapping */
+  .feature-table th:nth-child(1){width:22%}
+  .feature-table th:nth-child(2){width:26%}
+  .feature-table th:nth-child(3){width:26%}
+  .feature-table th:nth-child(4){width:26%}
+  .tag{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;margin:1px}
+  .tag-closes{background:var(--green-lt);color:#14532D}
+  .tag-reduces{background:#DBEAFE;color:#1E40AF}
+  .tag-remains{background:var(--border-lt);color:var(--text-secondary)}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="cover">
+    <div class="doc-type">Current State / Future State Analysis</div>
+    <h1>BA Compass</h1>
+    <div class="subtitle">Business Analysis Co-Pilot</div>
+    <div class="cover-meta">
+      <span><strong>Version</strong> 1.0</span>
+      <span><strong>Prepared by</strong> Hadi Mercer</span>
+      <span><strong>Date</strong> March 2026</span>
+      <span><strong>Status</strong> Draft — Pending Approval</span>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <h2>1. Purpose</h2>
+    <p>This document presents a structured gap analysis comparing how a junior-to-mid BA practitioner navigates a new engagement today (current state) versus how they will navigate it with BA Compass (future state). It establishes the specific gaps that BA Compass closes, providing the evidentiary basis for the product's problem statement and validating that the solution is grounded in a real, observable need.</p>
+    <p>This analysis serves two purposes within the portfolio: it demonstrates rigorous problem definition (a core BA competency), and it makes the case to hiring managers and portfolio reviewers that BA Compass is a response to a genuine gap — not a technology demonstration in search of a problem.</p>
+
+    <div class="note"><strong>Scope of analysis:</strong> The current state describes a junior BA (0–3 years experience) working on a new engagement without a dedicated senior mentor, using only standard office tools and their own training. The future state describes the same practitioner using BA Compass V1 as their primary engagement workspace.</div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <h2>2. Current State — How a Junior BA Navigates a New Engagement Today</h2>
+
+    <p>When a junior BA is assigned a new engagement today, they face a sequence of high-stakes decisions with limited structured support. Each decision point is an opportunity for wasted effort, inconsistent outputs, or missed deliverables.</p>
+
+    <h3>2.1 The Typical Journey — Current State</h3>
+
+    <div class="state-grid">
+      <div class="state-col current">
+        <div class="state-col-header">
+          <span class="icon">⚠️</span>
+          <h4>Current State — Pain Points by Stage</h4>
+        </div>
+
+        <p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--red);margin-bottom:8px">Engagement Start</p>
+        <div class="state-item"><span class="bullet bullet-red">✕</span><span>Assigned an engagement with a brief that may be ambiguous, incomplete, or framed as a solution rather than a problem</span></div>
+        <div class="state-item"><span class="bullet bullet-red">✕</span><span>No structured intake process — relies on ad-hoc stakeholder conversations and intuition to define scope</span></div>
+        <div class="state-item"><span class="bullet bullet-red">✕</span><span>Engagement type not formally classified — may proceed as if all engagements require the same deliverables</span></div>
+        <div class="state-item"><span class="bullet bullet-red">✕</span><span>No mechanism to capture the 10 critical intake dimensions systematically</span></div>
+
+        <p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--red);margin:12px 0 8px">Planning</p>
+        <div class="state-item"><span class="bullet bullet-red">✕</span><span>Roadmap built from scratch each time — usually a Word doc or Excel spreadsheet, often copied from a previous engagement</span></div>
+        <div class="state-item"><span class="bullet bullet-red">✕</span><span>BABOK knowledge areas may not be systematically considered — common to under-plan elicitation or skip solution evaluation</span></div>
+        <div class="state-item"><span class="bullet bullet-red">✕</span><span>No distinction between engagement types — a process improvement engagement and a requirements definition engagement get the same generic plan</span></div>
+        <div class="state-item"><span class="bullet bullet-red">✕</span><span>Effort estimation unreliable because scope is not tied to a module inventory</span></div>
+
+        <p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--red);margin:12px 0 8px">Execution</p>
+        <div class="state-item"><span class="bullet bullet-red">✕</span><span>Blank-page anxiety on each deliverable — no guided prompts, no structure, no examples</span></div>
+        <div class="state-item"><span class="bullet bullet-red">✕</span><span>Output quality varies by deliverable — some thorough, some thin, depending on familiarity</span></div>
+        <div class="state-item"><span class="bullet bullet-red">✕</span><span>Heavy reliance on templates downloaded from the internet — often not aligned to the specific engagement type or BABOK</span></div>
+        <div class="state-item"><span class="bullet bullet-red">✕</span><span>Context not carried forward between deliverables — same background repeated, or context lost</span></div>
+        <div class="state-item"><span class="bullet bullet-red">✕</span><span>No AI assistance — time spent on formatting and structure rather than analysis</span></div>
+
+        <p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--red);margin:12px 0 8px">Quality &amp; Delivery</p>
+        <div class="state-item"><span class="bullet bullet-red">✕</span><span>Gaps only discovered at stakeholder review — creates rework cycles and erodes credibility</span></div>
+        <div class="state-item"><span class="bullet bullet-red">✕</span><span>No traceability matrix — requirements cannot be traced to deliverables without manual effort</span></div>
+        <div class="state-item"><span class="bullet bullet-red">✕</span><span>Deliverable package assembled manually — inconsistent formatting, naming, and structure across documents</span></div>
+        <div class="state-item"><span class="bullet bullet-red">✕</span><span>No objective signal of completeness — "done" is a feeling, not a verified state</span></div>
+      </div>
+
+      <div class="state-col future">
+        <div class="state-col-header">
+          <span class="icon">✅</span>
+          <h4>Future State — With BA Compass</h4>
+        </div>
+
+        <p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--green);margin-bottom:8px">Engagement Start</p>
+        <div class="state-item"><span class="bullet bullet-green">✓</span><span>AI-led conversational intake systematically extracts all 10 dimensions across 3 tiers — no critical context missed</span></div>
+        <div class="state-item"><span class="bullet bullet-green">✓</span><span>Engagement classified into one of 8 types × 3 scale tiers — with AI reasoning visible and user override available</span></div>
+        <div class="state-item"><span class="bullet bullet-green">✓</span><span>Classification is persistent and drives every subsequent decision — roadmap, module selection, AI prompts</span></div>
+        <div class="state-item"><span class="bullet bullet-green">✓</span><span>All intake dimensions stored and referenced throughout the engagement — context never lost</span></div>
+
+        <p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--green);margin:12px 0 8px">Planning</p>
+        <div class="state-item"><span class="bullet bullet-green">✓</span><span>BABOK-aligned roadmap generated instantly from one of 24 pre-built templates matched to engagement type and scale</span></div>
+        <div class="state-item"><span class="bullet bullet-green">✓</span><span>All 52 modules considered — none missed by accident. Each tagged by BABOK knowledge area</span></div>
+        <div class="state-item"><span class="bullet bullet-green">✓</span><span>Roadmap is a living object — status tracked, modules navigable in any order, dependencies surfaced</span></div>
+        <div class="state-item"><span class="bullet bullet-green">✓</span><span>Scope is tied to a defined module inventory — basis for realistic effort conversation with stakeholders</span></div>
+
+        <p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--green);margin:12px 0 8px">Execution</p>
+        <div class="state-item"><span class="bullet bullet-green">✓</span><span>Co-pilot guided prompts eliminate blank-page anxiety — methodology embedded in the questions asked</span></div>
+        <div class="state-item"><span class="bullet bullet-green">✓</span><span>AI drafts artifact content; user reviews and owns — consistent quality floor across all deliverables</span></div>
+        <div class="state-item"><span class="bullet bullet-green">✓</span><span>Project context (dimensions, prior artifacts) automatically loaded into every co-pilot session</span></div>
+        <div class="state-item"><span class="bullet bullet-green">✓</span><span>Iterative refinement loop within each module — user can push back, ask for alternatives, refine content</span></div>
+        <div class="state-item"><span class="bullet bullet-green">✓</span><span>Time shifted from formatting to analysis — AI handles structure, BA applies judgement</span></div>
+
+        <p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--green);margin:12px 0 8px">Quality &amp; Delivery</p>
+        <div class="state-item"><span class="bullet bullet-green">✓</span><span>Gap analysis runs before delivery — AI reviews all artifacts against engagement requirements and flags weaknesses</span></div>
+        <div class="state-item"><span class="bullet bullet-green">✓</span><span>Traceability matrix generated automatically — requirements traceable to deliverables at click of a button</span></div>
+        <div class="state-item"><span class="bullet bullet-green">✓</span><span>Export package compiled with consistent formatting, naming, and structure across all deliverables</span></div>
+        <div class="state-item"><span class="bullet bullet-green">✓</span><span>Completeness is verified, not felt — gap analysis provides an objective signal before the package leaves the BA's hands</span></div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <h2>3. Gap Analysis — Capability by Capability</h2>
+    <p>The table below lists each identified capability gap, the current state behaviour, the future state behaviour enabled by BA Compass, and the specific product feature that closes the gap.</p>
+
+    <table class="feature-table">
+      <tr>
+        <th>Gap Area</th>
+        <th>Current State</th>
+        <th>Future State</th>
+        <th>BA Compass Feature</th>
+      </tr>
+      <tr>
+        <td><strong>G-01</strong><br>Engagement Classification</td>
+        <td class="current-cell">No formal classification. Practitioner proceeds with a generic approach regardless of engagement type. Process improvement treated the same as system requirements.</td>
+        <td class="future-cell">Every project is classified into one of 8 engagement types at 3 scale tiers. Classification is AI-reasoned, explained, and user-overridable.</td>
+        <td>Intake &amp; Classification Engine (FR-08 to FR-13)</td>
+      </tr>
+      <tr>
+        <td><strong>G-02</strong><br>Intake Dimension Capture</td>
+        <td class="current-cell">Intake is ad hoc — driven by whatever questions the BA thinks to ask. Critical dimensions (regulatory constraints, political sensitivity, data availability) routinely missed.</td>
+        <td class="future-cell">10 intake dimensions across 3 tiers captured conversationally. AI surfaces questions the BA may not have thought to ask. All dimensions persisted and referenced throughout the engagement.</td>
+        <td>Conversational Intake (FR-08, FR-09, FR-10)</td>
+      </tr>
+      <tr>
+        <td><strong>G-03</strong><br>Roadmap Generation</td>
+        <td class="current-cell">Roadmap built manually from scratch or copied from a previous engagement. BABOK coverage is inconsistent — common to miss elicitation planning or solution evaluation.</td>
+        <td class="future-cell">Instant BABOK-aligned roadmap from 24 pre-built templates matched to engagement type and scale. All 52 modules considered. Nothing missed by accident.</td>
+        <td>Roadmap Template Library + Instantiation (FR-14 to FR-16)</td>
+      </tr>
+      <tr>
+        <td><strong>G-04</strong><br>Module Navigation</td>
+        <td class="current-cell">No structured module concept. Deliverables appear ad hoc on a task list. Dependencies between deliverables are invisible — a BA may produce a solution design before completing requirements.</td>
+        <td class="future-cell">52 modules navigable in any order. Dependency warnings surface when a module is opened before its predecessors are complete. Status tracked per module.</td>
+        <td>Roadmap Navigator (FR-17, FR-18)</td>
+      </tr>
+      <tr>
+        <td><strong>G-05</strong><br>Artifact Creation Guidance</td>
+        <td class="current-cell">Blank page for every deliverable. BA either writes from memory, uses a generic internet template, or copies from a prior engagement. Quality is highly variable.</td>
+        <td class="future-cell">Co-pilot guided prompts for every module. AI asks the right questions in the right sequence, drawing on project context. Draft artifact produced as a starting point — BA edits, refines, owns.</td>
+        <td>Co-Pilot Module Experience (FR-19 to FR-22)</td>
+      </tr>
+      <tr>
+        <td><strong>G-06</strong><br>Context Continuity</td>
+        <td class="current-cell">Each deliverable created in isolation. BA must manually re-establish context — re-reading the brief, prior deliverables, and notes before starting each new document. Context drift common.</td>
+        <td class="future-cell">All project dimensions and prior artifact content loaded automatically into every co-pilot session. AI has full engagement context. No context drift.</td>
+        <td>Context Injection in Co-Pilot (FR-21)</td>
+      </tr>
+      <tr>
+        <td><strong>G-07</strong><br>Pre-Delivery Gap Check</td>
+        <td class="current-cell">Gaps discovered at stakeholder review — after effort has been invested and credibility is at stake. No systematic self-review mechanism available to the BA before submission.</td>
+        <td class="future-cell">AI-driven gap analysis reviews all artifacts against engagement requirements before delivery. Specific weaknesses flagged with explanations. BA addresses or explicitly acknowledges each flag.</td>
+        <td>Gap Analysis Module (FR-25, FR-26)</td>
+      </tr>
+      <tr>
+        <td><strong>G-08</strong><br>Requirements Traceability</td>
+        <td class="current-cell">Traceability matrix either not produced or produced manually at the end of the engagement — a time-consuming exercise that is frequently skipped under time pressure.</td>
+        <td class="future-cell">Traceability matrix generated automatically from the project's artifact record. Requirements are traceable to deliverables without manual effort.</td>
+        <td>Traceability Matrix Generation (FR-27)</td>
+      </tr>
+      <tr>
+        <td><strong>G-09</strong><br>Deliverable Package Quality</td>
+        <td class="current-cell">Final package assembled manually. Documents may use different templates, naming conventions, and formatting. Package looks like it was produced by several different people.</td>
+        <td class="future-cell">Export package compiled from all saved artifacts with consistent formatting and naming. Single download, professional presentation.</td>
+        <td>Export &amp; Packaging (FR-28 to FR-30)</td>
+      </tr>
+      <tr>
+        <td><strong>G-10</strong><br>Completeness Signal</td>
+        <td class="current-cell">"Done" is a subjective feeling. BA submits when they run out of time or patience — no objective completeness check available.</td>
+        <td class="future-cell">Gap analysis provides an objective completeness signal. BA knows what has been flagged and what has been addressed before the package leaves their hands.</td>
+        <td>Gap Analysis + Module Status Tracking (FR-25, FR-26, FR-24)</td>
+      </tr>
+    </table>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <h2>4. Gap Severity Assessment</h2>
+    <p>Each gap is rated by severity — the degree to which the absence of the capability impairs the quality of BA work and the probability that a junior practitioner will encounter the problem on a real engagement.</p>
+
+    <div class="gap-bar-wrap">
+
+      <div class="gap-area">
+        <div class="gap-area-header">
+          <span class="gap-area-label">G-01 — Engagement Classification</span>
+          <span class="gap-severity sev-critical">Critical</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill fill-critical" style="width:95%"></div></div>
+        <div class="gap-sub">Foundation error — wrong classification cascades into wrong roadmap, wrong deliverables, and wrong scope expectations. The most consequential gap in the set.</div>
+      </div>
+
+      <div class="gap-area">
+        <div class="gap-area-header">
+          <span class="gap-area-label">G-02 — Intake Dimension Capture</span>
+          <span class="gap-severity sev-critical">Critical</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill fill-critical" style="width:90%"></div></div>
+        <div class="gap-sub">Missed dimensions (regulatory constraints, political sensitivity, integration complexity) create scope surprises late in the engagement — expensive to recover from.</div>
+      </div>
+
+      <div class="gap-area">
+        <div class="gap-area-header">
+          <span class="gap-area-label">G-05 — Artifact Creation Guidance</span>
+          <span class="gap-severity sev-critical">Critical</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill fill-critical" style="width:88%"></div></div>
+        <div class="gap-sub">The most time-consuming and anxiety-producing gap in daily practice. Every deliverable starts from zero. Disproportionate time spent on structure rather than analysis.</div>
+      </div>
+
+      <div class="gap-area">
+        <div class="gap-area-header">
+          <span class="gap-area-label">G-07 — Pre-Delivery Gap Check</span>
+          <span class="gap-severity sev-high">High</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill fill-high" style="width:78%"></div></div>
+        <div class="gap-sub">Gaps found at review stage damage credibility and create rework. A pre-delivery check that a junior BA can run independently is high-value and currently unavailable.</div>
+      </div>
+
+      <div class="gap-area">
+        <div class="gap-area-header">
+          <span class="gap-area-label">G-03 — Roadmap Generation</span>
+          <span class="gap-severity sev-high">High</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill fill-high" style="width:75%"></div></div>
+        <div class="gap-sub">Generic roadmaps miss engagement-specific requirements. A process improvement engagement without an as-is analysis module, or a regulatory engagement without a compliance review module, will fail scope.</div>
+      </div>
+
+      <div class="gap-area">
+        <div class="gap-area-header">
+          <span class="gap-area-label">G-06 — Context Continuity</span>
+          <span class="gap-severity sev-high">High</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill fill-high" style="width:70%"></div></div>
+        <div class="gap-sub">Context drift between deliverables is a common source of inconsistency. Stakeholders notice when the BA appears to re-explain background that was established weeks earlier.</div>
+      </div>
+
+      <div class="gap-area">
+        <div class="gap-area-header">
+          <span class="gap-area-label">G-10 — Completeness Signal</span>
+          <span class="gap-severity sev-high">High</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill fill-high" style="width:68%"></div></div>
+        <div class="gap-sub">Subjective "doneness" is a significant confidence risk for junior practitioners. An objective signal — even a simple one — meaningfully reduces anxiety and improves submission quality.</div>
+      </div>
+
+      <div class="gap-area">
+        <div class="gap-area-header">
+          <span class="gap-area-label">G-04 — Module Navigation</span>
+          <span class="gap-severity sev-medium">Medium</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill fill-medium" style="width:55%"></div></div>
+        <div class="gap-sub">Dependency violations are common but recoverable. The risk is wasted effort, not engagement failure. High value for complex engagements; lower value for small-scale work.</div>
+      </div>
+
+      <div class="gap-area">
+        <div class="gap-area-header">
+          <span class="gap-area-label">G-08 — Requirements Traceability</span>
+          <span class="gap-severity sev-medium">Medium</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill fill-medium" style="width:50%"></div></div>
+        <div class="gap-sub">Critical for formal or regulated engagements; less critical for advisory or strategy work. Automating it removes a significant time burden when it is required.</div>
+      </div>
+
+      <div class="gap-area">
+        <div class="gap-area-header">
+          <span class="gap-area-label">G-09 — Deliverable Package Quality</span>
+          <span class="gap-severity sev-medium">Medium</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill fill-medium" style="width:45%"></div></div>
+        <div class="gap-sub">Inconsistent formatting creates a negative impression but rarely causes engagement failure. High value for external-facing or formal deliverable contexts.</div>
+      </div>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <h2>5. What BA Compass Closes vs. What It Does Not</h2>
+    <p>This section provides an honest boundary on the product's scope. Not every gap in BA practice is in scope for V1. Clear scope boundaries are a sign of rigorous problem definition — and they protect against scope creep during the build phase.</p>
+
+    <table>
+      <tr>
+        <th>Capability Area</th>
+        <th>V1 Status</th>
+        <th>Notes</th>
+      </tr>
+      <tr>
+        <td>Engagement classification</td>
+        <td><span class="tag tag-closes">Fully Closed — V1</span></td>
+        <td>8 engagement types × 3 scale tiers; AI-reasoned; user override</td>
+      </tr>
+      <tr>
+        <td>Intake dimension capture</td>
+        <td><span class="tag tag-closes">Fully Closed — V1</span></td>
+        <td>All 10 dimensions; 3-tier capture model; persisted throughout engagement</td>
+      </tr>
+      <tr>
+        <td>BABOK-aligned roadmap generation</td>
+        <td><span class="tag tag-closes">Fully Closed — V1</span></td>
+        <td>24 pre-built templates; 52 modules; instant generation on classification</td>
+      </tr>
+      <tr>
+        <td>Artifact creation guidance (co-pilot)</td>
+        <td><span class="tag tag-closes">Fully Closed — V1</span></td>
+        <td>Guided Q&amp;A per module; AI drafts; iterative refinement; context injection</td>
+      </tr>
+      <tr>
+        <td>Pre-delivery gap analysis</td>
+        <td><span class="tag tag-closes">Fully Closed — V1</span></td>
+        <td>AI reviews all artifacts against engagement requirements; flags weaknesses</td>
+      </tr>
+      <tr>
+        <td>Requirements traceability</td>
+        <td><span class="tag tag-closes">Fully Closed — V1</span></td>
+        <td>Auto-generated traceability matrix from artifact record</td>
+      </tr>
+      <tr>
+        <td>Deliverable package export</td>
+        <td><span class="tag tag-closes">Fully Closed — V1</span></td>
+        <td>Consistent formatting; single/full package export; download link</td>
+      </tr>
+      <tr>
+        <td>Stakeholder collaboration</td>
+        <td><span class="tag tag-remains">Out of Scope — V1</span></td>
+        <td>V1 is solo-user only. Multi-user collaboration is a post-V1 feature.</td>
+      </tr>
+      <tr>
+        <td>Live stakeholder elicitation support</td>
+        <td><span class="tag tag-remains">Out of Scope — V1</span></td>
+        <td>BA Compass supports artifact production, not live workshop facilitation or meeting capture.</td>
+      </tr>
+      <tr>
+        <td>Integration with external tools (JIRA, Confluence)</td>
+        <td><span class="tag tag-remains">Out of Scope — V1</span></td>
+        <td>Export is file-based in V1. Integration with external project tools is post-V1.</td>
+      </tr>
+      <tr>
+        <td>Custom module creation / editing</td>
+        <td><span class="tag tag-remains">Out of Scope — V1</span></td>
+        <td>Module library is static in V1. UI for adding or editing modules is post-V1.</td>
+      </tr>
+      <tr>
+        <td>Estimation and scheduling</td>
+        <td><span class="tag tag-remains">Out of Scope — V1</span></td>
+        <td>BA Compass scopes work into modules but does not produce effort estimates or project schedules.</td>
+      </tr>
+    </table>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <h2>6. Summary — The Case for BA Compass</h2>
+
+    <p>The analysis above documents ten distinct capability gaps in how a junior BA practitioner approaches a new engagement today. Seven of those gaps are rated High or Critical severity — meaning they routinely impair output quality or are encountered on virtually every engagement.</p>
+
+    <p>BA Compass closes all seven high/critical gaps within V1 scope. It does so not by adding a layer of AI on top of existing tools, but by restructuring the engagement workflow around a methodology engine that makes the right BA practice the path of least resistance. The AI is the accelerant; the BABOK methodology is the architecture.</p>
+
+    <p>The three gaps rated Medium severity (module navigation, traceability, package quality) are also addressed in V1 — they represent incremental quality improvements rather than fundamental capability unlocks, but they round out the product into a complete engagement workspace rather than a point solution.</p>
+
+    <p>The out-of-scope items (collaboration, live elicitation support, external integrations, custom modules) are genuine limitations, not oversights. They represent a deliberate V1 boundary that keeps the product buildable, testable, and demonstrable within a portfolio timeline — while leaving a clear and credible roadmap for future development.</p>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="signoff">
+      <h2>7. Document Sign-Off</h2>
+      <p>This document is submitted for review as part of the BA Compass pre-build documentation package. Approval confirms that the current state analysis accurately represents the target user's experience, and that the gap analysis correctly maps product features to identified capability gaps.</p>
+      <table>
+        <tr><th>Role</th><th>Name</th><th>Date</th><th>Status</th></tr>
+        <tr><td>Author / Product Owner</td><td>Hadi Mercer</td><td>March 2026</td><td>Pending Review</td></tr>
+        <tr><td>Reviewer</td><td>—</td><td>—</td><td>—</td></tr>
+      </table>
+      <div>
+        <div class="signoff-line">Approved by: ___________________________</div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /page -->
+</body>
+</html>

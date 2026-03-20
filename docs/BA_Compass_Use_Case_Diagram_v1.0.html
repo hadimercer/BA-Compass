@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BA Compass — Use Case Diagram v1.0</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #1B2A4A;
+    --accent: #2E75B6;
+    --accent-lt: #D5E8F0;
+    --accent-bg: #EAF2F8;
+    --bg: #FFFFFF;
+    --surface: #F8FAFC;
+    --border: #D1D5DB;
+    --border-lt: #E5E7EB;
+    --text: #1E293B;
+    --text-secondary: #64748B;
+    --text-muted: #94A3B8;
+    --success: #059669;
+    --warning: #D97706;
+    --danger: #DC2626;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    background: #F1F5F9;
+    line-height: 1.6;
+  }
+
+  .page {
+    max-width: 1040px;
+    margin: 40px auto;
+    background: var(--bg);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.04);
+    overflow: hidden;
+  }
+
+  /* ── Cover ────────────────────────────────── */
+  .cover {
+    background: linear-gradient(135deg, var(--navy) 0%, #243B67 100%);
+    padding: 80px 60px 60px;
+    color: #fff;
+  }
+  .cover h1 {
+    font-size: 42px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+  }
+  .cover .subtitle {
+    font-size: 20px;
+    font-weight: 400;
+    color: #93B5D6;
+    margin-bottom: 32px;
+  }
+  .cover .doc-type {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--accent-lt);
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 6px 16px;
+    border-radius: 4px;
+    margin-bottom: 40px;
+  }
+  .cover-meta {
+    display: flex;
+    gap: 40px;
+    margin-top: 24px;
+    font-size: 14px;
+    color: #93B5D6;
+  }
+  .cover-meta span { display: flex; align-items: center; gap: 6px; }
+  .cover-meta strong { color: #B8D4EA; font-weight: 500; }
+
+  /* ── Content area ─────────────────────────── */
+  .content { padding: 48px 60px 60px; }
+
+  h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--navy);
+    margin: 48px 0 8px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--accent);
+  }
+  h2:first-child { margin-top: 0; }
+
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--accent);
+    margin: 32px 0 12px;
+  }
+
+  p { margin-bottom: 12px; font-size: 15px; }
+
+  .note {
+    border-left: 4px solid var(--accent);
+    background: var(--accent-bg);
+    padding: 12px 16px;
+    margin: 16px 0 24px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    border-radius: 0 6px 6px 0;
+  }
+
+  /* ── Tables ───────────────────────────────── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0 24px;
+    font-size: 14px;
+  }
+  th {
+    background: var(--navy);
+    color: #fff;
+    font-weight: 600;
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 13px;
+    letter-spacing: 0.3px;
+  }
+  th:first-child { border-radius: 6px 0 0 0; }
+  th:last-child { border-radius: 0 6px 0 0; }
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border-lt);
+    vertical-align: top;
+  }
+  tr:nth-child(even) td { background: var(--surface); }
+  tr:last-child td:first-child { border-radius: 0 0 0 6px; }
+  tr:last-child td:last-child { border-radius: 0 0 6px 0; }
+  td.label { font-weight: 600; color: var(--navy); white-space: nowrap; width: 160px; }
+  td.uc-name { font-weight: 700; color: var(--navy); font-size: 15px; }
+
+  /* ── Diagram container ────────────────────── */
+  .diagram-wrap {
+    margin: 24px 0 32px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: #FDFDFE;
+  }
+  .diagram-wrap svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* ── Use case card ────────────────────────── */
+  .uc-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin: 16px 0;
+    overflow: hidden;
+  }
+  .uc-card-header {
+    background: var(--navy);
+    color: #fff;
+    padding: 10px 16px;
+    font-weight: 600;
+    font-size: 15px;
+  }
+  .uc-card-body { padding: 0; }
+  .uc-card-body table { margin: 0; }
+  .uc-card-body td { padding: 8px 16px; }
+  .uc-card-body td.label { background: var(--surface); width: 180px; }
+
+  /* ── Sign-off ─────────────────────────────── */
+  .signoff {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 2px solid var(--border);
+  }
+  .signoff-line {
+    margin-top: 40px;
+    padding-top: 12px;
+    border-top: 1px solid var(--text-muted);
+    display: inline-block;
+    min-width: 300px;
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+
+  /* ── Print ────────────────────────────────── */
+  @media print {
+    body { background: #fff; }
+    .page { margin: 0; box-shadow: none; border-radius: 0; }
+    .cover { break-after: page; }
+    h2 { break-after: avoid; }
+    .uc-card { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- ═══ COVER ═══ -->
+  <div class="cover">
+    <div class="doc-type">Use Case Diagram</div>
+    <h1>BA Compass</h1>
+    <div class="subtitle">Business Analysis Co-Pilot</div>
+    <div class="cover-meta">
+      <span><strong>Version</strong> 1.0</span>
+      <span><strong>Prepared by</strong> Hadi Mercer</span>
+      <span><strong>Date</strong> March 2026</span>
+      <span><strong>Status</strong> Draft — Pending Approval</span>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ═══ 1. OVERVIEW ═══ -->
+    <h2>1. Overview</h2>
+    <p>This document presents the UML Use Case Diagram for BA Compass — Business Analysis Co-Pilot. The diagram identifies all actors that interact with the system, the use cases each actor participates in, and the system boundary within which those use cases operate.</p>
+    <p>The use cases are derived directly from the Functional Requirements Document (FRD v1.0). Each use case maps to one or more functional requirements and represents a distinct, observable interaction between an actor and the system.</p>
+
+    <h3>1.1 Actors</h3>
+    <div class="note">Three actors interact with the BA Compass system.</div>
+    <table>
+      <tr><th>Actor</th><th>Type</th><th>Description</th></tr>
+      <tr>
+        <td class="uc-name">User (Junior BA)</td>
+        <td>Primary / Human</td>
+        <td>The business analyst using BA Compass. Initiates all workflows, provides domain knowledge, reviews and edits AI-generated content, and makes all decisions.</td>
+      </tr>
+      <tr>
+        <td class="uc-name">AI Engine (GPT-4o)</td>
+        <td>System / External</td>
+        <td>The OpenAI GPT-4o model accessed via API. Performs classification, guides module conversations, generates artifact content, runs gap analysis, and provides recommendations. Never acts autonomously — always in response to user actions or system triggers.</td>
+      </tr>
+      <tr>
+        <td class="uc-name">Database (Neon DB)</td>
+        <td>System / Internal</td>
+        <td>PostgreSQL database via Neon DB. Stores all persistent data: user accounts, projects, dimensions, roadmaps, conversation history, and artifacts. Provides data to all other actors.</td>
+      </tr>
+    </table>
+
+    <h3>1.2 System Boundary</h3>
+    <p>The system boundary encompasses all functionality delivered by the BA Compass web application. External actors (AI Engine, Database) sit outside the boundary but participate in use cases within it. The User interacts with the system through the Streamlit web interface.</p>
+
+    <!-- ═══ 2. USE CASE DIAGRAM ═══ -->
+    <h2>2. Use Case Diagram</h2>
+    <p>The following diagram shows all actors, use cases, and their associations. Use cases with <strong style="color:var(--accent);">blue fill</strong> are AI-driven. Solid lines indicate user associations, dashed blue lines indicate AI associations, and dotted grey lines indicate database persistence.</p>
+
+    <div class="diagram-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 1580" width="1100" height="1580">
+        <defs>
+          <style>
+            .d-title{font:bold 20px 'DM Sans',sans-serif;fill:#1B2A4A}
+            .d-sub{font:13px 'DM Sans',sans-serif;fill:#64748B}
+            .d-actor{font:bold 12px 'DM Sans',sans-serif;fill:#1B2A4A;text-anchor:middle}
+            .d-actor-sub{font:11px 'DM Sans',sans-serif;fill:#64748B;text-anchor:middle}
+            .d-group{font:600 13px 'DM Sans',sans-serif;fill:#1B2A4A}
+            .d-uc{font:12px 'DM Sans',sans-serif;fill:#1E293B;text-anchor:middle}
+            .d-uc-sm{font:10.5px 'DM Sans',sans-serif;fill:#64748B;text-anchor:middle}
+            .d-legend{font:11.5px 'DM Sans',sans-serif;fill:#1E293B}
+            .ln-user{stroke:#475569;stroke-width:1.1;fill:none}
+            .ln-ai{stroke:#2E75B6;stroke-width:1.1;fill:none;stroke-dasharray:6,3}
+            .ln-db{stroke:#94A3B8;stroke-width:1;fill:none;stroke-dasharray:3,3}
+          </style>
+        </defs>
+
+        <!-- System Boundary -->
+        <rect x="145" y="20" width="790" height="1430" rx="12" fill="none" stroke="#1B2A4A" stroke-width="2" stroke-dasharray="10,5"/>
+        <text x="540" y="48" text-anchor="middle" class="d-group" font-size="14" fill="#2E75B6">BA Compass System Boundary</text>
+
+        <!-- ══ ACTOR: USER ══ -->
+        <circle cx="65" cy="370" r="14" fill="none" stroke="#1B2A4A" stroke-width="2"/>
+        <line x1="65" y1="384" x2="65" y2="420" stroke="#1B2A4A" stroke-width="2"/>
+        <line x1="42" y1="398" x2="88" y2="398" stroke="#1B2A4A" stroke-width="2"/>
+        <line x1="65" y1="420" x2="42" y2="446" stroke="#1B2A4A" stroke-width="2"/>
+        <line x1="65" y1="420" x2="88" y2="446" stroke="#1B2A4A" stroke-width="2"/>
+        <text x="65" y="464" class="d-actor">User</text>
+        <text x="65" y="478" class="d-actor-sub">(Junior BA)</text>
+
+        <!-- ══ ACTOR: AI ENGINE ══ -->
+        <rect x="975" y="340" width="90" height="58" rx="8" fill="#EAF2F8" stroke="#2E75B6" stroke-width="1.5"/>
+        <text x="1020" y="363" class="d-actor" font-size="11">AI Engine</text>
+        <text x="1020" y="378" class="d-actor-sub">(GPT-4o)</text>
+        <text x="1020" y="392" class="d-actor-sub">«system»</text>
+
+        <!-- ══ ACTOR: DATABASE ══ -->
+        <ellipse cx="1020" cy="1090" rx="38" ry="11" fill="#F1F5F9" stroke="#94A3B8" stroke-width="1.5"/>
+        <rect x="982" y="1090" width="76" height="32" fill="#F1F5F9" stroke="none"/>
+        <line x1="982" y1="1090" x2="982" y2="1122" stroke="#94A3B8" stroke-width="1.5"/>
+        <line x1="1058" y1="1090" x2="1058" y2="1122" stroke="#94A3B8" stroke-width="1.5"/>
+        <ellipse cx="1020" cy="1122" rx="38" ry="11" fill="#F1F5F9" stroke="#94A3B8" stroke-width="1.5"/>
+        <text x="1020" y="1110" class="d-actor" font-size="11">Neon DB</text>
+        <text x="1020" y="1152" class="d-actor">Database</text>
+        <text x="1020" y="1166" class="d-actor-sub">«system»</text>
+
+        <!-- ══════════════════════════════════════════════ -->
+        <!-- GROUP 1: Authentication (y 65–190) -->
+        <!-- ══════════════════════════════════════════════ -->
+        <rect x="165" y="65" width="750" height="125" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="185" y="87" class="d-group">Authentication &amp; Access</text>
+
+        <ellipse cx="310" cy="140" rx="95" ry="26" fill="#fff" stroke="#1B2A4A" stroke-width="1.3"/>
+        <text x="310" y="144" class="d-uc">Register Account</text>
+
+        <ellipse cx="530" cy="140" rx="95" ry="26" fill="#fff" stroke="#1B2A4A" stroke-width="1.3"/>
+        <text x="530" y="144" class="d-uc">Log In / Log Out</text>
+
+        <ellipse cx="750" cy="140" rx="95" ry="26" fill="#fff" stroke="#1B2A4A" stroke-width="1.3"/>
+        <text x="750" y="144" class="d-uc">Maintain Session</text>
+
+        <line x1="105" y1="390" x2="215" y2="140" class="ln-user"/>
+        <line x1="105" y1="390" x2="435" y2="140" class="ln-user"/>
+        <line x1="975" y1="1090" x2="845" y2="148" class="ln-db"/>
+
+        <!-- ══════════════════════════════════════════════ -->
+        <!-- GROUP 2: Project Management (y 200–345) -->
+        <!-- ══════════════════════════════════════════════ -->
+        <rect x="165" y="200" width="750" height="145" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="185" y="222" class="d-group">Project Management</text>
+
+        <ellipse cx="300" cy="270" rx="90" ry="24" fill="#fff" stroke="#1B2A4A" stroke-width="1.3"/>
+        <text x="300" y="274" class="d-uc">Create Project</text>
+
+        <ellipse cx="500" cy="270" rx="95" ry="24" fill="#fff" stroke="#1B2A4A" stroke-width="1.3"/>
+        <text x="500" y="274" class="d-uc">View Project List</text>
+
+        <ellipse cx="700" cy="270" rx="90" ry="24" fill="#fff" stroke="#1B2A4A" stroke-width="1.3"/>
+        <text x="700" y="274" class="d-uc">Open Project</text>
+
+        <ellipse cx="370" cy="320" rx="100" ry="24" fill="#fff" stroke="#1B2A4A" stroke-width="1.3"/>
+        <text x="370" y="324" class="d-uc">Edit Project Details</text>
+
+        <ellipse cx="600" cy="320" rx="90" ry="24" fill="#fff" stroke="#1B2A4A" stroke-width="1.3"/>
+        <text x="600" y="324" class="d-uc">Delete Project</text>
+
+        <line x1="105" y1="395" x2="210" y2="270" class="ln-user"/>
+        <line x1="105" y1="395" x2="405" y2="270" class="ln-user"/>
+        <line x1="105" y1="395" x2="610" y2="270" class="ln-user"/>
+        <line x1="105" y1="400" x2="270" y2="320" class="ln-user"/>
+        <line x1="105" y1="400" x2="510" y2="320" class="ln-user"/>
+        <line x1="975" y1="1090" x2="790" y2="278" class="ln-db"/>
+
+        <!-- ══════════════════════════════════════════════ -->
+        <!-- GROUP 3: Intake & Classification (y 355–535) -->
+        <!-- ══════════════════════════════════════════════ -->
+        <rect x="165" y="355" width="750" height="180" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="185" y="377" class="d-group">Intake &amp; Classification</text>
+
+        <ellipse cx="310" cy="420" rx="100" ry="24" fill="#fff" stroke="#1B2A4A" stroke-width="1.3"/>
+        <text x="310" y="417" class="d-uc">Describe Assignment</text>
+        <text x="310" y="430" class="d-uc-sm">(natural language)</text>
+
+        <ellipse cx="540" cy="420" rx="110" ry="24" fill="#D5E8F0" stroke="#2E75B6" stroke-width="1.3"/>
+        <text x="540" y="417" class="d-uc">Extract Classification</text>
+        <text x="540" y="430" class="d-uc-sm">Signals «AI»</text>
+
+        <ellipse cx="770" cy="420" rx="100" ry="24" fill="#D5E8F0" stroke="#2E75B6" stroke-width="1.3"/>
+        <text x="770" y="417" class="d-uc">Ask Follow-Up</text>
+        <text x="770" y="430" class="d-uc-sm">Questions «AI»</text>
+
+        <ellipse cx="310" cy="490" rx="115" ry="24" fill="#D5E8F0" stroke="#2E75B6" stroke-width="1.3"/>
+        <text x="310" y="487" class="d-uc">Present Classification</text>
+        <text x="310" y="500" class="d-uc-sm">Recommendation «AI»</text>
+
+        <ellipse cx="540" cy="490" rx="110" ry="24" fill="#fff" stroke="#1B2A4A" stroke-width="1.3"/>
+        <text x="540" y="487" class="d-uc">Accept or Override</text>
+        <text x="540" y="500" class="d-uc-sm">Classification</text>
+
+        <ellipse cx="770" cy="490" rx="105" ry="24" fill="#fff" stroke="#1B2A4A" stroke-width="1.3"/>
+        <text x="770" y="487" class="d-uc">Capture Intake</text>
+        <text x="770" y="500" class="d-uc-sm">Dimensions</text>
+
+        <line x1="105" y1="405" x2="210" y2="420" class="ln-user"/>
+        <line x1="105" y1="415" x2="430" y2="490" class="ln-user"/>
+        <line x1="975" y1="370" x2="650" y2="420" class="ln-ai"/>
+        <line x1="975" y1="372" x2="870" y2="420" class="ln-ai"/>
+        <line x1="975" y1="375" x2="425" y2="490" class="ln-ai"/>
+        <line x1="975" y1="1090" x2="875" y2="498" class="ln-db"/>
+
+        <!-- ══════════════════════════════════════════════ -->
+        <!-- GROUP 4: Roadmap & Navigation (y 545–715) -->
+        <!-- ══════════════════════════════════════════════ -->
+        <rect x="165" y="545" width="750" height="170" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="185" y="567" class="d-group">Roadmap &amp; Navigation</text>
+
+        <ellipse cx="310" cy="610" rx="115" ry="24" fill="#fff" stroke="#1B2A4A" stroke-width="1.3"/>
+        <text x="310" y="607" class="d-uc">Generate Live Roadmap</text>
+        <text x="310" y="620" class="d-uc-sm">from Template</text>
+
+        <ellipse cx="560" cy="610" rx="105" ry="24" fill="#fff" stroke="#1B2A4A" stroke-width="1.3"/>
+        <text x="560" y="607" class="d-uc">View Roadmap</text>
+        <text x="560" y="620" class="d-uc-sm">(Navigator Mode)</text>
+
+        <ellipse cx="790" cy="610" rx="100" ry="24" fill="#fff" stroke="#1B2A4A" stroke-width="1.3"/>
+        <text x="790" y="607" class="d-uc">Add / Remove /</text>
+        <text x="790" y="620" class="d-uc-sm">Reorder Modules</text>
+
+        <ellipse cx="340" cy="670" rx="100" ry="24" fill="#fff" stroke="#1B2A4A" stroke-width="1.3"/>
+        <text x="340" y="674" class="d-uc">Track Module Status</text>
+
+        <ellipse cx="570" cy="670" rx="115" ry="24" fill="#D5E8F0" stroke="#2E75B6" stroke-width="1.3"/>
+        <text x="570" y="667" class="d-uc">Warn on Dependency</text>
+        <text x="570" y="680" class="d-uc-sm">Gaps «AI»</text>
+
+        <ellipse cx="800" cy="670" rx="105" ry="24" fill="#D5E8F0" stroke="#2E75B6" stroke-width="1.3"/>
+        <text x="800" y="667" class="d-uc">Suggest Module</text>
+        <text x="800" y="680" class="d-uc-sm">Additions «AI»</text>
+
+        <line x1="105" y1="420" x2="195" y2="610" class="ln-user"/>
+        <line x1="105" y1="422" x2="455" y2="610" class="ln-user"/>
+        <line x1="105" y1="424" x2="690" y2="610" class="ln-user"/>
+        <line x1="105" y1="426" x2="240" y2="670" class="ln-user"/>
+        <line x1="975" y1="378" x2="685" y2="670" class="ln-ai"/>
+        <line x1="975" y1="380" x2="905" y2="670" class="ln-ai"/>
+        <line x1="975" y1="1090" x2="425" y2="618" class="ln-db"/>
+
+        <!-- ══════════════════════════════════════════════ -->
+        <!-- GROUP 5: Co-Pilot Module Work (y 725–945) -->
+        <!-- ══════════════════════════════════════════════ -->
+        <rect x="165" y="725" width="750" height="220" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="185" y="747" class="d-group">Co-Pilot Module Work</text>
+
+        <ellipse cx="300" cy="790" rx="100" ry="24" fill="#fff" stroke="#1B2A4A" stroke-width="1.3"/>
+        <text x="300" y="787" class="d-uc">Enter Module</text>
+        <text x="300" y="800" class="d-uc-sm">(Co-Pilot Mode)</text>
+
+        <ellipse cx="530" cy="790" rx="110" ry="24" fill="#D5E8F0" stroke="#2E75B6" stroke-width="1.3"/>
+        <text x="530" y="787" class="d-uc">Guide Module</text>
+        <text x="530" y="800" class="d-uc-sm">Conversation «AI»</text>
+
+        <ellipse cx="770" cy="790" rx="110" ry="24" fill="#D5E8F0" stroke="#2E75B6" stroke-width="1.3"/>
+        <text x="770" y="787" class="d-uc">Generate Draft</text>
+        <text x="770" y="800" class="d-uc-sm">Artifact Content «AI»</text>
+
+        <ellipse cx="300" cy="855" rx="105" ry="24" fill="#fff" stroke="#1B2A4A" stroke-width="1.3"/>
+        <text x="300" y="859" class="d-uc">Edit Artifact Content</text>
+
+        <ellipse cx="540" cy="855" rx="115" ry="24" fill="#D5E8F0" stroke="#2E75B6" stroke-width="1.3"/>
+        <text x="540" y="852" class="d-uc">Flag Gaps &amp; Suggest</text>
+        <text x="540" y="865" class="d-uc-sm">Improvements «AI»</text>
+
+        <ellipse cx="770" cy="855" rx="90" ry="24" fill="#fff" stroke="#1B2A4A" stroke-width="1.3"/>
+        <text x="770" y="859" class="d-uc">Save Artifact</text>
+
+        <ellipse cx="480" cy="915" rx="115" ry="24" fill="#D5E8F0" stroke="#2E75B6" stroke-width="1.3"/>
+        <text x="480" y="912" class="d-uc">Provide Completion</text>
+        <text x="480" y="925" class="d-uc-sm">Summary «AI»</text>
+
+        <line x1="105" y1="432" x2="200" y2="790" class="ln-user"/>
+        <line x1="105" y1="434" x2="195" y2="855" class="ln-user"/>
+        <line x1="105" y1="436" x2="680" y2="855" class="ln-user"/>
+        <line x1="975" y1="382" x2="640" y2="790" class="ln-ai"/>
+        <line x1="975" y1="384" x2="880" y2="790" class="ln-ai"/>
+        <line x1="975" y1="386" x2="655" y2="855" class="ln-ai"/>
+        <line x1="975" y1="388" x2="595" y2="915" class="ln-ai"/>
+        <line x1="975" y1="1090" x2="860" y2="863" class="ln-db"/>
+
+        <!-- ══════════════════════════════════════════════ -->
+        <!-- GROUP 6: Gap Analysis (y 955–1095) -->
+        <!-- ══════════════════════════════════════════════ -->
+        <rect x="165" y="955" width="750" height="140" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="185" y="977" class="d-group">Gap Analysis &amp; Traceability</text>
+
+        <ellipse cx="320" cy="1035" rx="105" ry="24" fill="#D5E8F0" stroke="#2E75B6" stroke-width="1.3"/>
+        <text x="320" y="1032" class="d-uc">Run Gap</text>
+        <text x="320" y="1045" class="d-uc-sm">Analysis «AI»</text>
+
+        <ellipse cx="550" cy="1035" rx="115" ry="24" fill="#fff" stroke="#1B2A4A" stroke-width="1.3"/>
+        <text x="550" y="1032" class="d-uc">Generate Traceability</text>
+        <text x="550" y="1045" class="d-uc-sm">Matrix</text>
+
+        <ellipse cx="780" cy="1035" rx="105" ry="24" fill="#D5E8F0" stroke="#2E75B6" stroke-width="1.3"/>
+        <text x="780" y="1032" class="d-uc">Highlight Orphan</text>
+        <text x="780" y="1045" class="d-uc-sm">Items «AI»</text>
+
+        <line x1="105" y1="440" x2="215" y2="1035" class="ln-user"/>
+        <line x1="105" y1="442" x2="435" y2="1035" class="ln-user"/>
+        <line x1="975" y1="390" x2="425" y2="1035" class="ln-ai"/>
+        <line x1="975" y1="392" x2="885" y2="1035" class="ln-ai"/>
+        <line x1="975" y1="1090" x2="665" y2="1043" class="ln-db"/>
+
+        <!-- ══════════════════════════════════════════════ -->
+        <!-- GROUP 7: Export (y 1105–1240) -->
+        <!-- ══════════════════════════════════════════════ -->
+        <rect x="165" y="1105" width="750" height="130" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="185" y="1127" class="d-group">Export &amp; Packaging</text>
+
+        <ellipse cx="370" cy="1185" rx="120" ry="24" fill="#fff" stroke="#1B2A4A" stroke-width="1.3"/>
+        <text x="370" y="1182" class="d-uc">Export Individual</text>
+        <text x="370" y="1195" class="d-uc-sm">Artifact</text>
+
+        <ellipse cx="650" cy="1185" rx="125" ry="24" fill="#fff" stroke="#1B2A4A" stroke-width="1.3"/>
+        <text x="650" y="1182" class="d-uc">Export Full Project</text>
+        <text x="650" y="1195" class="d-uc-sm">Package</text>
+
+        <line x1="105" y1="446" x2="250" y2="1185" class="ln-user"/>
+        <line x1="105" y1="448" x2="525" y2="1185" class="ln-user"/>
+
+        <!-- ══ LEGEND ══ -->
+        <rect x="165" y="1275" width="750" height="165" rx="6" fill="#FAFBFC" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="185" y="1298" class="d-group">Legend</text>
+
+        <ellipse cx="260" cy="1328" rx="55" ry="16" fill="#fff" stroke="#1B2A4A" stroke-width="1.2"/>
+        <text x="260" y="1332" class="d-uc-sm" font-size="10">User Action</text>
+        <text x="340" y="1332" class="d-legend">User-initiated use case</text>
+
+        <ellipse cx="260" cy="1362" rx="55" ry="16" fill="#D5E8F0" stroke="#2E75B6" stroke-width="1.2"/>
+        <text x="260" y="1366" class="d-uc-sm" font-size="10">AI Action</text>
+        <text x="340" y="1366" class="d-legend">AI-driven use case (GPT-4o)</text>
+
+        <line x1="220" y1="1396" x2="300" y2="1396" class="ln-user"/>
+        <text x="340" y="1400" class="d-legend">User ↔ Use Case association</text>
+
+        <line x1="220" y1="1420" x2="300" y2="1420" class="ln-ai"/>
+        <text x="340" y="1424" class="d-legend">AI Engine ↔ Use Case association</text>
+
+        <line x1="600" y1="1328" x2="680" y2="1328" class="ln-db"/>
+        <text x="700" y="1332" class="d-legend">Database persistence</text>
+
+        <rect x="600" y="1350" width="80" height="28" rx="4" fill="none" stroke="#1B2A4A" stroke-width="1.5" stroke-dasharray="8,4"/>
+        <text x="700" y="1368" class="d-legend">System boundary</text>
+
+        <rect x="600" y="1390" width="80" height="28" rx="4" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="700" y="1408" class="d-legend">Functional group</text>
+      </svg>
+    </div>
+
+    <!-- ═══ 3. USE CASE CATALOG ═══ -->
+    <h2>3. Use Case Catalog</h2>
+    <div class="note">Detailed reference for each use case. Organized by functional group matching the FRD structure. Each entry includes actors, description, preconditions, postconditions, and FR traceability.</div>
+
+    <!-- 3.1 Authentication -->
+    <h3>3.1 Authentication &amp; Access</h3>
+
+    <div class="uc-card"><div class="uc-card-header">Register Account</div><div class="uc-card-body"><table>
+      <tr><td class="label">Actors</td><td>User, Database</td></tr>
+      <tr><td class="label">Description</td><td>A new user creates an account by providing an email address and password. The system validates the input, hashes the password with bcrypt, and stores the credentials in Neon DB.</td></tr>
+      <tr><td class="label">Preconditions</td><td>User is on the registration page. No account exists for the email.</td></tr>
+      <tr><td class="label">Postconditions</td><td>A new user record exists in the database. The user is logged in and redirected to the dashboard.</td></tr>
+      <tr><td class="label">Related FRs</td><td>FR-101</td></tr>
+    </table></div></div>
+
+    <div class="uc-card"><div class="uc-card-header">Log In / Log Out</div><div class="uc-card-body"><table>
+      <tr><td class="label">Actors</td><td>User, Database</td></tr>
+      <tr><td class="label">Description</td><td>A returning user authenticates with their email and password. The system verifies credentials against Neon DB and creates a session token. Logout terminates the session.</td></tr>
+      <tr><td class="label">Preconditions</td><td>User has a registered account.</td></tr>
+      <tr><td class="label">Postconditions</td><td>Login: authenticated session created. Logout: session terminated, user returned to login page.</td></tr>
+      <tr><td class="label">Related FRs</td><td>FR-102, FR-105, FR-106</td></tr>
+    </table></div></div>
+
+    <div class="uc-card"><div class="uc-card-header">Maintain Session</div><div class="uc-card-body"><table>
+      <tr><td class="label">Actors</td><td>Database</td></tr>
+      <tr><td class="label">Description</td><td>The system maintains the user's authenticated session across page reloads and Streamlit reruns. Session tokens are validated on each request.</td></tr>
+      <tr><td class="label">Preconditions</td><td>User is authenticated.</td></tr>
+      <tr><td class="label">Postconditions</td><td>Session persists until explicit logout or expiry.</td></tr>
+      <tr><td class="label">Related FRs</td><td>FR-104</td></tr>
+    </table></div></div>
+
+    <!-- 3.2 Project Management -->
+    <h3>3.2 Project Management</h3>
+
+    <div class="uc-card"><div class="uc-card-header">Create Project</div><div class="uc-card-body"><table>
+      <tr><td class="label">Actors</td><td>User, Database</td></tr>
+      <tr><td class="label">Description</td><td>The user creates a new project by providing a name and free-text description. The project is persisted to the database with status and timestamps.</td></tr>
+      <tr><td class="label">Preconditions</td><td>User is authenticated and on the dashboard.</td></tr>
+      <tr><td class="label">Postconditions</td><td>A new project record exists. The user is directed to the intake flow.</td></tr>
+      <tr><td class="label">Related FRs</td><td>FR-201, FR-207</td></tr>
+    </table></div></div>
+
+    <div class="uc-card"><div class="uc-card-header">View Project List</div><div class="uc-card-body"><table>
+      <tr><td class="label">Actors</td><td>User, Database</td></tr>
+      <tr><td class="label">Description</td><td>The dashboard displays all projects belonging to the authenticated user with key metadata: name, engagement type, scale tier, status, and last modified date.</td></tr>
+      <tr><td class="label">Preconditions</td><td>User is authenticated.</td></tr>
+      <tr><td class="label">Postconditions</td><td>Project list is displayed with current data.</td></tr>
+      <tr><td class="label">Related FRs</td><td>FR-202, FR-208</td></tr>
+    </table></div></div>
+
+    <div class="uc-card"><div class="uc-card-header">Open Project</div><div class="uc-card-body"><table>
+      <tr><td class="label">Actors</td><td>User, Database</td></tr>
+      <tr><td class="label">Description</td><td>The user selects a project from the list and enters the project workspace. The roadmap view loads as the default landing page.</td></tr>
+      <tr><td class="label">Preconditions</td><td>At least one project exists.</td></tr>
+      <tr><td class="label">Postconditions</td><td>Project workspace is displayed with roadmap view.</td></tr>
+      <tr><td class="label">Related FRs</td><td>FR-203, FR-501</td></tr>
+    </table></div></div>
+
+    <div class="uc-card"><div class="uc-card-header">Edit Project Details</div><div class="uc-card-body"><table>
+      <tr><td class="label">Actors</td><td>User, Database</td></tr>
+      <tr><td class="label">Description</td><td>The user modifies a project's name or description after creation.</td></tr>
+      <tr><td class="label">Preconditions</td><td>Project exists and is open.</td></tr>
+      <tr><td class="label">Postconditions</td><td>Updated metadata is persisted. Last modified timestamp updated.</td></tr>
+      <tr><td class="label">Related FRs</td><td>FR-204, FR-207</td></tr>
+    </table></div></div>
+
+    <div class="uc-card"><div class="uc-card-header">Delete Project</div><div class="uc-card-body"><table>
+      <tr><td class="label">Actors</td><td>User, Database</td></tr>
+      <tr><td class="label">Description</td><td>The user permanently removes a project after explicit confirmation. All associated data (dimensions, roadmap, artifacts) is deleted.</td></tr>
+      <tr><td class="label">Preconditions</td><td>Project exists. User confirms deletion.</td></tr>
+      <tr><td class="label">Postconditions</td><td>Project and all child records are removed from the database.</td></tr>
+      <tr><td class="label">Related FRs</td><td>FR-205</td></tr>
+    </table></div></div>
+
+    <!-- 3.3 Intake -->
+    <h3>3.3 Intake &amp; Classification</h3>
+
+    <div class="uc-card"><div class="uc-card-header">Describe Assignment</div><div class="uc-card-body"><table>
+      <tr><td class="label">Actors</td><td>User</td></tr>
+      <tr><td class="label">Description</td><td>The user provides natural language input describing their assignment. This can be typed text, a pasted email, a brief, or any free-text description of the work they have been given.</td></tr>
+      <tr><td class="label">Preconditions</td><td>A new project has been created and the intake flow has started.</td></tr>
+      <tr><td class="label">Postconditions</td><td>The AI has raw input to begin classification signal extraction.</td></tr>
+      <tr><td class="label">Related FRs</td><td>FR-301</td></tr>
+    </table></div></div>
+
+    <div class="uc-card"><div class="uc-card-header">Extract Classification Signals</div><div class="uc-card-body"><table>
+      <tr><td class="label">Actors</td><td>AI Engine</td></tr>
+      <tr><td class="label">Description</td><td>The AI analyzes the user's natural language input to identify signals for the four Must-Know dimensions: Engagement Type, Scale Tier, Trigger/Origin, and Solution Clarity. This happens internally before any classification is presented.</td></tr>
+      <tr><td class="label">Preconditions</td><td>User has provided initial input.</td></tr>
+      <tr><td class="label">Postconditions</td><td>The AI has a confidence assessment for each Must-Know dimension.</td></tr>
+      <tr><td class="label">Related FRs</td><td>FR-302</td></tr>
+    </table></div></div>
+
+    <div class="uc-card"><div class="uc-card-header">Ask Follow-Up Questions</div><div class="uc-card-body"><table>
+      <tr><td class="label">Actors</td><td>AI Engine, User</td></tr>
+      <tr><td class="label">Description</td><td>When the AI lacks sufficient signal for one or more Must-Know dimensions, it asks targeted follow-up questions. No more than two questions per turn. Questions are non-repetitive and build on what has already been captured.</td></tr>
+      <tr><td class="label">Preconditions</td><td>Initial input has been analyzed. One or more dimensions lack sufficient signal.</td></tr>
+      <tr><td class="label">Postconditions</td><td>Additional signal captured. Classification confidence improved.</td></tr>
+      <tr><td class="label">Related FRs</td><td>FR-303, FR-315</td></tr>
+    </table></div></div>
+
+    <div class="uc-card"><div class="uc-card-header">Present Classification Recommendation</div><div class="uc-card-body"><table>
+      <tr><td class="label">Actors</td><td>AI Engine</td></tr>
+      <tr><td class="label">Description</td><td>Once the AI has sufficient confidence, it presents its recommended Engagement Type and Scale Tier with a plain-language explanation of why each was selected.</td></tr>
+      <tr><td class="label">Preconditions</td><td>All Must-Know dimensions have sufficient signal.</td></tr>
+      <tr><td class="label">Postconditions</td><td>The user sees the recommendation and can act on it.</td></tr>
+      <tr><td class="label">Related FRs</td><td>FR-304, FR-305, FR-306</td></tr>
+    </table></div></div>
+
+    <div class="uc-card"><div class="uc-card-header">Accept or Override Classification</div><div class="uc-card-body"><table>
+      <tr><td class="label">Actors</td><td>User</td></tr>
+      <tr><td class="label">Description</td><td>The user reviews the AI's recommendation and either accepts it or overrides it by selecting a different engagement type and/or scale tier. This triggers roadmap generation.</td></tr>
+      <tr><td class="label">Preconditions</td><td>Classification recommendation has been presented.</td></tr>
+      <tr><td class="label">Postconditions</td><td>Engagement type and scale tier are confirmed. Roadmap generation is triggered.</td></tr>
+      <tr><td class="label">Related FRs</td><td>FR-307, FR-308</td></tr>
+    </table></div></div>
+
+    <div class="uc-card"><div class="uc-card-header">Capture Intake Dimensions</div><div class="uc-card-body"><table>
+      <tr><td class="label">Actors</td><td>User, AI Engine, Database</td></tr>
+      <tr><td class="label">Description</td><td>The system captures all ten intake dimensions across three tiers: Must-Know at intake, Should-Know Early in the first session, and Emerges During Work progressively. Each value is persisted with a capture timestamp.</td></tr>
+      <tr><td class="label">Preconditions</td><td>Project exists. Intake has started.</td></tr>
+      <tr><td class="label">Postconditions</td><td>Dimension values are stored in project_dimensions with timestamps.</td></tr>
+      <tr><td class="label">Related FRs</td><td>FR-309–313</td></tr>
+    </table></div></div>
+
+    <!-- 3.4 Roadmap -->
+    <h3>3.4 Roadmap &amp; Navigation</h3>
+
+    <div class="uc-card"><div class="uc-card-header">Generate Live Roadmap from Template</div><div class="uc-card-body"><table>
+      <tr><td class="label">Actors</td><td>Database</td></tr>
+      <tr><td class="label">Description</td><td>The system copies the module sequence from the matching roadmap template (Engagement Type × Scale Tier) into the project's live roadmap. All modules start with status Not Started.</td></tr>
+      <tr><td class="label">Preconditions</td><td>Classification has been confirmed by the user.</td></tr>
+      <tr><td class="label">Postconditions</td><td>A live roadmap exists in project_roadmap with all template modules.</td></tr>
+      <tr><td class="label">Related FRs</td><td>FR-401–403</td></tr>
+    </table></div></div>
+
+    <div class="uc-card"><div class="uc-card-header">View Roadmap (Navigator Mode)</div><div class="uc-card-body"><table>
+      <tr><td class="label">Actors</td><td>User, Database</td></tr>
+      <tr><td class="label">Description</td><td>The user sees the full roadmap with every module displayed, showing name, knowledge area, status, and overall completion percentage. Modules are visually distinguished by status. This is the project home base.</td></tr>
+      <tr><td class="label">Preconditions</td><td>A live roadmap exists for the project.</td></tr>
+      <tr><td class="label">Postconditions</td><td>Roadmap is rendered with current status data.</td></tr>
+      <tr><td class="label">Related FRs</td><td>FR-501–504, FR-508</td></tr>
+    </table></div></div>
+
+    <div class="uc-card"><div class="uc-card-header">Add / Remove / Reorder Modules</div><div class="uc-card-body"><table>
+      <tr><td class="label">Actors</td><td>User, Database</td></tr>
+      <tr><td class="label">Description</td><td>The user modifies their live roadmap by adding modules from the library, removing existing modules, or changing the sequence order. Removed modules' artifacts are preserved as orphaned.</td></tr>
+      <tr><td class="label">Preconditions</td><td>A live roadmap exists.</td></tr>
+      <tr><td class="label">Postconditions</td><td>Live roadmap is updated. Changes persisted to database.</td></tr>
+      <tr><td class="label">Related FRs</td><td>FR-404–406</td></tr>
+    </table></div></div>
+
+    <div class="uc-card"><div class="uc-card-header">Track Module Status</div><div class="uc-card-body"><table>
+      <tr><td class="label">Actors</td><td>User, Database</td></tr>
+      <tr><td class="label">Description</td><td>Module statuses update as the user works: auto-transition to In Progress on entry, manual marking as Complete or Skipped. Re-entering a completed module reverts it to In Progress.</td></tr>
+      <tr><td class="label">Preconditions</td><td>Modules exist in the live roadmap.</td></tr>
+      <tr><td class="label">Postconditions</td><td>Status is updated and persisted.</td></tr>
+      <tr><td class="label">Related FRs</td><td>FR-407–409</td></tr>
+    </table></div></div>
+
+    <div class="uc-card"><div class="uc-card-header">Warn on Dependency Gaps</div><div class="uc-card-body"><table>
+      <tr><td class="label">Actors</td><td>AI Engine</td></tr>
+      <tr><td class="label">Description</td><td>When a user enters a module whose logical prerequisites are incomplete, the AI displays an advisory warning identifying the missing dependencies. The warning does not block the user.</td></tr>
+      <tr><td class="label">Preconditions</td><td>User attempts to enter a module with incomplete dependencies.</td></tr>
+      <tr><td class="label">Postconditions</td><td>Warning is displayed. User can dismiss and proceed.</td></tr>
+      <tr><td class="label">Related FRs</td><td>FR-410</td></tr>
+    </table></div></div>
+
+    <div class="uc-card"><div class="uc-card-header">Suggest Module Additions</div><div class="uc-card-body"><table>
+      <tr><td class="label">Actors</td><td>AI Engine</td></tr>
+      <tr><td class="label">Description</td><td>As new intake dimensions are captured, the AI evaluates whether the current roadmap has gaps and suggests additional modules if needed.</td></tr>
+      <tr><td class="label">Preconditions</td><td>New dimension information reveals a gap in the roadmap.</td></tr>
+      <tr><td class="label">Postconditions</td><td>Suggestion is presented to the user for acceptance or dismissal.</td></tr>
+      <tr><td class="label">Related FRs</td><td>FR-412</td></tr>
+    </table></div></div>
+
+    <!-- 3.5 Co-Pilot -->
+    <h3>3.5 Co-Pilot Module Work</h3>
+
+    <div class="uc-card"><div class="uc-card-header">Enter Module (Co-Pilot Mode)</div><div class="uc-card-body"><table>
+      <tr><td class="label">Actors</td><td>User, Database</td></tr>
+      <tr><td class="label">Description</td><td>The user clicks a module in the roadmap to enter co-pilot mode. The system displays the module header (name, knowledge area, description, inputs, outputs) and loads any existing conversation history.</td></tr>
+      <tr><td class="label">Preconditions</td><td>The module exists in the live roadmap.</td></tr>
+      <tr><td class="label">Postconditions</td><td>Module view is rendered. Status updates to In Progress if it was Not Started.</td></tr>
+      <tr><td class="label">Related FRs</td><td>FR-505, FR-601, FR-408</td></tr>
+    </table></div></div>
+
+    <div class="uc-card"><div class="uc-card-header">Guide Module Conversation</div><div class="uc-card-body"><table>
+      <tr><td class="label">Actors</td><td>AI Engine, User</td></tr>
+      <tr><td class="label">Description</td><td>The AI initiates and maintains a structured conversation tailored to the module type. It asks targeted questions, uses project context to avoid redundancy, and builds toward the module's expected outputs.</td></tr>
+      <tr><td class="label">Preconditions</td><td>User has entered co-pilot mode for a module.</td></tr>
+      <tr><td class="label">Postconditions</td><td>User has provided enough input for artifact generation.</td></tr>
+      <tr><td class="label">Related FRs</td><td>FR-602, FR-603</td></tr>
+    </table></div></div>
+
+    <div class="uc-card"><div class="uc-card-header">Generate Draft Artifact Content</div><div class="uc-card-body"><table>
+      <tr><td class="label">Actors</td><td>AI Engine</td></tr>
+      <tr><td class="label">Description</td><td>Based on the user's responses, the AI generates a structured draft of the module's artifact. The draft is presented for review, not saved automatically.</td></tr>
+      <tr><td class="label">Preconditions</td><td>Sufficient user input has been captured in the conversation.</td></tr>
+      <tr><td class="label">Postconditions</td><td>Draft artifact content is displayed for user review.</td></tr>
+      <tr><td class="label">Related FRs</td><td>FR-604</td></tr>
+    </table></div></div>
+
+    <div class="uc-card"><div class="uc-card-header">Edit Artifact Content</div><div class="uc-card-body"><table>
+      <tr><td class="label">Actors</td><td>User</td></tr>
+      <tr><td class="label">Description</td><td>The user reviews and modifies any AI-generated content before saving. Edits can be made inline or through continued conversation with the AI.</td></tr>
+      <tr><td class="label">Preconditions</td><td>Draft artifact content has been generated.</td></tr>
+      <tr><td class="label">Postconditions</td><td>Content reflects the user's revisions.</td></tr>
+      <tr><td class="label">Related FRs</td><td>FR-605, FR-705</td></tr>
+    </table></div></div>
+
+    <div class="uc-card"><div class="uc-card-header">Flag Gaps &amp; Suggest Improvements</div><div class="uc-card-body"><table>
+      <tr><td class="label">Actors</td><td>AI Engine</td></tr>
+      <tr><td class="label">Description</td><td>The AI reviews the user's responses and draft content for weaknesses: missing stakeholders, vague requirements, unaddressed risks. It suggests specific improvements based on BABOK best practices.</td></tr>
+      <tr><td class="label">Preconditions</td><td>Draft content exists or the conversation is in progress.</td></tr>
+      <tr><td class="label">Postconditions</td><td>Gap findings and suggestions are presented to the user.</td></tr>
+      <tr><td class="label">Related FRs</td><td>FR-606, FR-607</td></tr>
+    </table></div></div>
+
+    <div class="uc-card"><div class="uc-card-header">Save Artifact</div><div class="uc-card-body"><table>
+      <tr><td class="label">Actors</td><td>User, Database</td></tr>
+      <tr><td class="label">Description</td><td>The user saves the finalized artifact content. The system creates a versioned record linked to the project and module. Previous versions are preserved.</td></tr>
+      <tr><td class="label">Preconditions</td><td>Artifact content has been reviewed and approved by the user.</td></tr>
+      <tr><td class="label">Postconditions</td><td>Artifact record created in the database with version number.</td></tr>
+      <tr><td class="label">Related FRs</td><td>FR-701, FR-703, FR-706</td></tr>
+    </table></div></div>
+
+    <div class="uc-card"><div class="uc-card-header">Provide Completion Summary</div><div class="uc-card-body"><table>
+      <tr><td class="label">Actors</td><td>AI Engine</td></tr>
+      <tr><td class="label">Description</td><td>When the user indicates they are done with a module, the AI provides a summary of what was produced and flags any remaining gaps or areas that could be strengthened.</td></tr>
+      <tr><td class="label">Preconditions</td><td>User signals module completion.</td></tr>
+      <tr><td class="label">Postconditions</td><td>Summary displayed. User can mark the module Complete or continue working.</td></tr>
+      <tr><td class="label">Related FRs</td><td>FR-610</td></tr>
+    </table></div></div>
+
+    <!-- 3.6 Gap Analysis -->
+    <h3>3.6 Gap Analysis &amp; Traceability</h3>
+
+    <div class="uc-card"><div class="uc-card-header">Run Gap Analysis</div><div class="uc-card-body"><table>
+      <tr><td class="label">Actors</td><td>User, AI Engine, Database</td></tr>
+      <tr><td class="label">Description</td><td>The user triggers an on-demand gap analysis. The AI reviews all completed artifacts for weaknesses, missing sections, vague language, and cross-artifact inconsistencies. Findings are presented as a prioritized, actionable list.</td></tr>
+      <tr><td class="label">Preconditions</td><td>At least one artifact has been completed.</td></tr>
+      <tr><td class="label">Postconditions</td><td>Gap analysis report is generated and displayed.</td></tr>
+      <tr><td class="label">Related FRs</td><td>FR-801, FR-802, FR-806</td></tr>
+    </table></div></div>
+
+    <div class="uc-card"><div class="uc-card-header">Generate Traceability Matrix</div><div class="uc-card-body"><table>
+      <tr><td class="label">Actors</td><td>User, AI Engine, Database</td></tr>
+      <tr><td class="label">Description</td><td>The system generates a traceability matrix linking business objectives to requirements, requirements to user stories, and user stories to acceptance criteria. The matrix auto-updates as artifacts change.</td></tr>
+      <tr><td class="label">Preconditions</td><td>Requirements and related artifacts exist.</td></tr>
+      <tr><td class="label">Postconditions</td><td>Traceability matrix is generated and displayed.</td></tr>
+      <tr><td class="label">Related FRs</td><td>FR-803, FR-804</td></tr>
+    </table></div></div>
+
+    <div class="uc-card"><div class="uc-card-header">Highlight Orphan Items</div><div class="uc-card-body"><table>
+      <tr><td class="label">Actors</td><td>AI Engine</td></tr>
+      <tr><td class="label">Description</td><td>The AI identifies items in the traceability matrix that lack linkage: requirements without user stories, acceptance criteria without parent requirements, and similar orphans.</td></tr>
+      <tr><td class="label">Preconditions</td><td>Traceability matrix exists.</td></tr>
+      <tr><td class="label">Postconditions</td><td>Orphan items are flagged in the matrix view.</td></tr>
+      <tr><td class="label">Related FRs</td><td>FR-805</td></tr>
+    </table></div></div>
+
+    <!-- 3.7 Export -->
+    <h3>3.7 Export &amp; Packaging</h3>
+
+    <div class="uc-card"><div class="uc-card-header">Export Individual Artifact</div><div class="uc-card-body"><table>
+      <tr><td class="label">Actors</td><td>User</td></tr>
+      <tr><td class="label">Description</td><td>The user exports a single artifact in a professional format (Markdown, PDF, or Word) with consistent branding including project name, engagement type, date, and artifact type.</td></tr>
+      <tr><td class="label">Preconditions</td><td>The artifact exists and has at least one saved version.</td></tr>
+      <tr><td class="label">Postconditions</td><td>A formatted document is downloaded to the user's device.</td></tr>
+      <tr><td class="label">Related FRs</td><td>FR-901, FR-902, FR-904</td></tr>
+    </table></div></div>
+
+    <div class="uc-card"><div class="uc-card-header">Export Full Project Package</div><div class="uc-card-body"><table>
+      <tr><td class="label">Actors</td><td>User, Database</td></tr>
+      <tr><td class="label">Description</td><td>The user exports a complete deliverable package containing all selected artifacts, the traceability matrix, and a project summary cover page.</td></tr>
+      <tr><td class="label">Preconditions</td><td>At least one artifact exists. User selects which artifacts to include.</td></tr>
+      <tr><td class="label">Postconditions</td><td>A packaged deliverable is downloaded.</td></tr>
+      <tr><td class="label">Related FRs</td><td>FR-903, FR-905</td></tr>
+    </table></div></div>
+
+    <!-- ═══ 4. FR CROSS-REFERENCE ═══ -->
+    <h2>4. Use Case to FR Cross-Reference</h2>
+    <div class="note">Summary mapping from each use case to its implementing functional requirements for traceability verification.</div>
+    <table>
+      <tr><th>Use Case</th><th>Related FRs</th></tr>
+      <tr><td><strong>Register Account</strong></td><td>FR-101</td></tr>
+      <tr><td><strong>Log In / Log Out</strong></td><td>FR-102, FR-105, FR-106</td></tr>
+      <tr><td><strong>Maintain Session</strong></td><td>FR-104</td></tr>
+      <tr><td><strong>Create Project</strong></td><td>FR-201, FR-207</td></tr>
+      <tr><td><strong>View Project List</strong></td><td>FR-202, FR-208</td></tr>
+      <tr><td><strong>Open Project</strong></td><td>FR-203, FR-501</td></tr>
+      <tr><td><strong>Edit Project Details</strong></td><td>FR-204, FR-207</td></tr>
+      <tr><td><strong>Delete Project</strong></td><td>FR-205</td></tr>
+      <tr><td><strong>Describe Assignment</strong></td><td>FR-301</td></tr>
+      <tr><td><strong>Extract Classification Signals</strong></td><td>FR-302</td></tr>
+      <tr><td><strong>Ask Follow-Up Questions</strong></td><td>FR-303, FR-315</td></tr>
+      <tr><td><strong>Present Classification Recommendation</strong></td><td>FR-304, FR-305, FR-306</td></tr>
+      <tr><td><strong>Accept or Override Classification</strong></td><td>FR-307, FR-308</td></tr>
+      <tr><td><strong>Capture Intake Dimensions</strong></td><td>FR-309–313</td></tr>
+      <tr><td><strong>Generate Live Roadmap from Template</strong></td><td>FR-401–403</td></tr>
+      <tr><td><strong>View Roadmap (Navigator Mode)</strong></td><td>FR-501–504, FR-508</td></tr>
+      <tr><td><strong>Add / Remove / Reorder Modules</strong></td><td>FR-404–406</td></tr>
+      <tr><td><strong>Track Module Status</strong></td><td>FR-407–409</td></tr>
+      <tr><td><strong>Warn on Dependency Gaps</strong></td><td>FR-410</td></tr>
+      <tr><td><strong>Suggest Module Additions</strong></td><td>FR-412</td></tr>
+      <tr><td><strong>Enter Module (Co-Pilot Mode)</strong></td><td>FR-505, FR-601, FR-408</td></tr>
+      <tr><td><strong>Guide Module Conversation</strong></td><td>FR-602, FR-603</td></tr>
+      <tr><td><strong>Generate Draft Artifact Content</strong></td><td>FR-604</td></tr>
+      <tr><td><strong>Edit Artifact Content</strong></td><td>FR-605, FR-705</td></tr>
+      <tr><td><strong>Flag Gaps &amp; Suggest Improvements</strong></td><td>FR-606, FR-607</td></tr>
+      <tr><td><strong>Save Artifact</strong></td><td>FR-701, FR-703, FR-706</td></tr>
+      <tr><td><strong>Provide Completion Summary</strong></td><td>FR-610</td></tr>
+      <tr><td><strong>Run Gap Analysis</strong></td><td>FR-801, FR-802, FR-806</td></tr>
+      <tr><td><strong>Generate Traceability Matrix</strong></td><td>FR-803, FR-804</td></tr>
+      <tr><td><strong>Highlight Orphan Items</strong></td><td>FR-805</td></tr>
+      <tr><td><strong>Export Individual Artifact</strong></td><td>FR-901, FR-902, FR-904</td></tr>
+      <tr><td><strong>Export Full Project Package</strong></td><td>FR-903, FR-905</td></tr>
+    </table>
+
+    <!-- ═══ 5. SIGN-OFF ═══ -->
+    <div class="signoff">
+      <h2>5. Document Sign-Off</h2>
+      <p>This document represents the complete Use Case Model for BA Compass — Business Analysis Co-Pilot, Version 1.</p>
+      <table>
+        <tr><th>Review Item</th><th>Status</th></tr>
+        <tr><td>Actor definitions confirmed</td><td>☐ Pending</td></tr>
+        <tr><td>Use Case Diagram confirmed</td><td>☐ Pending</td></tr>
+        <tr><td>Use Case Catalog confirmed</td><td>☐ Pending</td></tr>
+        <tr><td>FR Cross-Reference confirmed</td><td>☐ Pending</td></tr>
+      </table>
+      <div class="signoff-line">Approved by: ______________________________&nbsp;&nbsp;&nbsp;&nbsp;Date: ________________</div>
+      <p style="margin-top:8px;font-size:14px;color:var(--text-muted);font-style:italic;">Hadi Mercer — Project Owner &amp; Builder</p>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

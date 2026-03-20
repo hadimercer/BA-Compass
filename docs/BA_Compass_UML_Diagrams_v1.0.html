@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BA Compass — UML Diagrams v1.0</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:#1B2A4A;--accent:#2E75B6;--accent-lt:#D5E8F0;--accent-bg:#EAF2F8;
+    --bg:#FFFFFF;--surface:#F8FAFC;--border:#D1D5DB;--border-lt:#E5E7EB;
+    --text:#1E293B;--text-secondary:#64748B;--text-muted:#94A3B8;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'DM Sans',sans-serif;color:var(--text);background:#F1F5F9;line-height:1.6}
+  .page{max-width:1100px;margin:40px auto;background:var(--bg);border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.04);overflow:hidden}
+  .cover{background:linear-gradient(135deg,var(--navy) 0%,#243B67 100%);padding:80px 60px 60px;color:#fff}
+  .cover h1{font-size:42px;font-weight:700;letter-spacing:-0.5px;margin-bottom:4px}
+  .cover .subtitle{font-size:20px;font-weight:400;color:#93B5D6;margin-bottom:32px}
+  .cover .doc-type{display:inline-block;font-size:13px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent-lt);border:1px solid rgba(255,255,255,0.2);padding:6px 16px;border-radius:4px;margin-bottom:40px}
+  .cover-meta{display:flex;gap:40px;margin-top:24px;font-size:14px;color:#93B5D6}
+  .cover-meta strong{color:#B8D4EA;font-weight:500}
+  .content{padding:48px 60px 60px}
+  h2{font-size:24px;font-weight:700;color:var(--navy);margin:48px 0 8px;padding-bottom:8px;border-bottom:2px solid var(--accent)}
+  h2:first-child{margin-top:0}
+  h3{font-size:18px;font-weight:600;color:var(--accent);margin:32px 0 12px}
+  p{margin-bottom:12px;font-size:15px}
+  .note{border-left:4px solid var(--accent);background:var(--accent-bg);padding:12px 16px;margin:16px 0 24px;font-size:14px;color:var(--text-secondary);border-radius:0 6px 6px 0}
+  table{width:100%;border-collapse:collapse;margin:16px 0 24px;font-size:14px}
+  th{background:var(--navy);color:#fff;font-weight:600;text-align:left;padding:10px 14px;font-size:13px;letter-spacing:.3px}
+  th:first-child{border-radius:6px 0 0 0}th:last-child{border-radius:0 6px 0 0}
+  td{padding:10px 14px;border-bottom:1px solid var(--border-lt);vertical-align:top}
+  tr:nth-child(even) td{background:var(--surface)}
+  .diagram-wrap{margin:24px 0 32px;border:1px solid var(--border);border-radius:8px;overflow-x:auto;background:#FDFDFE}
+  .diagram-wrap svg{display:block;min-width:960px}
+  .signoff{margin-top:48px;padding-top:24px;border-top:2px solid var(--border)}
+  .signoff-line{margin-top:40px;padding-top:12px;border-top:1px solid var(--text-muted);display:inline-block;min-width:300px;font-size:14px;color:var(--text-muted)}
+  code{font-family:'DM Mono',monospace;font-size:13px;background:#F1F5F9;padding:2px 6px;border-radius:3px;color:#1B2A4A}
+  @media print{body{background:#fff}.page{margin:0;box-shadow:none;border-radius:0}.cover{break-after:page}h2{break-after:avoid}.diagram-wrap{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="cover">
+    <div class="doc-type">UML Diagrams</div>
+    <h1>BA Compass</h1>
+    <div class="subtitle">Business Analysis Co-Pilot</div>
+    <div class="cover-meta">
+      <span><strong>Version</strong> 1.0</span>
+      <span><strong>Prepared by</strong> Hadi Mercer</span>
+      <span><strong>Date</strong> March 2026</span>
+      <span><strong>Status</strong> Draft — Pending Approval</span>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <h2>1. Overview</h2>
+    <p>This document presents two UML diagrams for BA Compass: a Class Diagram documenting the core data model and entity relationships, and a Sequence Diagram documenting the intake classification interaction — the most complex and critical flow in the system.</p>
+    <p>Both diagrams are derived from the Product Definition Document v1.0 and the Functional Requirements Document v1.0. They serve as the structural and behavioral blueprints for the development phase.</p>
+
+    <h3>1.1 Diagrams Included</h3>
+    <table>
+      <tr><th>#</th><th>Diagram</th><th>UML Type</th><th>Purpose</th></tr>
+      <tr><td><strong>1</strong></td><td>Core Data Model</td><td>Class Diagram</td><td>Entities, attributes, relationships, and multiplicity for the database schema</td></tr>
+      <tr><td><strong>2</strong></td><td>Intake Classification Sequence</td><td>Sequence Diagram</td><td>Message exchange between User, UI, AI Engine, and Database during intake</td></tr>
+    </table>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- DIAGRAM 1: CLASS DIAGRAM -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <h2>2. Class Diagram — Core Data Model</h2>
+    <p>The class diagram shows all persistent entities in BA Compass, their attributes, and the relationships between them. This directly maps to the PostgreSQL schema implemented in Neon DB.</p>
+    <div class="note">Primary keys are marked with <code>PK</code>. Foreign keys are marked with <code>FK</code>. Data types shown are PostgreSQL types. Static reference tables (Module, RoadmapTemplate) are shaded blue.</div>
+
+    <div class="diagram-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 820" width="1040" height="820">
+        <defs>
+          <style>
+            .cls-name{font:bold 13px 'DM Sans',sans-serif;fill:#FFFFFF;text-anchor:middle}
+            .cls-attr{font:12px 'DM Mono',monospace;fill:#1E293B}
+            .cls-type{font:11px 'DM Mono',monospace;fill:#64748B}
+            .cls-pk{font:bold 11px 'DM Mono',monospace;fill:#2E75B6}
+            .cls-fk{font:11px 'DM Mono',monospace;fill:#D97706}
+            .rel-label{font:11px 'DM Sans',sans-serif;fill:#64748B;text-anchor:middle}
+            .rel-mult{font:bold 11px 'DM Mono',monospace;fill:#1B2A4A}
+            .rel-line{stroke:#475569;stroke-width:1.2;fill:none}
+            .rel-diamond{fill:#FFFFFF;stroke:#475569;stroke-width:1.2}
+            .rel-diamond-filled{fill:#1B2A4A;stroke:#1B2A4A;stroke-width:1.2}
+          </style>
+        </defs>
+
+        <!-- ══ USER ══ -->
+        <rect x="20" y="30" width="240" height="200" rx="6" fill="#FFFFFF" stroke="#1B2A4A" stroke-width="1.5"/>
+        <rect x="20" y="30" width="240" height="32" rx="6" fill="#1B2A4A"/>
+        <rect x="20" y="56" width="240" height="6" fill="#1B2A4A"/>
+        <text x="140" y="52" class="cls-name">User</text>
+        <line x1="20" y1="62" x2="260" y2="62" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="32" y="82" class="cls-pk">PK</text><text x="56" y="82" class="cls-attr"> user_id</text><text x="200" y="82" class="cls-type">UUID</text>
+        <text x="56" y="102" class="cls-attr">email</text><text x="200" y="102" class="cls-type">VARCHAR</text>
+        <text x="56" y="122" class="cls-attr">password_hash</text><text x="200" y="122" class="cls-type">VARCHAR</text>
+        <text x="56" y="142" class="cls-attr">session_token</text><text x="200" y="142" class="cls-type">VARCHAR</text>
+        <text x="56" y="162" class="cls-attr">created_at</text><text x="200" y="162" class="cls-type">TIMESTAMP</text>
+        <line x1="20" y1="172" x2="260" y2="172" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="56" y="192" class="cls-attr" style="fill:#64748B;font-style:italic">+ authenticate()</text>
+        <text x="56" y="210" class="cls-attr" style="fill:#64748B;font-style:italic">+ resetPassword()</text>
+
+        <!-- ══ PROJECT ══ -->
+        <rect x="380" y="30" width="280" height="260" rx="6" fill="#FFFFFF" stroke="#1B2A4A" stroke-width="1.5"/>
+        <rect x="380" y="30" width="280" height="32" rx="6" fill="#1B2A4A"/>
+        <rect x="380" y="56" width="280" height="6" fill="#1B2A4A"/>
+        <text x="520" y="52" class="cls-name">Project</text>
+        <line x1="380" y1="62" x2="660" y2="62" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="392" y="82" class="cls-pk">PK</text><text x="418" y="82" class="cls-attr"> project_id</text><text x="580" y="82" class="cls-type">UUID</text>
+        <text x="392" y="102" class="cls-fk">FK</text><text x="418" y="102" class="cls-attr"> user_id</text><text x="580" y="102" class="cls-type">UUID</text>
+        <text x="418" y="122" class="cls-attr">name</text><text x="580" y="122" class="cls-type">VARCHAR</text>
+        <text x="418" y="142" class="cls-attr">description</text><text x="580" y="142" class="cls-type">TEXT</text>
+        <text x="418" y="162" class="cls-attr">engagement_type</text><text x="580" y="162" class="cls-type">VARCHAR</text>
+        <text x="418" y="182" class="cls-attr">scale_tier</text><text x="580" y="182" class="cls-type">VARCHAR</text>
+        <text x="418" y="202" class="cls-attr">status</text><text x="580" y="202" class="cls-type">VARCHAR</text>
+        <text x="418" y="222" class="cls-attr">created_at</text><text x="580" y="222" class="cls-type">TIMESTAMP</text>
+        <text x="418" y="242" class="cls-attr">updated_at</text><text x="580" y="242" class="cls-type">TIMESTAMP</text>
+        <line x1="380" y1="252" x2="660" y2="252" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="418" y="272" class="cls-attr" style="fill:#64748B;font-style:italic">+ reclassify()</text>
+
+        <!-- ══ PROJECT DIMENSION ══ -->
+        <rect x="740" y="30" width="280" height="200" rx="6" fill="#FFFFFF" stroke="#1B2A4A" stroke-width="1.5"/>
+        <rect x="740" y="30" width="280" height="32" rx="6" fill="#1B2A4A"/>
+        <rect x="740" y="56" width="280" height="6" fill="#1B2A4A"/>
+        <text x="880" y="52" class="cls-name">ProjectDimension</text>
+        <line x1="740" y1="62" x2="1020" y2="62" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="752" y="82" class="cls-pk">PK</text><text x="778" y="82" class="cls-attr"> dimension_id</text><text x="940" y="82" class="cls-type">UUID</text>
+        <text x="752" y="102" class="cls-fk">FK</text><text x="778" y="102" class="cls-attr"> project_id</text><text x="940" y="102" class="cls-type">UUID</text>
+        <text x="778" y="122" class="cls-attr">dimension_name</text><text x="940" y="122" class="cls-type">VARCHAR</text>
+        <text x="778" y="142" class="cls-attr">dimension_value</text><text x="940" y="142" class="cls-type">TEXT</text>
+        <text x="778" y="162" class="cls-attr">captured_at</text><text x="940" y="162" class="cls-type">TIMESTAMP</text>
+        <line x1="740" y1="172" x2="1020" y2="172" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="778" y="192" class="cls-attr" style="fill:#64748B;font-style:italic">+ getMustKnow()</text>
+        <text x="778" y="210" class="cls-attr" style="fill:#64748B;font-style:italic">+ getAll()</text>
+
+        <!-- ══ MODULE (static) ══ -->
+        <rect x="20" y="340" width="260" height="220" rx="6" fill="#FFFFFF" stroke="#2E75B6" stroke-width="1.5"/>
+        <rect x="20" y="340" width="260" height="32" rx="6" fill="#2E75B6"/>
+        <rect x="20" y="366" width="260" height="6" fill="#2E75B6"/>
+        <text x="150" y="362" class="cls-name">Module «static»</text>
+        <line x1="20" y1="372" x2="280" y2="372" stroke="#D5E8F0" stroke-width="1"/>
+        <text x="32" y="392" class="cls-pk">PK</text><text x="56" y="392" class="cls-attr"> module_id</text><text x="218" y="392" class="cls-type">UUID</text>
+        <text x="56" y="412" class="cls-attr">name</text><text x="218" y="412" class="cls-type">VARCHAR</text>
+        <text x="56" y="432" class="cls-attr">knowledge_area</text><text x="218" y="432" class="cls-type">VARCHAR</text>
+        <text x="56" y="452" class="cls-attr">description</text><text x="218" y="452" class="cls-type">TEXT</text>
+        <text x="56" y="472" class="cls-attr">typical_inputs</text><text x="218" y="472" class="cls-type">TEXT</text>
+        <text x="56" y="492" class="cls-attr">typical_outputs</text><text x="218" y="492" class="cls-type">TEXT</text>
+        <line x1="20" y1="502" x2="280" y2="502" stroke="#D5E8F0" stroke-width="1"/>
+        <text x="56" y="522" class="cls-attr" style="fill:#64748B;font-style:italic">+ getByKnowledgeArea()</text>
+        <text x="56" y="540" class="cls-attr" style="fill:#64748B;font-style:italic">+ getAll()</text>
+
+        <!-- ══ ROADMAP TEMPLATE (static) ══ -->
+        <rect x="20" y="620" width="260" height="180" rx="6" fill="#FFFFFF" stroke="#2E75B6" stroke-width="1.5"/>
+        <rect x="20" y="620" width="260" height="32" rx="6" fill="#2E75B6"/>
+        <rect x="20" y="646" width="260" height="6" fill="#2E75B6"/>
+        <text x="150" y="642" class="cls-name">RoadmapTemplate «static»</text>
+        <line x1="20" y1="652" x2="280" y2="652" stroke="#D5E8F0" stroke-width="1"/>
+        <text x="32" y="672" class="cls-pk">PK</text><text x="56" y="672" class="cls-attr"> template_id</text><text x="218" y="672" class="cls-type">UUID</text>
+        <text x="56" y="692" class="cls-attr">engagement_type</text><text x="218" y="692" class="cls-type">VARCHAR</text>
+        <text x="56" y="712" class="cls-attr">scale_tier</text><text x="218" y="712" class="cls-type">VARCHAR</text>
+        <text x="56" y="732" class="cls-attr">module_sequence</text><text x="218" y="732" class="cls-type">JSONB</text>
+        <line x1="20" y1="742" x2="280" y2="742" stroke="#D5E8F0" stroke-width="1"/>
+        <text x="56" y="762" class="cls-attr" style="fill:#64748B;font-style:italic">+ getByTypeAndTier()</text>
+        <text x="56" y="780" class="cls-attr" style="fill:#64748B;font-style:italic">+ instantiate()</text>
+
+        <!-- ══ PROJECT ROADMAP ITEM ══ -->
+        <rect x="380" y="370" width="280" height="220" rx="6" fill="#FFFFFF" stroke="#1B2A4A" stroke-width="1.5"/>
+        <rect x="380" y="370" width="280" height="32" rx="6" fill="#1B2A4A"/>
+        <rect x="380" y="396" width="280" height="6" fill="#1B2A4A"/>
+        <text x="520" y="392" class="cls-name">ProjectRoadmapItem</text>
+        <line x1="380" y1="402" x2="660" y2="402" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="392" y="422" class="cls-pk">PK</text><text x="418" y="422" class="cls-attr"> roadmap_item_id</text><text x="590" y="422" class="cls-type">UUID</text>
+        <text x="392" y="442" class="cls-fk">FK</text><text x="418" y="442" class="cls-attr"> project_id</text><text x="590" y="442" class="cls-type">UUID</text>
+        <text x="392" y="462" class="cls-fk">FK</text><text x="418" y="462" class="cls-attr"> module_id</text><text x="590" y="462" class="cls-type">UUID</text>
+        <text x="418" y="482" class="cls-attr">sequence_order</text><text x="590" y="482" class="cls-type">INTEGER</text>
+        <text x="418" y="502" class="cls-attr">status</text><text x="590" y="502" class="cls-type">VARCHAR</text>
+        <text x="418" y="522" class="cls-attr">created_at</text><text x="590" y="522" class="cls-type">TIMESTAMP</text>
+        <text x="418" y="542" class="cls-attr">updated_at</text><text x="590" y="542" class="cls-type">TIMESTAMP</text>
+        <line x1="380" y1="552" x2="660" y2="552" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="418" y="572" class="cls-attr" style="fill:#64748B;font-style:italic">+ updateStatus()</text>
+
+        <!-- ══ ARTIFACT ══ -->
+        <rect x="740" y="340" width="280" height="240" rx="6" fill="#FFFFFF" stroke="#1B2A4A" stroke-width="1.5"/>
+        <rect x="740" y="340" width="280" height="32" rx="6" fill="#1B2A4A"/>
+        <rect x="740" y="366" width="280" height="6" fill="#1B2A4A"/>
+        <text x="880" y="362" class="cls-name">Artifact</text>
+        <line x1="740" y1="372" x2="1020" y2="372" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="752" y="392" class="cls-pk">PK</text><text x="778" y="392" class="cls-attr"> artifact_id</text><text x="950" y="392" class="cls-type">UUID</text>
+        <text x="752" y="412" class="cls-fk">FK</text><text x="778" y="412" class="cls-attr"> project_id</text><text x="950" y="412" class="cls-type">UUID</text>
+        <text x="752" y="432" class="cls-fk">FK</text><text x="778" y="432" class="cls-attr"> module_id</text><text x="950" y="432" class="cls-type">UUID</text>
+        <text x="778" y="452" class="cls-attr">artifact_type</text><text x="950" y="452" class="cls-type">VARCHAR</text>
+        <text x="778" y="472" class="cls-attr">content</text><text x="950" y="472" class="cls-type">JSONB</text>
+        <text x="778" y="492" class="cls-attr">version</text><text x="950" y="492" class="cls-type">INTEGER</text>
+        <text x="778" y="512" class="cls-attr">created_at</text><text x="950" y="512" class="cls-type">TIMESTAMP</text>
+        <text x="778" y="532" class="cls-attr">updated_at</text><text x="950" y="532" class="cls-type">TIMESTAMP</text>
+        <line x1="740" y1="542" x2="1020" y2="542" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="778" y="562" class="cls-attr" style="fill:#64748B;font-style:italic">+ saveVersion()</text>
+
+        <!-- ══ CONVERSATION HISTORY ══ -->
+        <rect x="740" y="630" width="280" height="190" rx="6" fill="#FFFFFF" stroke="#1B2A4A" stroke-width="1.5"/>
+        <rect x="740" y="630" width="280" height="32" rx="6" fill="#1B2A4A"/>
+        <rect x="740" y="656" width="280" height="6" fill="#1B2A4A"/>
+        <text x="880" y="652" class="cls-name">ConversationHistory</text>
+        <line x1="740" y1="662" x2="1020" y2="662" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="752" y="682" class="cls-pk">PK</text><text x="778" y="682" class="cls-attr"> message_id</text><text x="950" y="682" class="cls-type">UUID</text>
+        <text x="752" y="702" class="cls-fk">FK</text><text x="778" y="702" class="cls-attr"> project_id</text><text x="950" y="702" class="cls-type">UUID</text>
+        <text x="752" y="722" class="cls-fk">FK</text><text x="778" y="722" class="cls-attr"> module_id</text><text x="950" y="722" class="cls-type">UUID</text>
+        <text x="778" y="742" class="cls-attr">role</text><text x="950" y="742" class="cls-type">VARCHAR</text>
+        <text x="778" y="762" class="cls-attr">content</text><text x="950" y="762" class="cls-type">TEXT</text>
+        <text x="778" y="782" class="cls-attr">created_at</text><text x="950" y="782" class="cls-type">TIMESTAMP</text>
+        <line x1="740" y1="792" x2="1020" y2="792" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="778" y="810" class="cls-attr" style="fill:#64748B;font-style:italic">+ getByModule()</text>
+
+        <!-- ══ RELATIONSHIPS ══ -->
+        <!-- User 1──* Project -->
+        <line x1="260" y1="130" x2="380" y2="130" class="rel-line"/>
+        <text x="270" y="124" class="rel-mult">1</text>
+        <text x="370" y="124" class="rel-mult">*</text>
+        <text x="320" y="118" class="rel-label">owns</text>
+
+        <!-- Project 1──* ProjectDimension -->
+        <line x1="660" y1="130" x2="740" y2="130" class="rel-line"/>
+        <text x="670" y="124" class="rel-mult">1</text>
+        <text x="730" y="124" class="rel-mult">*</text>
+        <text x="700" y="118" class="rel-label">has</text>
+
+        <!-- Project 1──* ProjectRoadmapItem -->
+        <line x1="520" y1="290" x2="520" y2="370" class="rel-line"/>
+        <text x="528" y="304" class="rel-mult">1</text>
+        <text x="528" y="365" class="rel-mult">*</text>
+        <text x="548" y="335" class="rel-label">contains</text>
+
+        <!-- Project 1──* Artifact -->
+        <line x1="660" y1="200" x2="740" y2="400" class="rel-line"/>
+        <text x="668" y="220" class="rel-mult">1</text>
+        <text x="732" y="394" class="rel-mult">*</text>
+        <text x="716" y="300" class="rel-label" transform="rotate(34,716,300)">produces</text>
+
+        <!-- Project 1──* ConversationHistory -->
+        <line x1="660" y1="260" x2="740" y2="700" class="rel-line"/>
+        <text x="668" y="280" class="rel-mult">1</text>
+        <text x="732" y="694" class="rel-mult">*</text>
+
+        <!-- Module 1──* ProjectRoadmapItem -->
+        <line x1="280" y1="460" x2="380" y2="460" class="rel-line"/>
+        <text x="290" y="454" class="rel-mult">1</text>
+        <text x="370" y="454" class="rel-mult">*</text>
+        <text x="330" y="448" class="rel-label">references</text>
+
+        <!-- Module 1──* Artifact -->
+        <line x1="280" y1="420" x2="330" y2="420" class="rel-line"/>
+        <line x1="330" y1="420" x2="330" y2="310" class="rel-line"/>
+        <line x1="330" y1="310" x2="880" y2="310" class="rel-line"/>
+        <line x1="880" y1="310" x2="880" y2="340" class="rel-line"/>
+        <text x="290" y="414" class="rel-mult">1</text>
+        <text x="872" y="336" class="rel-mult">*</text>
+        <text x="600" y="304" class="rel-label">produces via</text>
+
+        <!-- Module 1──* ConversationHistory -->
+        <line x1="150" y1="560" x2="150" y2="725" class="rel-line"/>
+        <line x1="150" y1="725" x2="740" y2="725" class="rel-line"/>
+        <text x="158" y="575" class="rel-mult">1</text>
+        <text x="730" y="719" class="rel-mult">*</text>
+
+        <!-- RoadmapTemplate ──references──> Module (dashed) -->
+        <line x1="280" y1="710" x2="340" y2="710" stroke="#64748B" stroke-width="1" stroke-dasharray="5,3" fill="none"/>
+        <line x1="340" y1="710" x2="340" y2="490" stroke="#64748B" stroke-width="1" stroke-dasharray="5,3" fill="none"/>
+        <line x1="340" y1="490" x2="280" y2="490" stroke="#64748B" stroke-width="1" stroke-dasharray="5,3" fill="none" marker-end="url(#arr-grey)"/>
+        <text x="360" y="600" class="rel-label" transform="rotate(-90,360,600)">references modules</text>
+
+        <defs>
+          <marker id="arr-grey" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#64748B"/></marker>
+        </defs>
+
+        <!-- LEGEND -->
+        <rect x="380" y="640" width="310" height="160" rx="6" fill="#FAFBFC" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="400" y="664" style="font:bold 13px 'DM Sans',sans-serif;fill:#1B2A4A">Legend</text>
+        <rect x="400" y="678" width="50" height="20" rx="3" fill="#FFFFFF" stroke="#1B2A4A" stroke-width="1.2"/>
+        <text x="462" y="693" style="font:12px 'DM Sans',sans-serif;fill:#1E293B">Entity (mutable data)</text>
+        <rect x="400" y="706" width="50" height="20" rx="3" fill="#FFFFFF" stroke="#2E75B6" stroke-width="1.2"/>
+        <text x="462" y="721" style="font:12px 'DM Sans',sans-serif;fill:#1E293B">Static reference table</text>
+        <line x1="400" y1="742" x2="450" y2="742" class="rel-line"/>
+        <text x="462" y="747" style="font:12px 'DM Sans',sans-serif;fill:#1E293B">Association (FK relationship)</text>
+        <line x1="400" y1="766" x2="450" y2="766" stroke="#64748B" stroke-width="1" stroke-dasharray="5,3" fill="none"/>
+        <text x="462" y="771" style="font:12px 'DM Sans',sans-serif;fill:#1E293B">Reference (JSONB array)</text>
+        <text x="400" y="793" class="cls-pk" style="font-size:12px">PK</text><text x="425" y="793" style="font:12px 'DM Sans',sans-serif;fill:#1E293B"> Primary Key</text>
+        <text x="520" y="793" class="cls-fk" style="font-size:12px">FK</text><text x="545" y="793" style="font:12px 'DM Sans',sans-serif;fill:#1E293B"> Foreign Key</text>
+      </svg>
+    </div>
+
+    <h3>2.1 Entity Descriptions</h3>
+    <table>
+      <tr><th>Entity</th><th>Type</th><th>Description</th><th>Key Relationships</th></tr>
+      <tr><td><strong>User</strong></td><td>Mutable</td><td>Authenticated user account. Custom auth with bcrypt password hashing and session token management.</td><td>Owns 0..* Projects</td></tr>
+      <tr><td><strong>Project</strong></td><td>Mutable</td><td>The central object. All intake data, classification, roadmap, and artifacts scope to one Project.</td><td>Belongs to 1 User. Has 0..* Dimensions, RoadmapItems, Artifacts, ConversationHistory</td></tr>
+      <tr><td><strong>ProjectDimension</strong></td><td>Mutable</td><td>One row per intake dimension per project. Captured across three tiers with timestamp tracking.</td><td>Belongs to 1 Project</td></tr>
+      <tr><td><strong>Module</strong></td><td>Static</td><td>The 52-module BABOK-aligned library. Read-only reference data seeded at deployment.</td><td>Referenced by RoadmapItems and Artifacts</td></tr>
+      <tr><td><strong>RoadmapTemplate</strong></td><td>Static</td><td>24 pre-built templates (8 types × 3 tiers). Each contains an ordered module_sequence as JSONB.</td><td>References Modules via JSONB array</td></tr>
+      <tr><td><strong>ProjectRoadmapItem</strong></td><td>Mutable</td><td>One row per module in a project's live roadmap. Tracks sequence and status.</td><td>Belongs to 1 Project. References 1 Module</td></tr>
+      <tr><td><strong>Artifact</strong></td><td>Mutable</td><td>Structured output from a module. Versioned — each save creates a new row. Content stored as JSONB.</td><td>Belongs to 1 Project and 1 Module</td></tr>
+      <tr><td><strong>ConversationHistory</strong></td><td>Mutable</td><td>Per-module co-pilot conversation. Each row is one message (user or assistant role).</td><td>Belongs to 1 Project and 1 Module</td></tr>
+    </table>
+
+    <h3>2.2 Key Design Decisions</h3>
+    <table>
+      <tr><th>Decision</th><th>Rationale</th></tr>
+      <tr><td>UUIDs for all primary keys</td><td>Prevents ID collision if data is ever merged or exported. Standard for modern web applications.</td></tr>
+      <tr><td>module_sequence as JSONB in RoadmapTemplate</td><td>Ordered arrays of module IDs. Simpler than a join table for static reference data. Instantiated into ProjectRoadmapItem rows at runtime.</td></tr>
+      <tr><td>Artifact content as JSONB</td><td>Supports varied artifact structures (tables, matrices, free-text) without schema changes per type.</td></tr>
+      <tr><td>Versioning via new rows, not updates</td><td>Full audit trail. Each artifact save creates a new version row. Latest version = max(version) per artifact_type per module.</td></tr>
+      <tr><td>user_id FK on all data tables</td><td>Row-level security foundation. Every query filters by authenticated user_id for data isolation.</td></tr>
+      <tr><td>ConversationHistory as separate table</td><td>Conversation state must persist independently of artifacts so users can resume module work. Kept separate from artifacts for clean separation.</td></tr>
+    </table>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- DIAGRAM 2: SEQUENCE DIAGRAM -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <h2>3. Sequence Diagram — Intake Classification</h2>
+    <p>This sequence diagram shows the detailed message exchange between all four participants during the intake classification flow — the most complex interaction in BA Compass. It documents the exact order of calls, responses, decision points, and data persistence.</p>
+
+    <div class="diagram-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1020" width="1000" height="1020">
+        <defs>
+          <marker id="sa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#475569"/></marker>
+          <marker id="sb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#2E75B6"/></marker>
+          <marker id="sd" viewBox="0 0 10 10" refX="0" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M10,0 L0,5 L10,10 Z" fill="#475569"/></marker>
+          <style>
+            .sq-head{font:bold 13px 'DM Sans',sans-serif;fill:#FFFFFF;text-anchor:middle}
+            .sq-life{stroke:#CBD5E1;stroke-width:1;stroke-dasharray:5,4}
+            .sq-act{fill:#D5E8F0;stroke:#2E75B6;stroke-width:1.2}
+            .sq-act-u{fill:#FEF3C7;stroke:#D97706;stroke-width:1.2}
+            .sq-act-db{fill:#E2E8F0;stroke:#64748B;stroke-width:1.2}
+            .sq-msg{stroke:#475569;stroke-width:1.1;marker-end:url(#sa)}
+            .sq-ret{stroke:#475569;stroke-width:1;stroke-dasharray:5,3;marker-start:url(#sd)}
+            .sq-label{font:12px 'DM Sans',sans-serif;fill:#1E293B}
+            .sq-label-sm{font:11px 'DM Sans',sans-serif;fill:#64748B}
+            .sq-frag{fill:none;stroke:#1B2A4A;stroke-width:1.3}
+            .sq-frag-label{font:bold 11px 'DM Mono',monospace;fill:#FFFFFF}
+            .sq-frag-cond{font:italic 11px 'DM Sans',sans-serif;fill:#64748B}
+          </style>
+        </defs>
+
+        <!-- ══ PARTICIPANTS ══ -->
+        <!-- User -->
+        <rect x="60" y="10" width="120" height="36" rx="6" fill="#D97706"/>
+        <text x="120" y="33" class="sq-head">User</text>
+        <line x1="120" y1="46" x2="120" y2="1000" class="sq-life"/>
+
+        <!-- Streamlit UI -->
+        <rect x="280" y="10" width="140" height="36" rx="6" fill="#1B2A4A"/>
+        <text x="350" y="33" class="sq-head">Streamlit UI</text>
+        <line x1="350" y1="46" x2="350" y2="1000" class="sq-life"/>
+
+        <!-- AI Engine -->
+        <rect x="530" y="10" width="140" height="36" rx="6" fill="#2E75B6"/>
+        <text x="600" y="33" class="sq-head">AI Engine</text>
+        <line x1="600" y1="46" x2="600" y2="1000" class="sq-life"/>
+
+        <!-- Database -->
+        <rect x="780" y="10" width="140" height="36" rx="6" fill="#64748B"/>
+        <text x="850" y="33" class="sq-head">Neon DB</text>
+        <line x1="850" y1="46" x2="850" y2="1000" class="sq-life"/>
+
+        <!-- ══ MESSAGES ══ -->
+
+        <!-- 1. User → UI: Create project (name, desc) -->
+        <rect x="114" y="70" width="12" height="50" class="sq-act-u"/>
+        <line x1="126" y1="80" x2="344" y2="80" class="sq-msg"/>
+        <text x="235" y="74" class="sq-label">1. createProject(name, description)</text>
+
+        <!-- 2. UI → DB: INSERT project -->
+        <rect x="344" y="80" width="12" height="40" class="sq-act"/>
+        <line x1="356" y1="95" x2="844" y2="95" class="sq-msg"/>
+        <text x="600" y="89" class="sq-label">2. INSERT INTO projects</text>
+        <rect x="844" y="90" width="12" height="20" class="sq-act-db"/>
+
+        <!-- 3. DB → UI: return project_id -->
+        <line x1="844" y1="110" x2="356" y2="110" class="sq-ret"/>
+        <text x="600" y="125" class="sq-label-sm">return project_id</text>
+
+        <!-- 4. UI → User: Show intake interface -->
+        <line x1="344" y1="140" x2="126" y2="140" class="sq-ret"/>
+        <text x="235" y="135" class="sq-label-sm">render intake conversation UI</text>
+
+        <!-- 5. User → UI: Describe assignment -->
+        <rect x="114" y="155" width="12" height="30" class="sq-act-u"/>
+        <line x1="126" y1="165" x2="344" y2="165" class="sq-msg"/>
+        <text x="235" y="159" class="sq-label">3. submitDescription(text)</text>
+
+        <!-- 6. UI → AI: Send for classification -->
+        <rect x="344" y="165" width="12" height="40" class="sq-act"/>
+        <line x1="356" y1="180" x2="594" y2="180" class="sq-msg"/>
+        <text x="475" y="174" class="sq-label">4. classifyIntake(text, dimensions)</text>
+        <rect x="594" y="175" width="12" height="50" class="sq-act"/>
+
+        <!-- ═══ LOOP FRAGMENT ═══ -->
+        <rect x="80" y="235" width="800" height="280" class="sq-frag" rx="4"/>
+        <rect x="80" y="235" width="80" height="22" rx="4" fill="#1B2A4A"/>
+        <text x="120" y="251" class="sq-frag-label">loop</text>
+        <text x="170" y="251" class="sq-frag-cond">[insufficient signal for Must-Know dimensions]</text>
+
+        <!-- 7. AI → UI: Follow-up questions (≤2) -->
+        <rect x="594" y="265" width="12" height="30" class="sq-act"/>
+        <line x1="594" y1="275" x2="356" y2="275" class="sq-ret"/>
+        <text x="475" y="269" class="sq-label">5. return followUpQuestions (max 2)</text>
+
+        <!-- 8. UI → User: Display questions -->
+        <rect x="344" y="280" width="12" height="30" class="sq-act"/>
+        <line x1="344" y1="295" x2="126" y2="295" class="sq-ret"/>
+        <text x="235" y="289" class="sq-label-sm">render AI questions</text>
+
+        <!-- 9. User → UI: Answer -->
+        <rect x="114" y="320" width="12" height="30" class="sq-act-u"/>
+        <line x1="126" y1="335" x2="344" y2="335" class="sq-msg"/>
+        <text x="235" y="329" class="sq-label">6. submitAnswers(text)</text>
+
+        <!-- 10. UI → DB: Save conversation turn -->
+        <rect x="344" y="340" width="12" height="30" class="sq-act"/>
+        <line x1="356" y1="350" x2="844" y2="350" class="sq-msg"/>
+        <text x="600" y="344" class="sq-label">7. INSERT INTO conversation_history</text>
+        <rect x="844" y="345" width="12" height="16" class="sq-act-db"/>
+
+        <!-- 11. UI → AI: Process additional input -->
+        <line x1="356" y1="380" x2="594" y2="380" class="sq-msg"/>
+        <text x="475" y="374" class="sq-label">8. processAdditionalInput(answers)</text>
+        <rect x="594" y="375" width="12" height="50" class="sq-act"/>
+
+        <!-- Loop iterations -->
+        <text x="500" y="440" class="sq-label-sm" style="font-style:italic">↑ Repeat until AI has sufficient signal for all Must-Know dimensions</text>
+
+        <!-- ═══ AFTER LOOP ═══ -->
+
+        <!-- 12. AI → UI: Classification result -->
+        <rect x="594" y="530" width="12" height="40" class="sq-act"/>
+        <line x1="594" y1="545" x2="356" y2="545" class="sq-ret"/>
+        <text x="475" y="539" class="sq-label">9. return classification(type, tier, explanation)</text>
+
+        <!-- 13. UI → DB: Save dimensions -->
+        <rect x="344" y="550" width="12" height="30" class="sq-act"/>
+        <line x1="356" y1="565" x2="844" y2="565" class="sq-msg"/>
+        <text x="600" y="559" class="sq-label">10. INSERT INTO project_dimensions</text>
+        <rect x="844" y="560" width="12" height="16" class="sq-act-db"/>
+
+        <!-- 14. UI → User: Show recommendation -->
+        <line x1="344" y1="590" x2="126" y2="590" class="sq-ret"/>
+        <text x="235" y="584" class="sq-label-sm">render classification with explanation</text>
+
+        <!-- ═══ ALT FRAGMENT ═══ -->
+        <rect x="80" y="610" width="800" height="200" class="sq-frag" rx="4"/>
+        <rect x="80" y="610" width="60" height="22" rx="4" fill="#1B2A4A"/>
+        <text x="110" y="626" class="sq-frag-label">alt</text>
+
+        <!-- Alt 1: Accept -->
+        <text x="100" y="650" class="sq-frag-cond">[user accepts classification]</text>
+        <rect x="114" y="658" width="12" height="25" class="sq-act-u"/>
+        <line x1="126" y1="668" x2="344" y2="668" class="sq-msg"/>
+        <text x="235" y="662" class="sq-label">11a. confirmClassification()</text>
+
+        <!-- Dashed divider -->
+        <line x1="80" y1="700" x2="880" y2="700" stroke="#1B2A4A" stroke-width="1" stroke-dasharray="8,4"/>
+
+        <!-- Alt 2: Override -->
+        <text x="100" y="725" class="sq-frag-cond">[user overrides classification]</text>
+        <rect x="114" y="733" width="12" height="25" class="sq-act-u"/>
+        <line x1="126" y1="743" x2="344" y2="743" class="sq-msg"/>
+        <text x="235" y="737" class="sq-label">11b. overrideClassification(newType, newTier)</text>
+
+        <!-- UI → DB: Update project -->
+        <rect x="344" y="755" width="12" height="25" class="sq-act"/>
+        <line x1="356" y1="768" x2="844" y2="768" class="sq-msg"/>
+        <text x="600" y="762" class="sq-label">12. UPDATE projects SET engagement_type, scale_tier</text>
+        <rect x="844" y="763" width="12" height="16" class="sq-act-db"/>
+
+        <!-- ═══ AFTER ALT ═══ -->
+
+        <!-- 15. UI → DB: Get template -->
+        <rect x="344" y="825" width="12" height="30" class="sq-act"/>
+        <line x1="356" y1="840" x2="844" y2="840" class="sq-msg"/>
+        <text x="600" y="834" class="sq-label">13. SELECT FROM roadmap_templates WHERE type &amp; tier</text>
+        <rect x="844" y="835" width="12" height="20" class="sq-act-db"/>
+        <line x1="844" y1="855" x2="356" y2="855" class="sq-ret"/>
+        <text x="600" y="870" class="sq-label-sm">return template.module_sequence</text>
+
+        <!-- 16. UI → DB: Create roadmap items -->
+        <rect x="344" y="880" width="12" height="30" class="sq-act"/>
+        <line x1="356" y1="895" x2="844" y2="895" class="sq-msg"/>
+        <text x="600" y="889" class="sq-label">14. INSERT INTO project_roadmap (for each module)</text>
+        <rect x="844" y="890" width="12" height="16" class="sq-act-db"/>
+
+        <!-- 17. UI → User: Show roadmap -->
+        <line x1="344" y1="925" x2="126" y2="925" class="sq-ret"/>
+        <text x="235" y="919" class="sq-label-sm">render roadmap view (Navigator Mode)</text>
+
+        <!-- End markers -->
+        <rect x="116" y="960" width="8" height="8" fill="#1E293B"/>
+        <rect x="346" y="960" width="8" height="8" fill="#1E293B"/>
+        <rect x="596" y="960" width="8" height="8" fill="#1E293B"/>
+        <rect x="846" y="960" width="8" height="8" fill="#1E293B"/>
+      </svg>
+    </div>
+
+    <h3>3.1 Sequence Description</h3>
+    <table>
+      <tr><th>Step</th><th>From → To</th><th>Message</th><th>Related FRs</th></tr>
+      <tr><td>1</td><td>User → UI</td><td>Create project with name and description</td><td>FR-201</td></tr>
+      <tr><td>2</td><td>UI → DB</td><td>Insert project record with metadata</td><td>FR-206, FR-207</td></tr>
+      <tr><td>3</td><td>User → UI</td><td>Submit natural language assignment description</td><td>FR-301</td></tr>
+      <tr><td>4</td><td>UI → AI</td><td>Send text for classification signal extraction</td><td>FR-302</td></tr>
+      <tr><td>5</td><td>AI → UI</td><td>Return follow-up questions (max 2 per turn)</td><td>FR-303, FR-315</td></tr>
+      <tr><td>6</td><td>User → UI</td><td>Submit answers to follow-up questions</td><td>FR-303</td></tr>
+      <tr><td>7</td><td>UI → DB</td><td>Persist conversation turn</td><td>FR-608</td></tr>
+      <tr><td>8</td><td>UI → AI</td><td>Process additional input for classification</td><td>FR-302</td></tr>
+      <tr><td>9</td><td>AI → UI</td><td>Return classification: engagement type, scale tier, explanation</td><td>FR-304, FR-305, FR-306</td></tr>
+      <tr><td>10</td><td>UI → DB</td><td>Insert dimension values with timestamps</td><td>FR-309, FR-310, FR-313</td></tr>
+      <tr><td>11a</td><td>User → UI</td><td>Confirm classification (accept path)</td><td>FR-307</td></tr>
+      <tr><td>11b</td><td>User → UI</td><td>Override with different type/tier</td><td>FR-307</td></tr>
+      <tr><td>12</td><td>UI → DB</td><td>Update project with confirmed classification</td><td>FR-206</td></tr>
+      <tr><td>13</td><td>UI → DB</td><td>Retrieve matching roadmap template</td><td>FR-401</td></tr>
+      <tr><td>14</td><td>UI → DB</td><td>Insert roadmap items (one per template module, status: Not Started)</td><td>FR-402, FR-403</td></tr>
+      <tr><td>15</td><td>UI → User</td><td>Render roadmap view (Navigator Mode)</td><td>FR-501</td></tr>
+    </table>
+
+    <h3>3.2 Interaction Fragments</h3>
+    <table>
+      <tr><th>Fragment</th><th>Type</th><th>Condition</th><th>Description</th></tr>
+      <tr><td><strong>loop</strong></td><td>Loop</td><td>Insufficient signal for Must-Know dimensions</td><td>Steps 5–8 repeat until the AI has adequate confidence on Engagement Type, Scale Tier, Trigger/Origin, and Solution Clarity. Each iteration asks at most 2 questions.</td></tr>
+      <tr><td><strong>alt</strong></td><td>Alternative</td><td>User accepts OR user overrides</td><td>If the user accepts the AI recommendation, classification proceeds as-is. If the user overrides, the system uses the user-selected type and tier instead. Both paths lead to roadmap generation.</td></tr>
+    </table>
+
+    <!-- ═══ 4. FR TRACEABILITY ═══ -->
+    <h2>4. Diagram to FR Traceability</h2>
+    <div class="note">Maps each UML diagram to the functional requirements it documents.</div>
+    <table>
+      <tr><th>Diagram</th><th>UML Type</th><th>Related FRs</th></tr>
+      <tr>
+        <td><strong>Core Data Model</strong></td>
+        <td>Class Diagram</td>
+        <td>FR-101 (User), FR-206 (Project), FR-313 (ProjectDimension), FR-401 (Module, RoadmapTemplate), FR-407 (ProjectRoadmapItem), FR-701–706 (Artifact), FR-608 (ConversationHistory)</td>
+      </tr>
+      <tr>
+        <td><strong>Intake Classification</strong></td>
+        <td>Sequence Diagram</td>
+        <td>FR-201, FR-206, FR-207, FR-301–310, FR-313, FR-315, FR-307, FR-308, FR-401–403, FR-501, FR-608</td>
+      </tr>
+    </table>
+
+    <!-- ═══ 5. SIGN-OFF ═══ -->
+    <div class="signoff">
+      <h2>5. Document Sign-Off</h2>
+      <p>This document presents the complete UML structural and behavioral models for BA Compass — Business Analysis Co-Pilot, Version 1.</p>
+      <table>
+        <tr><th>Review Item</th><th>Status</th></tr>
+        <tr><td>Class Diagram — entities and relationships confirmed</td><td>☐ Pending</td></tr>
+        <tr><td>Class Diagram — data types and keys confirmed</td><td>☐ Pending</td></tr>
+        <tr><td>Sequence Diagram — intake flow confirmed</td><td>☐ Pending</td></tr>
+        <tr><td>FR Traceability confirmed</td><td>☐ Pending</td></tr>
+      </table>
+      <div class="signoff-line">Approved by: ______________________________&nbsp;&nbsp;&nbsp;&nbsp;Date: ________________</div>
+      <p style="margin-top:8px;font-size:14px;color:var(--text-muted);font-style:italic;">Hadi Mercer — Project Owner &amp; Builder</p>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

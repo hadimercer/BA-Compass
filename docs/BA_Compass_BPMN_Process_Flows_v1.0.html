@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BA Compass — BPMN Process Flow Diagrams v1.0</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #1B2A4A;
+    --accent: #2E75B6;
+    --accent-lt: #D5E8F0;
+    --accent-bg: #EAF2F8;
+    --bg: #FFFFFF;
+    --surface: #F8FAFC;
+    --border: #D1D5DB;
+    --border-lt: #E5E7EB;
+    --text: #1E293B;
+    --text-secondary: #64748B;
+    --text-muted: #94A3B8;
+    --success: #059669;
+    --warning: #D97706;
+    --danger: #DC2626;
+    --user-lane: #FEF9EF;
+    --ui-lane: #F0F7FF;
+    --ai-lane: #EAF2F8;
+    --db-lane: #F1F5F9;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; color: var(--text); background: #F1F5F9; line-height: 1.6; }
+  .page { max-width: 1100px; margin: 40px auto; background: var(--bg); border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.04); overflow: hidden; }
+  .cover { background: linear-gradient(135deg, var(--navy) 0%, #243B67 100%); padding: 80px 60px 60px; color: #fff; }
+  .cover h1 { font-size: 42px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 4px; }
+  .cover .subtitle { font-size: 20px; font-weight: 400; color: #93B5D6; margin-bottom: 32px; }
+  .cover .doc-type { display: inline-block; font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent-lt); border: 1px solid rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 4px; margin-bottom: 40px; }
+  .cover-meta { display: flex; gap: 40px; margin-top: 24px; font-size: 14px; color: #93B5D6; }
+  .cover-meta strong { color: #B8D4EA; font-weight: 500; }
+  .content { padding: 48px 60px 60px; }
+  h2 { font-size: 24px; font-weight: 700; color: var(--navy); margin: 48px 0 8px; padding-bottom: 8px; border-bottom: 2px solid var(--accent); }
+  h2:first-child { margin-top: 0; }
+  h3 { font-size: 18px; font-weight: 600; color: var(--accent); margin: 32px 0 12px; }
+  p { margin-bottom: 12px; font-size: 15px; }
+  .note { border-left: 4px solid var(--accent); background: var(--accent-bg); padding: 12px 16px; margin: 16px 0 24px; font-size: 14px; color: var(--text-secondary); border-radius: 0 6px 6px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 14px; }
+  th { background: var(--navy); color: #fff; font-weight: 600; text-align: left; padding: 10px 14px; font-size: 13px; letter-spacing: 0.3px; }
+  th:first-child { border-radius: 6px 0 0 0; } th:last-child { border-radius: 0 6px 0 0; }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--border-lt); vertical-align: top; }
+  tr:nth-child(even) td { background: var(--surface); }
+
+  .diagram-wrap { margin: 24px 0 32px; border: 1px solid var(--border); border-radius: 8px; overflow-x: auto; background: #FDFDFE; }
+  .diagram-wrap svg { display: block; min-width: 980px; }
+
+  /* BPMN SVG styles */
+  .bpmn-task { fill: #FFFFFF; stroke: #1B2A4A; stroke-width: 1.3; rx: 6; }
+  .bpmn-task-ai { fill: #D5E8F0; stroke: #2E75B6; stroke-width: 1.3; rx: 6; }
+  .bpmn-gateway { fill: #FFFFFF; stroke: #1B2A4A; stroke-width: 1.5; }
+  .bpmn-event-start { fill: #FFFFFF; stroke: #059669; stroke-width: 2; }
+  .bpmn-event-end { fill: #FFFFFF; stroke: #DC2626; stroke-width: 2.5; }
+  .bpmn-flow { stroke: #475569; stroke-width: 1.2; fill: none; marker-end: url(#arrow); }
+  .bpmn-flow-msg { stroke: #2E75B6; stroke-width: 1; fill: none; stroke-dasharray: 6,4; marker-end: url(#arrow-blue); }
+  .bpmn-label { font: 11.5px 'DM Sans', sans-serif; fill: #1E293B; text-anchor: middle; }
+  .bpmn-label-sm { font: 10px 'DM Sans', sans-serif; fill: #64748B; text-anchor: middle; }
+  .bpmn-lane-label { font: bold 12px 'DM Sans', sans-serif; fill: #1B2A4A; }
+  .bpmn-gate-label { font: 10px 'DM Sans', sans-serif; fill: #64748B; text-anchor: middle; }
+  .bpmn-pool-label { font: bold 14px 'DM Sans', sans-serif; fill: #FFFFFF; }
+
+  .flow-desc { margin: 8px 0 32px; }
+  .flow-desc dt { font-weight: 600; color: var(--navy); margin-top: 8px; font-size: 14px; }
+  .flow-desc dd { margin-left: 16px; font-size: 14px; color: var(--text-secondary); }
+
+  .signoff { margin-top: 48px; padding-top: 24px; border-top: 2px solid var(--border); }
+  .signoff-line { margin-top: 40px; padding-top: 12px; border-top: 1px solid var(--text-muted); display: inline-block; min-width: 300px; font-size: 14px; color: var(--text-muted); }
+
+  @media print {
+    body { background: #fff; }
+    .page { margin: 0; box-shadow: none; border-radius: 0; }
+    .cover { break-after: page; }
+    h2 { break-after: avoid; }
+    .diagram-wrap { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ═══ COVER ═══ -->
+  <div class="cover">
+    <div class="doc-type">BPMN Process Flow Diagrams</div>
+    <h1>BA Compass</h1>
+    <div class="subtitle">Business Analysis Co-Pilot</div>
+    <div class="cover-meta">
+      <span><strong>Version</strong> 1.0</span>
+      <span><strong>Prepared by</strong> Hadi Mercer</span>
+      <span><strong>Date</strong> March 2026</span>
+      <span><strong>Status</strong> Draft — Pending Approval</span>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ═══ 1. OVERVIEW ═══ -->
+    <h2>1. Overview</h2>
+    <p>This document presents four BPMN (Business Process Model and Notation) diagrams documenting the core user journeys through BA Compass. Each diagram uses standard BPMN notation with swimlanes to distinguish actor responsibilities.</p>
+    <p>All process flows are derived from the Functional Requirements Document (FRD v1.0) and the Use Case Diagram v1.0. Together they describe how the system behaves from the user's first interaction through to final deliverable export.</p>
+
+    <h3>1.1 Notation Guide</h3>
+    <div class="note">Standard BPMN notation is used throughout. The following elements appear in the diagrams.</div>
+    <table>
+      <tr><th>Element</th><th>Symbol</th><th>Meaning</th></tr>
+      <tr><td><strong>Start Event</strong></td><td>Green circle</td><td>Process begins</td></tr>
+      <tr><td><strong>End Event</strong></td><td>Red circle (bold)</td><td>Process terminates</td></tr>
+      <tr><td><strong>Task</strong></td><td>White rounded rectangle</td><td>A discrete activity performed by the lane's actor</td></tr>
+      <tr><td><strong>AI Task</strong></td><td>Blue rounded rectangle</td><td>A task performed by the AI Engine</td></tr>
+      <tr><td><strong>Exclusive Gateway</strong></td><td>Diamond with ✕</td><td>Decision point — exactly one path taken</td></tr>
+      <tr><td><strong>Sequence Flow</strong></td><td>Solid arrow</td><td>Order of activities within a lane</td></tr>
+      <tr><td><strong>Message Flow</strong></td><td>Dashed blue arrow</td><td>Communication between lanes</td></tr>
+      <tr><td><strong>Swimlane</strong></td><td>Horizontal band</td><td>Actor or system component responsible for tasks</td></tr>
+    </table>
+
+    <h3>1.2 Diagrams Included</h3>
+    <table>
+      <tr><th>#</th><th>Diagram</th><th>Scope</th><th>Related FRs</th></tr>
+      <tr><td><strong>1</strong></td><td>New Project Creation &amp; Intake Classification</td><td>Project creation through roadmap generation</td><td>FR-201, FR-301–316, FR-401–403</td></tr>
+      <tr><td><strong>2</strong></td><td>Roadmap Navigation &amp; Module Selection</td><td>Opening a project through entering co-pilot mode</td><td>FR-203, FR-407–410, FR-501–508</td></tr>
+      <tr><td><strong>3</strong></td><td>Co-Pilot Module Interaction</td><td>Module entry through artifact save and completion</td><td>FR-601–611, FR-701–706</td></tr>
+      <tr><td><strong>4</strong></td><td>Artifact Export &amp; Packaging</td><td>Single artifact export and full package export</td><td>FR-901–905</td></tr>
+    </table>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- DIAGRAM 1: INTAKE & CLASSIFICATION -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <h2>2. Diagram 1 — New Project Creation &amp; Intake Classification</h2>
+    <p>This is the most critical process flow. It covers the journey from project creation through conversational intake, AI classification, user confirmation, and live roadmap generation.</p>
+
+    <div class="diagram-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1020 520" width="1020" height="520">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#475569"/></marker>
+          <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#2E75B6"/></marker>
+        </defs>
+
+        <!-- Pool -->
+        <rect x="0" y="0" width="1020" height="520" rx="0" fill="none" stroke="#1B2A4A" stroke-width="2"/>
+        <rect x="0" y="0" width="32" height="520" fill="#1B2A4A"/>
+        <text x="16" y="270" class="bpmn-pool-label" text-anchor="middle" transform="rotate(-90,16,270)">BA Compass — Intake &amp; Classification</text>
+
+        <!-- Lanes -->
+        <rect x="32" y="0" width="988" height="130" fill="var(--user-lane)" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="46" y="70" class="bpmn-lane-label" transform="rotate(-90,46,70)">User</text>
+
+        <rect x="32" y="130" width="988" height="130" fill="var(--ui-lane)" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="46" y="200" class="bpmn-lane-label" transform="rotate(-90,46,200)">System</text>
+
+        <rect x="32" y="260" width="988" height="130" fill="var(--ai-lane)" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="46" y="330" class="bpmn-lane-label" transform="rotate(-90,46,330)">AI Engine</text>
+
+        <rect x="32" y="390" width="988" height="130" fill="var(--db-lane)" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="46" y="460" class="bpmn-lane-label" transform="rotate(-90,46,460)">Database</text>
+
+        <!-- ── USER LANE ── -->
+        <!-- Start -->
+        <circle cx="90" cy="65" r="14" class="bpmn-event-start"/>
+        <text x="90" y="98" class="bpmn-label-sm">Start</text>
+
+        <!-- T1: Enter name & description -->
+        <rect x="130" y="42" width="130" height="46" class="bpmn-task" rx="6"/>
+        <text x="195" y="62" class="bpmn-label">Enter Project</text>
+        <text x="195" y="76" class="bpmn-label">Name &amp; Description</text>
+
+        <!-- T2: Describe assignment -->
+        <rect x="350" y="42" width="130" height="46" class="bpmn-task" rx="6"/>
+        <text x="415" y="62" class="bpmn-label">Describe</text>
+        <text x="415" y="76" class="bpmn-label">Assignment</text>
+
+        <!-- T3: Answer follow-ups -->
+        <rect x="530" y="42" width="120" height="46" class="bpmn-task" rx="6"/>
+        <text x="590" y="62" class="bpmn-label">Answer</text>
+        <text x="590" y="76" class="bpmn-label">Follow-Ups</text>
+
+        <!-- G2: Accept or override (user) -->
+        <polygon points="730,65 755,42 780,65 755,88" class="bpmn-gateway"/>
+        <text x="755" y="69" style="font:bold 12px 'DM Sans';fill:#1B2A4A;text-anchor:middle">✕</text>
+        <text x="755" y="108" class="bpmn-gate-label">Accept or</text>
+        <text x="755" y="120" class="bpmn-gate-label">Override?</text>
+
+        <!-- ── SYSTEM LANE ── -->
+        <!-- T4: Display intake UI -->
+        <rect x="285" y="157" width="120" height="46" class="bpmn-task" rx="6"/>
+        <text x="345" y="177" class="bpmn-label">Display Intake</text>
+        <text x="345" y="191" class="bpmn-label">Interface</text>
+
+        <!-- T5: Show classification -->
+        <rect x="680" y="157" width="130" height="46" class="bpmn-task" rx="6"/>
+        <text x="745" y="177" class="bpmn-label">Display</text>
+        <text x="745" y="191" class="bpmn-label">Classification</text>
+
+        <!-- T6: Generate roadmap -->
+        <rect x="850" y="157" width="120" height="46" class="bpmn-task" rx="6"/>
+        <text x="910" y="177" class="bpmn-label">Generate Live</text>
+        <text x="910" y="191" class="bpmn-label">Roadmap</text>
+
+        <!-- ── AI LANE ── -->
+        <!-- T7: Extract signals -->
+        <rect x="370" y="292" width="130" height="46" class="bpmn-task-ai" rx="6"/>
+        <text x="435" y="312" class="bpmn-label">Extract</text>
+        <text x="435" y="326" class="bpmn-label">Classification Signals</text>
+
+        <!-- G1: Sufficient signal? -->
+        <polygon points="550,315 575,292 600,315 575,338" class="bpmn-gateway"/>
+        <text x="575" y="319" style="font:bold 12px 'DM Sans';fill:#1B2A4A;text-anchor:middle">✕</text>
+        <text x="575" y="358" class="bpmn-gate-label">Sufficient</text>
+        <text x="575" y="370" class="bpmn-gate-label">signal?</text>
+
+        <!-- T8: Ask follow-up -->
+        <rect x="520" y="225" width="110" height="40" class="bpmn-task-ai" rx="6"/>
+        <text x="575" y="249" class="bpmn-label">Ask Follow-Up</text>
+
+        <!-- T9: Present recommendation -->
+        <rect x="640" y="292" width="130" height="46" class="bpmn-task-ai" rx="6"/>
+        <text x="705" y="312" class="bpmn-label">Present</text>
+        <text x="705" y="326" class="bpmn-label">Recommendation</text>
+
+        <!-- ── DB LANE ── -->
+        <!-- T10: Save project -->
+        <rect x="150" y="420" width="120" height="46" class="bpmn-task" rx="6"/>
+        <text x="210" y="440" class="bpmn-label">Save Project</text>
+        <text x="210" y="454" class="bpmn-label">Record</text>
+
+        <!-- T11: Save dimensions -->
+        <rect x="550" y="420" width="120" height="46" class="bpmn-task" rx="6"/>
+        <text x="610" y="440" class="bpmn-label">Persist</text>
+        <text x="610" y="454" class="bpmn-label">Dimensions</text>
+
+        <!-- T12: Save roadmap -->
+        <rect x="830" y="420" width="130" height="46" class="bpmn-task" rx="6"/>
+        <text x="895" y="440" class="bpmn-label">Save Roadmap</text>
+        <text x="895" y="454" class="bpmn-label">to project_roadmap</text>
+
+        <!-- End -->
+        <circle cx="985" cy="443" r="14" class="bpmn-event-end"/>
+
+        <!-- ── FLOWS ── -->
+        <!-- Start → T1 -->
+        <line x1="104" y1="65" x2="128" y2="65" class="bpmn-flow"/>
+        <!-- T1 → T4 (msg down) -->
+        <line x1="260" y1="65" x2="275" y2="65" class="bpmn-flow-msg"/>
+        <line x1="275" y1="65" x2="275" y2="180" class="bpmn-flow-msg"/>
+        <line x1="275" y1="180" x2="283" y2="180" class="bpmn-flow-msg"/>
+        <!-- T1 → T10 (msg to DB) -->
+        <line x1="210" y1="88" x2="210" y2="418" class="bpmn-flow-msg"/>
+        <!-- T4 → T2 (msg up) -->
+        <line x1="345" y1="157" x2="345" y2="130" class="bpmn-flow-msg"/>
+        <line x1="345" y1="130" x2="415" y2="130" class="bpmn-flow-msg"/>
+        <line x1="415" y1="130" x2="415" y2="90" class="bpmn-flow-msg"/>
+        <!-- T2 → T7 (msg down to AI) -->
+        <line x1="415" y1="88" x2="415" y2="130" class="bpmn-flow-msg" style="marker-end:none"/>
+        <line x1="435" y1="130" x2="435" y2="290" class="bpmn-flow-msg"/>
+        <!-- T7 → G1 -->
+        <line x1="500" y1="315" x2="548" y2="315" class="bpmn-flow"/>
+        <!-- G1 No → T8 (up) -->
+        <line x1="575" y1="292" x2="575" y2="267" class="bpmn-flow"/>
+        <text x="560" y="283" class="bpmn-gate-label">No</text>
+        <!-- T8 → T3 (msg up to user) -->
+        <line x1="575" y1="225" x2="590" y2="90" class="bpmn-flow-msg"/>
+        <!-- T3 → back to AI (loop) -->
+        <line x1="530" y1="65" x2="510" y2="65" class="bpmn-flow-msg" style="marker-end:none"/>
+        <line x1="510" y1="65" x2="510" y2="315" class="bpmn-flow-msg"/>
+        <line x1="510" y1="315" x2="548" y2="315" class="bpmn-flow-msg" style="marker-end:none"/>
+        <!-- G1 Yes → T9 -->
+        <line x1="600" y1="315" x2="638" y2="315" class="bpmn-flow"/>
+        <text x="620" y="308" class="bpmn-gate-label">Yes</text>
+        <!-- T9 → T11 (persist dimensions) -->
+        <line x1="665" y1="338" x2="610" y2="418" class="bpmn-flow-msg"/>
+        <!-- T9 → T5 (msg to system) -->
+        <line x1="705" y1="292" x2="745" y2="205" class="bpmn-flow-msg"/>
+        <!-- T5 → G2 (msg up to user) -->
+        <line x1="745" y1="157" x2="755" y2="90" class="bpmn-flow-msg"/>
+        <!-- G2 Accept → T6 -->
+        <line x1="780" y1="65" x2="830" y2="65" class="bpmn-flow"/>
+        <line x1="830" y1="65" x2="830" y2="130" class="bpmn-flow"/>
+        <line x1="830" y1="130" x2="850" y2="155" class="bpmn-flow"/>
+        <text x="808" y="58" class="bpmn-gate-label">Accept</text>
+        <!-- G2 Override → T6 (same result, reclassify) -->
+        <text x="758" y="34" class="bpmn-gate-label">Override</text>
+        <path d="M755,42 C755,20 900,20 910,155" class="bpmn-flow" style="marker-end:url(#arrow)"/>
+        <!-- T6 → T12 (DB) -->
+        <line x1="910" y1="203" x2="895" y2="418" class="bpmn-flow-msg"/>
+        <!-- T12 → End -->
+        <line x1="960" y1="443" x2="969" y2="443" class="bpmn-flow"/>
+      </svg>
+    </div>
+
+    <h3>Process Description</h3>
+    <dl class="flow-desc">
+      <dt>1. User enters project name and description</dt>
+      <dd>Triggers project record creation in the database and opens the intake interface.</dd>
+      <dt>2. User describes their assignment in natural language</dt>
+      <dd>Free-text input (or pasted email/brief) is sent to the AI Engine for classification signal extraction.</dd>
+      <dt>3. AI extracts classification signals</dt>
+      <dd>The AI analyzes input for the four Must-Know dimensions. If insufficient signal exists, it asks follow-up questions (max 2 per turn). This loops until confidence is reached.</dd>
+      <dt>4. AI presents classification recommendation</dt>
+      <dd>Engagement Type and Scale Tier are recommended with plain-language explanations. Dimension values are persisted.</dd>
+      <dt>5. User accepts or overrides</dt>
+      <dd>Either path leads to roadmap generation from the corresponding template. Override uses the user-selected combination.</dd>
+      <dt>6. System generates live roadmap</dt>
+      <dd>Template modules are copied to project_roadmap, each with status Not Started. Process completes.</dd>
+    </dl>
+
+    <table>
+      <tr><th>Step</th><th>Actor</th><th>Related FRs</th></tr>
+      <tr><td>Enter project name &amp; description</td><td>User</td><td>FR-201, FR-207</td></tr>
+      <tr><td>Save project record</td><td>Database</td><td>FR-206</td></tr>
+      <tr><td>Display intake interface</td><td>System</td><td>FR-301</td></tr>
+      <tr><td>Describe assignment</td><td>User</td><td>FR-301</td></tr>
+      <tr><td>Extract classification signals</td><td>AI Engine</td><td>FR-302</td></tr>
+      <tr><td>Ask follow-up questions</td><td>AI Engine</td><td>FR-303, FR-315</td></tr>
+      <tr><td>Present recommendation</td><td>AI Engine</td><td>FR-304, FR-305, FR-306</td></tr>
+      <tr><td>Persist dimensions</td><td>Database</td><td>FR-309, FR-310, FR-313</td></tr>
+      <tr><td>Accept or override classification</td><td>User</td><td>FR-307</td></tr>
+      <tr><td>Generate live roadmap</td><td>System</td><td>FR-308, FR-402, FR-403</td></tr>
+      <tr><td>Save roadmap to project_roadmap</td><td>Database</td><td>FR-401</td></tr>
+    </table>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- DIAGRAM 2: ROADMAP NAVIGATION -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <h2>3. Diagram 2 — Roadmap Navigation &amp; Module Selection</h2>
+    <p>Covers the flow from opening a project through navigating the roadmap and selecting a module to work on, including dependency checking.</p>
+
+    <div class="diagram-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1020 420" width="1020" height="420">
+        <defs>
+          <marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#475569"/></marker>
+          <marker id="a2b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#2E75B6"/></marker>
+        </defs>
+
+        <rect x="0" y="0" width="1020" height="420" rx="0" fill="none" stroke="#1B2A4A" stroke-width="2"/>
+        <rect x="0" y="0" width="32" height="420" fill="#1B2A4A"/>
+        <text x="16" y="220" class="bpmn-pool-label" text-anchor="middle" transform="rotate(-90,16,220)">BA Compass — Roadmap Navigation</text>
+
+        <!-- Lanes -->
+        <rect x="32" y="0" width="988" height="140" fill="var(--user-lane)" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="46" y="75" class="bpmn-lane-label" transform="rotate(-90,46,75)">User</text>
+
+        <rect x="32" y="140" width="988" height="140" fill="var(--ui-lane)" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="46" y="215" class="bpmn-lane-label" transform="rotate(-90,46,215)">System</text>
+
+        <rect x="32" y="280" width="988" height="140" fill="var(--ai-lane)" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="46" y="355" class="bpmn-lane-label" transform="rotate(-90,46,355)">AI Engine</text>
+
+        <!-- USER -->
+        <circle cx="85" cy="70" r="14" class="bpmn-event-start"/>
+        <text x="85" y="103" class="bpmn-label-sm">Open Project</text>
+
+        <rect x="130" y="47" width="120" height="46" class="bpmn-task" rx="6"/>
+        <text x="190" y="67" class="bpmn-label">Select Project</text>
+        <text x="190" y="81" class="bpmn-label">from List</text>
+
+        <rect x="390" y="47" width="120" height="46" class="bpmn-task" rx="6"/>
+        <text x="450" y="67" class="bpmn-label">Browse</text>
+        <text x="450" y="81" class="bpmn-label">Roadmap</text>
+
+        <rect x="560" y="47" width="120" height="46" class="bpmn-task" rx="6"/>
+        <text x="620" y="67" class="bpmn-label">Click Module</text>
+        <text x="620" y="81" class="bpmn-label">to Enter</text>
+
+        <!-- Gateway: Deps ok? -->
+        <polygon points="770,70 795,47 820,70 795,93" class="bpmn-gateway"/>
+        <text x="795" y="74" style="font:bold 12px 'DM Sans';fill:#1B2A4A;text-anchor:middle">✕</text>
+        <text x="795" y="118" class="bpmn-gate-label">Dependencies</text>
+        <text x="795" y="130" class="bpmn-gate-label">complete?</text>
+
+        <!-- End: Enter co-pilot -->
+        <rect x="890" y="47" width="100" height="46" class="bpmn-task" rx="6"/>
+        <text x="940" y="67" class="bpmn-label">Enter</text>
+        <text x="940" y="81" class="bpmn-label">Co-Pilot Mode</text>
+
+        <!-- SYSTEM -->
+        <rect x="220" y="167" width="130" height="46" class="bpmn-task" rx="6"/>
+        <text x="285" y="187" class="bpmn-label">Load Roadmap</text>
+        <text x="285" y="201" class="bpmn-label">View</text>
+
+        <rect x="730" y="167" width="130" height="46" class="bpmn-task" rx="6"/>
+        <text x="795" y="187" class="bpmn-label">Show Dependency</text>
+        <text x="795" y="201" class="bpmn-label">Warning</text>
+
+        <rect x="880" y="167" width="110" height="46" class="bpmn-task" rx="6"/>
+        <text x="935" y="187" class="bpmn-label">Update Status</text>
+        <text x="935" y="201" class="bpmn-label">→ In Progress</text>
+
+        <!-- AI -->
+        <rect x="630" y="317" width="140" height="46" class="bpmn-task-ai" rx="6"/>
+        <text x="700" y="337" class="bpmn-label">Check Module</text>
+        <text x="700" y="351" class="bpmn-label">Dependencies</text>
+
+        <!-- End -->
+        <circle cx="970" cy="355" r="14" class="bpmn-event-end"/>
+
+        <!-- FLOWS -->
+        <line x1="99" y1="70" x2="128" y2="70" style="stroke:#475569;stroke-width:1.2;fill:none;marker-end:url(#a2)"/>
+        <line x1="250" y1="70" x2="260" y2="70" style="stroke:#2E75B6;stroke-width:1;fill:none;stroke-dasharray:6,4;marker-end:url(#a2b)"/>
+        <line x1="260" y1="70" x2="260" y2="165" style="stroke:#2E75B6;stroke-width:1;fill:none;stroke-dasharray:6,4;marker-end:url(#a2b)"/>
+        <!-- System loads → user sees roadmap -->
+        <line x1="350" y1="190" x2="380" y2="190" style="stroke:#2E75B6;stroke-width:1;fill:none;stroke-dasharray:6,4;marker-end:none"/>
+        <line x1="380" y1="190" x2="380" y2="70" style="stroke:#2E75B6;stroke-width:1;fill:none;stroke-dasharray:6,4;marker-end:none"/>
+        <line x1="380" y1="70" x2="388" y2="70" style="stroke:#2E75B6;stroke-width:1;fill:none;stroke-dasharray:6,4;marker-end:url(#a2b)"/>
+        <!-- Browse → click -->
+        <line x1="510" y1="70" x2="558" y2="70" style="stroke:#475569;stroke-width:1.2;fill:none;marker-end:url(#a2)"/>
+        <!-- Click → AI dep check -->
+        <line x1="620" y1="93" x2="620" y2="340" style="stroke:#2E75B6;stroke-width:1;fill:none;stroke-dasharray:6,4;marker-end:none"/>
+        <line x1="620" y1="340" x2="628" y2="340" style="stroke:#2E75B6;stroke-width:1;fill:none;stroke-dasharray:6,4;marker-end:url(#a2b)"/>
+        <!-- AI → gateway -->
+        <line x1="700" y1="317" x2="700" y2="70" style="stroke:#2E75B6;stroke-width:1;fill:none;stroke-dasharray:6,4;marker-end:none"/>
+        <line x1="700" y1="70" x2="768" y2="70" style="stroke:#475569;stroke-width:1.2;fill:none;marker-end:url(#a2)"/>
+        <!-- Gateway Yes → enter co-pilot -->
+        <line x1="820" y1="70" x2="888" y2="70" style="stroke:#475569;stroke-width:1.2;fill:none;marker-end:url(#a2)"/>
+        <text x="853" y="62" class="bpmn-gate-label">Yes</text>
+        <!-- Gateway No → show warning -->
+        <line x1="795" y1="93" x2="795" y2="165" style="stroke:#475569;stroke-width:1.2;fill:none;marker-end:url(#a2)"/>
+        <text x="810" y="140" class="bpmn-gate-label">No</text>
+        <!-- Warning → still enter (user dismisses) -->
+        <line x1="860" y1="190" x2="878" y2="190" style="stroke:#475569;stroke-width:1.2;fill:none;marker-end:url(#a2)"/>
+        <!-- Enter → update status -->
+        <line x1="940" y1="93" x2="935" y2="165" style="stroke:#2E75B6;stroke-width:1;fill:none;stroke-dasharray:6,4;marker-end:url(#a2b)"/>
+        <!-- Update status → end -->
+        <line x1="935" y1="213" x2="935" y2="340" style="stroke:#2E75B6;stroke-width:1;fill:none;stroke-dasharray:6,4;marker-end:none"/>
+        <line x1="935" y1="340" x2="955" y2="355" style="stroke:#475569;stroke-width:1.2;fill:none;marker-end:url(#a2)"/>
+      </svg>
+    </div>
+
+    <h3>Process Description</h3>
+    <dl class="flow-desc">
+      <dt>1. User selects a project from the dashboard</dt>
+      <dd>The system loads the roadmap view (Navigator Mode) as the default landing page.</dd>
+      <dt>2. User browses the roadmap</dt>
+      <dd>All modules are visible with status indicators, knowledge area groupings, and completion percentage.</dd>
+      <dt>3. User clicks a module to enter</dt>
+      <dd>The AI checks whether the module's logical dependencies are complete.</dd>
+      <dt>4. Dependency check gateway</dt>
+      <dd>If dependencies are complete, the user enters co-pilot mode directly. If not, a warning is displayed identifying missing prerequisites. The warning is advisory only — the user can dismiss it and proceed.</dd>
+      <dt>5. Module status updates to In Progress</dt>
+      <dd>Automatic on first entry. Process completes with the user in co-pilot mode.</dd>
+    </dl>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- DIAGRAM 3: CO-PILOT MODULE INTERACTION -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <h2>4. Diagram 3 — Co-Pilot Module Interaction</h2>
+    <p>The core value delivery flow. Covers the guided conversation between the user and AI within a single module, from entry through artifact generation, editing, saving, and completion.</p>
+
+    <div class="diagram-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1020 520" width="1020" height="520">
+        <defs>
+          <marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#475569"/></marker>
+          <marker id="a3b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#2E75B6"/></marker>
+        </defs>
+
+        <rect x="0" y="0" width="1020" height="520" rx="0" fill="none" stroke="#1B2A4A" stroke-width="2"/>
+        <rect x="0" y="0" width="32" height="520" fill="#1B2A4A"/>
+        <text x="16" y="270" class="bpmn-pool-label" text-anchor="middle" transform="rotate(-90,16,270)">BA Compass — Co-Pilot Module Work</text>
+
+        <!-- Lanes -->
+        <rect x="32" y="0" width="988" height="130" fill="var(--user-lane)" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="46" y="70" class="bpmn-lane-label" transform="rotate(-90,46,70)">User</text>
+
+        <rect x="32" y="130" width="988" height="130" fill="var(--ui-lane)" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="46" y="200" class="bpmn-lane-label" transform="rotate(-90,46,200)">System</text>
+
+        <rect x="32" y="260" width="988" height="130" fill="var(--ai-lane)" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="46" y="330" class="bpmn-lane-label" transform="rotate(-90,46,330)">AI Engine</text>
+
+        <rect x="32" y="390" width="988" height="130" fill="var(--db-lane)" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="46" y="460" class="bpmn-lane-label" transform="rotate(-90,46,460)">Database</text>
+
+        <!-- USER -->
+        <circle cx="80" cy="65" r="14" class="bpmn-event-start"/>
+        <text x="80" y="98" class="bpmn-label-sm">Module</text>
+        <text x="80" y="110" class="bpmn-label-sm">Selected</text>
+
+        <rect x="230" y="42" width="110" height="46" class="bpmn-task" rx="6"/>
+        <text x="285" y="62" class="bpmn-label">Answer AI</text>
+        <text x="285" y="76" class="bpmn-label">Questions</text>
+
+        <rect x="560" y="42" width="110" height="46" class="bpmn-task" rx="6"/>
+        <text x="615" y="62" class="bpmn-label">Review &amp; Edit</text>
+        <text x="615" y="76" class="bpmn-label">Draft Artifact</text>
+
+        <!-- G1: Satisfied? -->
+        <polygon points="720,65 745,42 770,65 745,88" class="bpmn-gateway"/>
+        <text x="745" y="69" style="font:bold 12px 'DM Sans';fill:#1B2A4A;text-anchor:middle">✕</text>
+        <text x="745" y="115" class="bpmn-gate-label">Satisfied?</text>
+
+        <rect x="820" y="42" width="100" height="46" class="bpmn-task" rx="6"/>
+        <text x="870" y="62" class="bpmn-label">Save &amp; Mark</text>
+        <text x="870" y="76" class="bpmn-label">Complete</text>
+
+        <!-- SYSTEM -->
+        <rect x="100" y="157" width="120" height="46" class="bpmn-task" rx="6"/>
+        <text x="160" y="177" class="bpmn-label">Display Module</text>
+        <text x="160" y="191" class="bpmn-label">Header &amp; Context</text>
+
+        <rect x="500" y="157" width="120" height="46" class="bpmn-task" rx="6"/>
+        <text x="560" y="177" class="bpmn-label">Render Draft</text>
+        <text x="560" y="191" class="bpmn-label">for Editing</text>
+
+        <rect x="850" y="157" width="120" height="46" class="bpmn-task" rx="6"/>
+        <text x="910" y="177" class="bpmn-label">Display</text>
+        <text x="910" y="191" class="bpmn-label">Completion Summary</text>
+
+        <!-- AI -->
+        <rect x="150" y="292" width="130" height="46" class="bpmn-task-ai" rx="6"/>
+        <text x="215" y="312" class="bpmn-label">Initiate Guided</text>
+        <text x="215" y="326" class="bpmn-label">Conversation</text>
+
+        <rect x="350" y="292" width="120" height="46" class="bpmn-task-ai" rx="6"/>
+        <text x="410" y="312" class="bpmn-label">Process Input</text>
+        <text x="410" y="326" class="bpmn-label">&amp; Flag Gaps</text>
+
+        <!-- G2: enough for draft? -->
+        <polygon points="510,315 535,292 560,315 535,338" class="bpmn-gateway"/>
+        <text x="535" y="319" style="font:bold 12px 'DM Sans';fill:#1B2A4A;text-anchor:middle">✕</text>
+        <text x="535" y="360" class="bpmn-gate-label">Ready for</text>
+        <text x="535" y="372" class="bpmn-gate-label">draft?</text>
+
+        <rect x="600" y="292" width="120" height="46" class="bpmn-task-ai" rx="6"/>
+        <text x="660" y="312" class="bpmn-label">Generate Draft</text>
+        <text x="660" y="326" class="bpmn-label">Artifact Content</text>
+
+        <rect x="790" y="292" width="120" height="46" class="bpmn-task-ai" rx="6"/>
+        <text x="850" y="312" class="bpmn-label">Provide</text>
+        <text x="850" y="326" class="bpmn-label">Completion Summary</text>
+
+        <!-- DB -->
+        <rect x="140" y="420" width="140" height="46" class="bpmn-task" rx="6"/>
+        <text x="210" y="440" class="bpmn-label">Load Conversation</text>
+        <text x="210" y="454" class="bpmn-label">History</text>
+
+        <rect x="400" y="420" width="130" height="46" class="bpmn-task" rx="6"/>
+        <text x="465" y="440" class="bpmn-label">Save Conversation</text>
+        <text x="465" y="454" class="bpmn-label">Turn</text>
+
+        <rect x="720" y="420" width="120" height="46" class="bpmn-task" rx="6"/>
+        <text x="780" y="440" class="bpmn-label">Save Artifact</text>
+        <text x="780" y="454" class="bpmn-label">(New Version)</text>
+
+        <circle cx="975" cy="443" r="14" class="bpmn-event-end"/>
+
+        <!-- FLOWS -->
+        <line x1="94" y1="65" x2="100" y2="65" style="stroke:#475569;stroke-width:1.2;fill:none;marker-end:none"/>
+        <line x1="100" y1="65" x2="100" y2="155" style="stroke:#2E75B6;stroke-width:1;fill:none;stroke-dasharray:6,4;marker-end:url(#a3b)"/>
+        <!-- System → load conv history -->
+        <line x1="160" y1="203" x2="210" y2="418" style="stroke:#2E75B6;stroke-width:1;fill:none;stroke-dasharray:6,4;marker-end:url(#a3b)"/>
+        <!-- System → AI initiate -->
+        <line x1="220" y1="190" x2="280" y2="190" style="stroke:#2E75B6;stroke-width:1;fill:none;stroke-dasharray:6,4;marker-end:none"/>
+        <line x1="215" y1="203" x2="215" y2="290" style="stroke:#2E75B6;stroke-width:1;fill:none;stroke-dasharray:6,4;marker-end:url(#a3b)"/>
+        <!-- AI initiate → user questions -->
+        <line x1="215" y1="292" x2="285" y2="90" style="stroke:#2E75B6;stroke-width:1;fill:none;stroke-dasharray:6,4;marker-end:url(#a3b)"/>
+        <!-- User answers → AI process -->
+        <line x1="340" y1="65" x2="360" y2="65" style="stroke:#2E75B6;stroke-width:1;fill:none;stroke-dasharray:6,4;marker-end:none"/>
+        <line x1="360" y1="65" x2="410" y2="290" style="stroke:#2E75B6;stroke-width:1;fill:none;stroke-dasharray:6,4;marker-end:url(#a3b)"/>
+        <!-- AI → save turn -->
+        <line x1="410" y1="338" x2="465" y2="418" style="stroke:#2E75B6;stroke-width:1;fill:none;stroke-dasharray:6,4;marker-end:url(#a3b)"/>
+        <!-- AI process → G2 -->
+        <line x1="470" y1="315" x2="508" y2="315" style="stroke:#475569;stroke-width:1.2;fill:none;marker-end:url(#a3)"/>
+        <!-- G2 No → back to user (loop) -->
+        <text x="525" y="285" class="bpmn-gate-label">No</text>
+        <path d="M535,292 C535,270 285,270 285,90" style="stroke:#2E75B6;stroke-width:1;fill:none;stroke-dasharray:6,4;marker-end:url(#a3b)"/>
+        <!-- G2 Yes → generate draft -->
+        <line x1="560" y1="315" x2="598" y2="315" style="stroke:#475569;stroke-width:1.2;fill:none;marker-end:url(#a3)"/>
+        <text x="580" y="308" class="bpmn-gate-label">Yes</text>
+        <!-- Generate → system render -->
+        <line x1="660" y1="292" x2="560" y2="205" style="stroke:#2E75B6;stroke-width:1;fill:none;stroke-dasharray:6,4;marker-end:url(#a3b)"/>
+        <!-- System render → user review -->
+        <line x1="560" y1="157" x2="615" y2="90" style="stroke:#2E75B6;stroke-width:1;fill:none;stroke-dasharray:6,4;marker-end:url(#a3b)"/>
+        <!-- User review → G1 -->
+        <line x1="670" y1="65" x2="718" y2="65" style="stroke:#475569;stroke-width:1.2;fill:none;marker-end:url(#a3)"/>
+        <!-- G1 No → back to edit loop (continue conversation) -->
+        <text x="733" y="38" class="bpmn-gate-label">No — continue</text>
+        <path d="M745,42 C745,20 285,20 285,40" style="stroke:#475569;stroke-width:1.2;fill:none;marker-end:url(#a3)"/>
+        <!-- G1 Yes → save -->
+        <line x1="770" y1="65" x2="818" y2="65" style="stroke:#475569;stroke-width:1.2;fill:none;marker-end:url(#a3)"/>
+        <text x="793" y="58" class="bpmn-gate-label">Yes</text>
+        <!-- Save → DB -->
+        <line x1="870" y1="88" x2="780" y2="418" style="stroke:#2E75B6;stroke-width:1;fill:none;stroke-dasharray:6,4;marker-end:url(#a3b)"/>
+        <!-- Save → AI completion summary -->
+        <line x1="870" y1="88" x2="850" y2="290" style="stroke:#2E75B6;stroke-width:1;fill:none;stroke-dasharray:6,4;marker-end:url(#a3b)"/>
+        <!-- AI summary → system display -->
+        <line x1="850" y1="292" x2="910" y2="205" style="stroke:#2E75B6;stroke-width:1;fill:none;stroke-dasharray:6,4;marker-end:url(#a3b)"/>
+        <!-- → End -->
+        <line x1="910" y1="203" x2="910" y2="443" style="stroke:#2E75B6;stroke-width:1;fill:none;stroke-dasharray:6,4;marker-end:none"/>
+        <line x1="910" y1="443" x2="959" y2="443" style="stroke:#475569;stroke-width:1.2;fill:none;marker-end:url(#a3)"/>
+      </svg>
+    </div>
+
+    <h3>Process Description</h3>
+    <dl class="flow-desc">
+      <dt>1. Module loads with header and context</dt>
+      <dd>System displays module metadata (name, knowledge area, inputs, outputs) and loads any existing conversation history from the database.</dd>
+      <dt>2. AI initiates guided conversation</dt>
+      <dd>The AI asks targeted questions tailored to the module type, using all available project context to avoid redundancy.</dd>
+      <dt>3. Question-answer loop</dt>
+      <dd>The user answers questions. The AI processes responses, flags gaps (missing stakeholders, vague requirements), and checks if enough information exists to generate a draft. Each turn is persisted. The loop continues until the AI has sufficient input.</dd>
+      <dt>4. AI generates draft artifact content</dt>
+      <dd>A structured draft is generated and rendered in an editable view for the user.</dd>
+      <dt>5. User reviews and edits</dt>
+      <dd>The user can modify content directly. If unsatisfied, they can continue the conversation to refine. If satisfied, they save.</dd>
+      <dt>6. Save and completion</dt>
+      <dd>Artifact is saved as a new version. The AI provides a completion summary listing outputs produced and remaining gaps. The user can mark the module complete or continue working.</dd>
+    </dl>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- DIAGRAM 4: EXPORT & PACKAGING -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <h2>5. Diagram 4 — Artifact Export &amp; Packaging</h2>
+    <p>Covers both single artifact export and full project package export, including format selection and document generation.</p>
+
+    <div class="diagram-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1020 340" width="1020" height="340">
+        <defs>
+          <marker id="a4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#475569"/></marker>
+          <marker id="a4b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#2E75B6"/></marker>
+        </defs>
+
+        <rect x="0" y="0" width="1020" height="340" rx="0" fill="none" stroke="#1B2A4A" stroke-width="2"/>
+        <rect x="0" y="0" width="32" height="340" fill="#1B2A4A"/>
+        <text x="16" y="180" class="bpmn-pool-label" text-anchor="middle" transform="rotate(-90,16,180)">BA Compass — Export &amp; Packaging</text>
+
+        <!-- Lanes -->
+        <rect x="32" y="0" width="988" height="130" fill="var(--user-lane)" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="46" y="70" class="bpmn-lane-label" transform="rotate(-90,46,70)">User</text>
+
+        <rect x="32" y="130" width="988" height="110" fill="var(--ui-lane)" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="46" y="190" class="bpmn-lane-label" transform="rotate(-90,46,190)">System</text>
+
+        <rect x="32" y="240" width="988" height="100" fill="var(--db-lane)" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="46" y="295" class="bpmn-lane-label" transform="rotate(-90,46,295)">Database</text>
+
+        <!-- USER -->
+        <circle cx="80" cy="65" r="14" class="bpmn-event-start"/>
+
+        <!-- G1: Single or package? -->
+        <polygon points="140,65 165,42 190,65 165,88" class="bpmn-gateway"/>
+        <text x="165" y="69" style="font:bold 12px 'DM Sans';fill:#1B2A4A;text-anchor:middle">✕</text>
+        <text x="165" y="115" class="bpmn-gate-label">Export type?</text>
+
+        <!-- Single path -->
+        <rect x="230" y="20" width="110" height="40" class="bpmn-task" rx="6"/>
+        <text x="285" y="44" class="bpmn-label">Select Artifact</text>
+
+        <rect x="370" y="20" width="110" height="40" class="bpmn-task" rx="6"/>
+        <text x="425" y="44" class="bpmn-label">Choose Format</text>
+
+        <!-- Package path -->
+        <rect x="230" y="75" width="130" height="40" class="bpmn-task" rx="6"/>
+        <text x="295" y="99" class="bpmn-label">Select Artifacts</text>
+        <text x="295" y="111" class="bpmn-label-sm">for Package</text>
+
+        <!-- Merge -->
+        <polygon points="520,65 545,42 570,65 545,88" class="bpmn-gateway"/>
+        <text x="545" y="69" style="font:bold 12px 'DM Sans';fill:#1B2A4A;text-anchor:middle">✕</text>
+
+        <!-- Download -->
+        <rect x="830" y="42" width="110" height="46" class="bpmn-task" rx="6"/>
+        <text x="885" y="62" class="bpmn-label">Download</text>
+        <text x="885" y="76" class="bpmn-label">Export</text>
+
+        <circle cx="975" cy="65" r="14" class="bpmn-event-end"/>
+
+        <!-- SYSTEM -->
+        <rect x="585" y="157" width="130" height="46" class="bpmn-task" rx="6"/>
+        <text x="650" y="177" class="bpmn-label">Generate Formatted</text>
+        <text x="650" y="191" class="bpmn-label">Document(s)</text>
+
+        <rect x="750" y="157" width="120" height="46" class="bpmn-task" rx="6"/>
+        <text x="810" y="177" class="bpmn-label">Apply Branding</text>
+        <text x="810" y="191" class="bpmn-label">&amp; Cover Page</text>
+
+        <!-- DB -->
+        <rect x="500" y="267" width="130" height="46" class="bpmn-task" rx="6"/>
+        <text x="565" y="287" class="bpmn-label">Retrieve Artifact</text>
+        <text x="565" y="301" class="bpmn-label">Content</text>
+
+        <!-- FLOWS -->
+        <line x1="94" y1="65" x2="138" y2="65" style="stroke:#475569;stroke-width:1.2;fill:none;marker-end:url(#a4)"/>
+        <!-- G1 → single -->
+        <line x1="165" y1="42" x2="165" y2="40" style="stroke:#475569;stroke-width:1.2;fill:none;marker-end:none"/>
+        <line x1="165" y1="40" x2="228" y2="40" style="stroke:#475569;stroke-width:1.2;fill:none;marker-end:url(#a4)"/>
+        <text x="195" y="34" class="bpmn-gate-label">Single</text>
+        <!-- single select → format -->
+        <line x1="340" y1="40" x2="368" y2="40" style="stroke:#475569;stroke-width:1.2;fill:none;marker-end:url(#a4)"/>
+        <!-- format → merge -->
+        <line x1="480" y1="40" x2="545" y2="40" style="stroke:#475569;stroke-width:1.2;fill:none;marker-end:none"/>
+        <line x1="545" y1="42" x2="545" y2="42" style="stroke:#475569;stroke-width:1.2;fill:none;marker-end:url(#a4)"/>
+        <!-- G1 → package -->
+        <line x1="190" y1="65" x2="200" y2="65" style="stroke:#475569;stroke-width:1.2;fill:none;marker-end:none"/>
+        <line x1="200" y1="65" x2="200" y2="95" style="stroke:#475569;stroke-width:1.2;fill:none;marker-end:none"/>
+        <line x1="200" y1="95" x2="228" y2="95" style="stroke:#475569;stroke-width:1.2;fill:none;marker-end:url(#a4)"/>
+        <text x="208" y="84" class="bpmn-gate-label">Package</text>
+        <!-- package → merge -->
+        <line x1="360" y1="95" x2="545" y2="90" style="stroke:#475569;stroke-width:1.2;fill:none;marker-end:url(#a4)"/>
+        <!-- merge → DB retrieve -->
+        <line x1="545" y1="88" x2="565" y2="265" style="stroke:#2E75B6;stroke-width:1;fill:none;stroke-dasharray:6,4;marker-end:url(#a4b)"/>
+        <!-- DB → system generate -->
+        <line x1="630" y1="267" x2="650" y2="205" style="stroke:#2E75B6;stroke-width:1;fill:none;stroke-dasharray:6,4;marker-end:url(#a4b)"/>
+        <!-- system generate → branding -->
+        <line x1="715" y1="180" x2="748" y2="180" style="stroke:#475569;stroke-width:1.2;fill:none;marker-end:url(#a4)"/>
+        <!-- branding → user download -->
+        <line x1="810" y1="157" x2="885" y2="90" style="stroke:#2E75B6;stroke-width:1;fill:none;stroke-dasharray:6,4;marker-end:url(#a4b)"/>
+        <!-- download → end -->
+        <line x1="940" y1="65" x2="959" y2="65" style="stroke:#475569;stroke-width:1.2;fill:none;marker-end:url(#a4)"/>
+      </svg>
+    </div>
+
+    <h3>Process Description</h3>
+    <dl class="flow-desc">
+      <dt>1. User initiates export</dt>
+      <dd>An exclusive gateway determines whether this is a single artifact export or a full project package export.</dd>
+      <dt>2a. Single artifact path</dt>
+      <dd>User selects the specific artifact and chooses an export format (Markdown, PDF, or Word).</dd>
+      <dt>2b. Package export path</dt>
+      <dd>User selects which artifacts to include in the package.</dd>
+      <dt>3. System retrieves artifact content from database</dt>
+      <dd>All selected artifact content is loaded from the artifacts table.</dd>
+      <dt>4. System generates formatted document(s)</dt>
+      <dd>Content is rendered into the chosen format with professional formatting.</dd>
+      <dt>5. Apply branding and cover page</dt>
+      <dd>Project name, engagement type, date, and artifact type are applied to headers/cover. Package exports include a summary cover page.</dd>
+      <dt>6. User downloads</dt>
+      <dd>The formatted export is downloaded to the user's device. Process completes.</dd>
+    </dl>
+
+    <!-- ═══ 6. FR TRACEABILITY ═══ -->
+    <h2>6. Process Flow to FR Traceability</h2>
+    <div class="note">Maps each BPMN diagram to the functional requirements it documents.</div>
+    <table>
+      <tr><th>Diagram</th><th>Process Flow</th><th>Related FRs</th></tr>
+      <tr>
+        <td><strong>1</strong></td>
+        <td>New Project Creation &amp; Intake Classification</td>
+        <td>FR-201, FR-206, FR-207, FR-301–316, FR-308, FR-401–403</td>
+      </tr>
+      <tr>
+        <td><strong>2</strong></td>
+        <td>Roadmap Navigation &amp; Module Selection</td>
+        <td>FR-203, FR-407, FR-408, FR-410, FR-501–508</td>
+      </tr>
+      <tr>
+        <td><strong>3</strong></td>
+        <td>Co-Pilot Module Interaction</td>
+        <td>FR-601–611, FR-701, FR-703, FR-705, FR-706</td>
+      </tr>
+      <tr>
+        <td><strong>4</strong></td>
+        <td>Artifact Export &amp; Packaging</td>
+        <td>FR-901–905</td>
+      </tr>
+    </table>
+
+    <!-- ═══ 7. SIGN-OFF ═══ -->
+    <div class="signoff">
+      <h2>7. Document Sign-Off</h2>
+      <p>This document represents the complete BPMN Process Flow specification for BA Compass — Business Analysis Co-Pilot, Version 1.</p>
+      <table>
+        <tr><th>Review Item</th><th>Status</th></tr>
+        <tr><td>Diagram 1 — Intake &amp; Classification confirmed</td><td>☐ Pending</td></tr>
+        <tr><td>Diagram 2 — Roadmap Navigation confirmed</td><td>☐ Pending</td></tr>
+        <tr><td>Diagram 3 — Co-Pilot Interaction confirmed</td><td>☐ Pending</td></tr>
+        <tr><td>Diagram 4 — Export &amp; Packaging confirmed</td><td>☐ Pending</td></tr>
+        <tr><td>FR Traceability confirmed</td><td>☐ Pending</td></tr>
+      </table>
+      <div class="signoff-line">Approved by: ______________________________&nbsp;&nbsp;&nbsp;&nbsp;Date: ________________</div>
+      <p style="margin-top:8px;font-size:14px;color:var(--text-muted);font-style:italic;">Hadi Mercer — Project Owner &amp; Builder</p>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

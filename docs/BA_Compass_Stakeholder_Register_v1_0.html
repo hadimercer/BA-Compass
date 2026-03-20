@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BA Compass — Stakeholder Register v1.0</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:#1B2A4A;--accent:#2E75B6;--accent-lt:#D5E8F0;--accent-bg:#EAF2F8;
+    --bg:#FFFFFF;--surface:#F8FAFC;--border:#D1D5DB;--border-lt:#E5E7EB;
+    --text:#1E293B;--text-secondary:#64748B;--text-muted:#94A3B8;
+    --green:#16A34A;--green-lt:#DCFCE7;--amber:#D97706;--amber-lt:#FEF3C7;
+    --red:#DC2626;--red-lt:#FEE2E2;--purple:#7C3AED;--purple-lt:#EDE9FE;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'DM Sans',sans-serif;color:var(--text);background:#F1F5F9;line-height:1.6}
+  .page{max-width:1100px;margin:40px auto;background:var(--bg);border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.04);overflow:hidden}
+  .cover{background:linear-gradient(135deg,var(--navy) 0%,#243B67 100%);padding:80px 60px 60px;color:#fff}
+  .cover h1{font-size:42px;font-weight:700;letter-spacing:-0.5px;margin-bottom:4px}
+  .cover .subtitle{font-size:20px;font-weight:400;color:#93B5D6;margin-bottom:32px}
+  .cover .doc-type{display:inline-block;font-size:13px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent-lt);border:1px solid rgba(255,255,255,0.2);padding:6px 16px;border-radius:4px;margin-bottom:40px}
+  .cover-meta{display:flex;gap:40px;margin-top:24px;font-size:14px;color:#93B5D6}
+  .cover-meta strong{color:#B8D4EA;font-weight:500}
+  .content{padding:48px 60px 60px}
+  h2{font-size:24px;font-weight:700;color:var(--navy);margin:48px 0 8px;padding-bottom:8px;border-bottom:2px solid var(--accent)}
+  h2:first-child{margin-top:0}
+  h3{font-size:18px;font-weight:600;color:var(--accent);margin:32px 0 12px}
+  p{margin-bottom:12px;font-size:15px}
+  .note{border-left:4px solid var(--accent);background:var(--accent-bg);padding:12px 16px;margin:16px 0 24px;font-size:14px;color:var(--text-secondary);border-radius:0 6px 6px 0}
+  table{width:100%;border-collapse:collapse;margin:16px 0 24px;font-size:14px}
+  th{background:var(--navy);color:#fff;font-weight:600;text-align:left;padding:10px 14px;font-size:13px;letter-spacing:.3px}
+  th:first-child{border-radius:6px 0 0 0}th:last-child{border-radius:0 6px 0 0}
+  td{padding:10px 14px;border-bottom:1px solid var(--border-lt);vertical-align:top}
+  tr:nth-child(even) td{background:var(--surface)}
+  .signoff{margin-top:48px;padding-top:24px;border-top:2px solid var(--border)}
+  .signoff-line{margin-top:40px;padding-top:12px;border-top:1px solid var(--text-muted);display:inline-block;min-width:300px;font-size:14px;color:var(--text-muted)}
+  code{font-family:'DM Mono',monospace;font-size:13px;background:#F1F5F9;padding:2px 6px;border-radius:3px;color:#1B2A4A}
+
+  /* Badges */
+  .badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px;white-space:nowrap}
+  .badge-high-i{background:#DBEAFE;color:#1E40AF}
+  .badge-med-i{background:#E0F2FE;color:#0C4A6E}
+  .badge-low-i{background:#F1F5F9;color:#475569}
+  .badge-high-p{background:#DCFCE7;color:#14532D}
+  .badge-med-p{background:var(--amber-lt);color:#92400E}
+  .badge-low-p{background:#FEE2E2;color:#991B1B}
+  .badge-monitor{background:#F1F5F9;color:#475569}
+  .badge-manage{background:#DBEAFE;color:#1E40AF}
+  .badge-satisfy{background:var(--amber-lt);color:#92400E}
+  .badge-collaborate{background:#DCFCE7;color:#14532D}
+  .badge-inform{background:var(--purple-lt);color:#5B21B6}
+
+  /* Power/Interest grid */
+  .grid-wrap{margin:24px 0 32px;overflow-x:auto}
+  .pi-grid{position:relative;width:560px;height:420px;border:1px solid var(--border);border-radius:8px;background:var(--surface)}
+  .pi-grid .axis-x{position:absolute;bottom:30px;left:40px;right:20px;height:1px;background:var(--border)}
+  .pi-grid .axis-y{position:absolute;left:60px;top:20px;bottom:30px;width:1px;background:var(--border)}
+  .pi-grid .ax-label{position:absolute;font-size:11px;font-weight:600;color:var(--text-secondary);letter-spacing:.5px;text-transform:uppercase}
+  .pi-grid .quadrant-label{position:absolute;font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:.5px;text-align:center}
+  .pi-dot{position:absolute;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;transform:translate(-50%,-50%);cursor:default;border:2px solid rgba(255,255,255,0.5)}
+  .pi-dot-label{position:absolute;font-size:10px;font-weight:600;color:var(--navy);white-space:nowrap;transform:translate(-50%, 14px)}
+
+  /* Stakeholder cards */
+  .sh-card{border:1px solid var(--border);border-radius:8px;padding:20px 24px;margin-bottom:16px;background:var(--bg)}
+  .sh-card-header{display:flex;align-items:flex-start;gap:16px;margin-bottom:12px}
+  .sh-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+  .sh-card-meta{flex:1}
+  .sh-card-meta h4{font-size:16px;font-weight:700;color:var(--navy);margin-bottom:2px}
+  .sh-card-meta .sh-role{font-size:13px;color:var(--text-secondary);margin-bottom:6px}
+  .sh-card-meta .badge-row{display:flex;gap:6px;flex-wrap:wrap}
+  .sh-body{font-size:13.5px;color:var(--text);line-height:1.6}
+  .sh-body strong{font-weight:600;color:var(--navy)}
+  .sh-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+  .sh-field{background:var(--surface);border-radius:6px;padding:10px 14px}
+  .sh-field .label{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px}
+  .sh-field .value{font-size:13px;color:var(--text)}
+  .sh-full{grid-column:1/-1}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="cover">
+    <div class="doc-type">Stakeholder Register</div>
+    <h1>BA Compass</h1>
+    <div class="subtitle">Business Analysis Co-Pilot</div>
+    <div class="cover-meta">
+      <span><strong>Version</strong> 1.0</span>
+      <span><strong>Prepared by</strong> Hadi Mercer</span>
+      <span><strong>Date</strong> March 2026</span>
+      <span><strong>Status</strong> Draft — Pending Approval</span>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <h2>1. Purpose &amp; Framing</h2>
+    <p>This stakeholder register treats the build and deployment of BA Compass (F2) as a formal BA engagement. That framing is intentional: the register itself is a portfolio demonstration of BA practice applied to a real-world scenario — in this case, Hadi's own career transition project.</p>
+    <p>The register identifies all parties with a stake in the successful delivery of BA Compass, documents their interest, influence, expectations, and risks, and specifies an appropriate engagement approach for each. It follows the BABOK v3 stakeholder analysis framework.</p>
+
+    <div class="note"><strong>Engagement framing:</strong> The "client" is Hadi Mercer as the product owner and career-transition candidate. The "deliverable" is a fully functional, portfolio-quality BA Co-Pilot application. The "business outcome" is a demonstrated BA skill set that accelerates a career transition from HR/data to Business Analysis.</div>
+
+    <h3>1.1 Stakeholder Categories</h3>
+    <table>
+      <tr><th>Category</th><th>Description</th><th>Stakeholders in this Register</th></tr>
+      <tr><td><strong>Primary</strong></td><td>Direct participants in the engagement — shape, build, or evaluate the product</td><td>Hadi Mercer (Builder/User), Claude AI (Co-Author/Tool)</td></tr>
+      <tr><td><strong>Secondary</strong></td><td>Directly affected by the product outcome but not part of the build</td><td>Portfolio Reviewers, Hiring Managers, Recruiters</td></tr>
+      <tr><td><strong>Tertiary</strong></td><td>Indirectly affected — future beneficiaries or analogous users</td><td>Junior BAs (Target User Persona), Potential Future Users</td></tr>
+      <tr><td><strong>External</strong></td><td>Platform or service providers whose reliability the product depends on</td><td>Anthropic / OpenAI, Neon DB, Streamlit Cloud, GitHub</td></tr>
+    </table>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <h2>2. Power / Interest Grid</h2>
+
+    <p>The power/interest grid plots each stakeholder by their level of influence over the project (power) and their level of interest in the outcome (interest). This determines the engagement strategy applied to each.</p>
+
+    <div class="grid-wrap">
+      <div class="pi-grid" style="width:560px;height:420px">
+        <!-- Quadrant fills -->
+        <div style="position:absolute;left:61px;top:20px;right:20px;bottom:31px;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr">
+          <div style="background:#FEF3C7;opacity:.35;border-radius:4px 0 0 0"></div>
+          <div style="background:#DCFCE7;opacity:.4;border-radius:0 4px 0 0"></div>
+          <div style="background:#F1F5F9;opacity:.6;border-radius:0 0 0 4px"></div>
+          <div style="background:#DBEAFE;opacity:.4;border-radius:0 0 4px 0"></div>
+        </div>
+        <!-- Quadrant labels -->
+        <div class="quadrant-label" style="left:75px;top:26px;width:220px">KEEP SATISFIED<br><span style="font-weight:400;font-size:10px">High power, low interest</span></div>
+        <div class="quadrant-label" style="right:22px;top:26px;width:220px;text-align:right">MANAGE CLOSELY<br><span style="font-weight:400;font-size:10px">High power, high interest</span></div>
+        <div class="quadrant-label" style="left:75px;bottom:36px;width:220px">MONITOR<br><span style="font-weight:400;font-size:10px">Low power, low interest</span></div>
+        <div class="quadrant-label" style="right:22px;bottom:36px;width:220px;text-align:right">KEEP INFORMED<br><span style="font-weight:400;font-size:10px">Low power, high interest</span></div>
+        <!-- Axes -->
+        <div class="axis-x"></div>
+        <div class="axis-y"></div>
+        <!-- Axis labels -->
+        <div class="ax-label" style="bottom:10px;left:240px">Interest →</div>
+        <div class="ax-label" style="left:4px;top:200px;transform:rotate(-90deg);transform-origin:center">Power →</div>
+        <!-- Dots: left=interest(61→540), bottom=power(30→400), high values = right/top -->
+        <!-- Hadi: High interest, High power → top-right. x~480, y~50 -->
+        <div class="pi-dot" style="background:#1B2A4A;left:480px;top:50px">H</div>
+        <div class="pi-dot-label" style="left:480px;top:50px">Hadi</div>
+        <!-- Hiring Managers: High power, medium-high interest → top-right quadrant leaning left x~380,y~60 -->
+        <div class="pi-dot" style="background:#2E75B6;left:380px;top:65px">HM</div>
+        <div class="pi-dot-label" style="left:395px;top:65px">Hiring Mgrs</div>
+        <!-- Portfolio Reviewers: High interest, high power → top-right x~440, y~80 -->
+        <div class="pi-dot" style="background:#6366F1;left:440px;top:90px">PR</div>
+        <div class="pi-dot-label" style="left:440px;top:90px">Portfolio Rev.</div>
+        <!-- Recruiters: medium interest, medium-low power → bottom-right x~340, y~280 -->
+        <div class="pi-dot" style="background:#7C3AED;left:340px;top:280px">RC</div>
+        <div class="pi-dot-label" style="left:340px;top:280px">Recruiters</div>
+        <!-- Junior BAs (target persona): High interest, no power → bottom-right x~490, y~310 -->
+        <div class="pi-dot" style="background:#16A34A;left:490px;top:310px">JBA</div>
+        <div class="pi-dot-label" style="left:490px;top:310px">Junior BAs</div>
+        <!-- OpenAI: low interest, high power (dependency) → top-left x~130, y~80 -->
+        <div class="pi-dot" style="background:#D97706;left:130px;top:90px">OAI</div>
+        <div class="pi-dot-label" style="left:130px;top:90px">OpenAI</div>
+        <!-- Neon/Streamlit: low interest, medium power → mid-left x~130, y~210 -->
+        <div class="pi-dot" style="background:#94A3B8;left:130px;top:210px">INF</div>
+        <div class="pi-dot-label" style="left:130px;top:210px">Infrastructure</div>
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <table style="width:auto;margin-bottom:32px">
+      <tr><th>ID</th><th>Stakeholder</th><th>Strategy</th></tr>
+      <tr><td><span class="badge badge-high-i">H</span></td><td>Hadi Mercer — Builder / Product Owner</td><td><span class="badge badge-collaborate">Manage Closely</span></td></tr>
+      <tr><td><span class="badge" style="background:#DBEAFE;color:#1E40AF">HM</span></td><td>Hiring Managers</td><td><span class="badge badge-collaborate">Manage Closely</span></td></tr>
+      <tr><td><span class="badge" style="background:#EDE9FE;color:#5B21B6">PR</span></td><td>Portfolio Reviewers (BA community, academic)</td><td><span class="badge badge-collaborate">Manage Closely</span></td></tr>
+      <tr><td><span class="badge" style="background:#EDE9FE;color:#5B21B6">RC</span></td><td>Recruiters</td><td><span class="badge badge-inform">Keep Informed</span></td></tr>
+      <tr><td><span class="badge" style="background:#DCFCE7;color:#14532D">JBA</span></td><td>Junior BAs (Target User Persona)</td><td><span class="badge badge-inform">Keep Informed</span></td></tr>
+      <tr><td><span class="badge" style="background:var(--amber-lt);color:#92400E">OAI</span></td><td>OpenAI (API Provider)</td><td><span class="badge badge-satisfy">Keep Satisfied</span></td></tr>
+      <tr><td><span class="badge badge-low-i">INF</span></td><td>Infrastructure (Neon DB, Streamlit Cloud, GitHub)</td><td><span class="badge badge-monitor">Monitor</span></td></tr>
+    </table>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <h2>3. Stakeholder Profiles</h2>
+    <p>Each profile documents the stakeholder's role, interests, influence, expectations, potential risks they pose to the engagement, and the engagement approach applied.</p>
+
+    <!-- SH1: Hadi -->
+    <div class="sh-card">
+      <div class="sh-card-header">
+        <div class="sh-avatar" style="background:#EAF2F8;font-size:22px">🧑‍💻</div>
+        <div class="sh-card-meta">
+          <h4>SH-01 — Hadi Mercer</h4>
+          <div class="sh-role">Builder · Product Owner · Primary End User · Portfolio Candidate</div>
+          <div class="badge-row">
+            <span class="badge badge-high-i">Interest: High</span>
+            <span class="badge badge-high-p">Power: High</span>
+            <span class="badge badge-collaborate">Manage Closely</span>
+          </div>
+        </div>
+      </div>
+      <div class="sh-body">
+        <div class="sh-grid">
+          <div class="sh-field">
+            <div class="label">Primary Interest</div>
+            <div class="value">Deliver a portfolio-quality, production-grade application that demonstrably validates a career transition from HR/data to Business Analysis. Must be deployable, defensible, and impressive to technical evaluators.</div>
+          </div>
+          <div class="sh-field">
+            <div class="label">Influence</div>
+            <div class="value">Full authority over product scope, design decisions, technology choices, and build sequence. Has final approval over all pre-build documents. Can halt, pivot, or change direction at any point.</div>
+          </div>
+          <div class="sh-field">
+            <div class="label">Expectations</div>
+            <div class="value">High visual quality bar; professional-grade documentation; code that works first time; explanations before execution; no wholesale file regenerations; PowerShell syntax for all terminal commands.</div>
+          </div>
+          <div class="sh-field">
+            <div class="label">Constraints</div>
+            <div class="value">Working on Windows. Learning Python and SQL — implementation is AI-assisted. Time-constrained: portfolio must be job-application-ready. Budget-conscious: Streamlit Community Cloud (free), Neon DB (free tier).</div>
+          </div>
+          <div class="sh-field">
+            <div class="label">Risks Posed</div>
+            <div class="value">Scope creep driven by domain expertise — deep knowledge may generate endless "what if we also..." additions. Risk of perfectionism stalling delivery. Learning curve on Python may slow debugging.</div>
+          </div>
+          <div class="sh-field">
+            <div class="label">Engagement Approach</div>
+            <div class="value">Explain before executing. Seek approval at each document milestone before proceeding. Flag scope risks explicitly when they arise. Provide targeted fixes, not rewrites. Treat every output as a portfolio artefact.</div>
+          </div>
+          <div class="sh-field sh-full">
+            <div class="label">Success Criteria (from Hadi's perspective)</div>
+            <div class="value">BA Compass is live on Streamlit Cloud, passes a portfolio walkthrough without visible flaws, and clearly demonstrates BABOK methodology embedded in product logic — not just an LLM chat wrapper. Hiring manager or BA community reviewer responds with a credibility-level reaction, not a polite "interesting project."</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SH2: Hiring Managers -->
+    <div class="sh-card">
+      <div class="sh-card-header">
+        <div class="sh-avatar" style="background:#DBEAFE;font-size:22px">👔</div>
+        <div class="sh-card-meta">
+          <h4>SH-02 — Hiring Managers</h4>
+          <div class="sh-role">BA / Product / Data roles · Financial services, consulting, technology sectors · Canada-primary</div>
+          <div class="badge-row">
+            <span class="badge badge-high-i">Interest: High</span>
+            <span class="badge badge-high-p">Power: High</span>
+            <span class="badge badge-collaborate">Manage Closely</span>
+          </div>
+        </div>
+      </div>
+      <div class="sh-body">
+        <div class="sh-grid">
+          <div class="sh-field">
+            <div class="label">Primary Interest</div>
+            <div class="value">Assess whether Hadi's BA skills are credible enough to justify hiring relative to candidates with direct BA job titles. They are evaluating depth of methodology knowledge, not just tool familiarity.</div>
+          </div>
+          <div class="sh-field">
+            <div class="label">Influence</div>
+            <div class="value">High — they are the ultimate decision-makers in the engagement outcome (employment). Their evaluation criteria implicitly define the quality bar for the portfolio.</div>
+          </div>
+          <div class="sh-field">
+            <div class="label">Expectations</div>
+            <div class="value">Evidence of structured thinking. BABOK alignment. A product that solves a real problem. Professional documentation that holds up to scrutiny. Code that actually runs — not just screenshots. Clear articulation of design decisions.</div>
+          </div>
+          <div class="sh-field">
+            <div class="label">Key Concerns</div>
+            <div class="value">Is this genuinely the candidate's work, or is it all AI-generated? Does the candidate understand what they built and why? Can they walk through methodology decisions without reading from a script?</div>
+          </div>
+          <div class="sh-field">
+            <div class="label">Risks Posed</div>
+            <div class="value">May dismiss portfolio if it appears overly AI-dependent. May not review documentation if application demo is weak. Short attention window — first 90 seconds of a walkthrough are decisive.</div>
+          </div>
+          <div class="sh-field">
+            <div class="label">Engagement Approach</div>
+            <div class="value">Design every pre-build document so Hadi can speak to it fluently in an interview. Ensure the application's UI surface communicates methodology without explanation. Produce a 2-minute demo script as a final artefact.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SH3: Portfolio Reviewers -->
+    <div class="sh-card">
+      <div class="sh-card-header">
+        <div class="sh-avatar" style="background:#EDE9FE;font-size:22px">🔍</div>
+        <div class="sh-card-meta">
+          <h4>SH-03 — Portfolio Reviewers</h4>
+          <div class="sh-role">BA community (LinkedIn, IIBA chapters) · Academic / bootcamp assessors · Peer reviewers</div>
+          <div class="badge-row">
+            <span class="badge badge-high-i">Interest: High</span>
+            <span class="badge badge-high-p">Power: Medium-High</span>
+            <span class="badge badge-collaborate">Manage Closely</span>
+          </div>
+        </div>
+      </div>
+      <div class="sh-body">
+        <div class="sh-grid">
+          <div class="sh-field">
+            <div class="label">Primary Interest</div>
+            <div class="value">Evaluate the rigour and authenticity of the BA methodology demonstrated. Interested in whether the BABOK knowledge is applied correctly, not just referenced nominally.</div>
+          </div>
+          <div class="sh-field">
+            <div class="label">Influence</div>
+            <div class="value">Medium-high — LinkedIn endorsements, referrals, and community credibility materially affect job search outcomes. A strong IIBA community reaction multiplies the portfolio's reach.</div>
+          </div>
+          <div class="sh-field">
+            <div class="label">Expectations</div>
+            <div class="value">Correct BABOK terminology. Traceability between requirements and deliverables. Demonstrated understanding of elicitation, analysis, and solution evaluation — not just requirements documentation. Pre-build artefacts that a senior BA would actually produce.</div>
+          </div>
+          <div class="sh-field">
+            <div class="label">Risks Posed</div>
+            <div class="value">May identify BABOK misapplication if terminology is used loosely. Risk of "this is a tech project, not a BA project" dismissal if the methodology layer is not visible enough.</div>
+          </div>
+          <div class="sh-field">
+            <div class="label">Engagement Approach</div>
+            <div class="value">Ensure all 52 modules are accurately categorised by BABOK knowledge area. Use BABOK v3 vocabulary throughout documentation. Make the methodology engine the headline, not the AI integration.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SH4: Recruiters -->
+    <div class="sh-card">
+      <div class="sh-card-header">
+        <div class="sh-avatar" style="background:var(--purple-lt);font-size:22px">📋</div>
+        <div class="sh-card-meta">
+          <h4>SH-04 — Recruiters</h4>
+          <div class="sh-role">Technical and generalist recruiters · Agency and in-house · BA, Product, Data roles</div>
+          <div class="badge-row">
+            <span class="badge badge-med-i">Interest: Medium</span>
+            <span class="badge badge-low-p">Power: Medium-Low</span>
+            <span class="badge badge-inform">Keep Informed</span>
+          </div>
+        </div>
+      </div>
+      <div class="sh-body">
+        <div class="sh-grid">
+          <div class="sh-field">
+            <div class="label">Primary Interest</div>
+            <div class="value">Quickly assess whether Hadi is placeable for BA-adjacent roles. Recruiters are keyword-matchers at first pass — they will skim the portfolio for recognisable signals: BABOK, SQL, Python, Streamlit, data analysis.</div>
+          </div>
+          <div class="sh-field">
+            <div class="label">Influence</div>
+            <div class="value">Medium-low — gatekeepers to opportunities but not final decision-makers. A recruiter who "doesn't get it" is a miss, not a failure. The portfolio is primarily built for hiring managers, not recruiters.</div>
+          </div>
+          <div class="sh-field">
+            <div class="label">Expectations</div>
+            <div class="value">A live link to the application. A clear one-paragraph description of what the tool does and who it's for. Recognisable keywords in the project description. Evidence of working software.</div>
+          </div>
+          <div class="sh-field">
+            <div class="label">Engagement Approach</div>
+            <div class="value">Ensure the README and portfolio landing page has a recruiter-scannable summary: tool name, problem solved, tech stack, and a live link. The documentation depth is for managers; the headline is for recruiters.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SH5: Junior BAs -->
+    <div class="sh-card">
+      <div class="sh-card-header">
+        <div class="sh-avatar" style="background:#DCFCE7;font-size:22px">🎓</div>
+        <div class="sh-card-meta">
+          <h4>SH-05 — Junior BAs (Target User Persona)</h4>
+          <div class="sh-role">0–3 years BA experience · Recent grads / career changers · Working without senior mentors</div>
+          <div class="badge-row">
+            <span class="badge badge-high-i">Interest: High</span>
+            <span class="badge badge-low-p">Power: Low</span>
+            <span class="badge badge-inform">Keep Informed</span>
+          </div>
+        </div>
+      </div>
+      <div class="sh-body">
+        <div class="sh-grid">
+          <div class="sh-field">
+            <div class="label">Primary Interest</div>
+            <div class="value">Get a tool that actually helps them navigate a new BA engagement without a senior mentor standing over their shoulder. They want structure, guidance, and outputs they can be proud of.</div>
+          </div>
+          <div class="sh-field">
+            <div class="label">Influence</div>
+            <div class="value">Low in V1 — no formal user research or feedback loop is built into the product roadmap yet. They represent the design target, not active participants in the build.</div>
+          </div>
+          <div class="sh-field">
+            <div class="label">Expectations</div>
+            <div class="value">A tool that explains why, not just what. Methodology embedded in prompts and guidance, not assumed. An interface that doesn't look like a student project. Outputs they can submit to a client without embarrassment.</div>
+          </div>
+          <div class="sh-field">
+            <div class="label">Pain Points Addressed</div>
+            <div class="value">Blank-page anxiety on new engagements. Uncertainty about which BABOK areas apply. Inconsistent artifact quality. No way to know if they've done enough. No mentor to sanity-check their work.</div>
+          </div>
+          <div class="sh-field">
+            <div class="label">Engagement Approach</div>
+            <div class="value">Keep this persona central during all UX and prompt design decisions. Hadi's own experience as a methodical, analytical thinker formalising a BA skill set makes him the ideal empathy source for this persona.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SH6: OpenAI -->
+    <div class="sh-card">
+      <div class="sh-card-header">
+        <div class="sh-avatar" style="background:var(--amber-lt);font-size:22px">🤖</div>
+        <div class="sh-card-meta">
+          <h4>SH-06 — OpenAI (API Provider)</h4>
+          <div class="sh-role">External service provider · GPT-4o · Critical dependency</div>
+          <div class="badge-row">
+            <span class="badge badge-low-i">Interest: Low</span>
+            <span class="badge badge-high-p">Power: High</span>
+            <span class="badge badge-satisfy">Keep Satisfied</span>
+          </div>
+        </div>
+      </div>
+      <div class="sh-body">
+        <div class="sh-grid">
+          <div class="sh-field">
+            <div class="label">Nature of Relationship</div>
+            <div class="value">OpenAI has no interest in BA Compass specifically but holds high power via API reliability, pricing policy, and model availability. A GPT-4o deprecation or pricing change would require significant product rework.</div>
+          </div>
+          <div class="sh-field">
+            <div class="label">Key Risks</div>
+            <div class="value">API unavailability during a portfolio demo. Unexpected rate limit behaviour under concurrent use. Model output quality degradation across versions. Prompt format changes in future SDK versions.</div>
+          </div>
+          <div class="sh-field">
+            <div class="label">Engagement Approach</div>
+            <div class="value">Use the <code>openai</code> Python package pinned to a tested version. Implement graceful error handling on all API calls. Store all prompts as editable config, not hardcoded strings. Monitor OpenAI changelog as part of maintenance.</div>
+          </div>
+          <div class="sh-field">
+            <div class="label">Contractual / Terms</div>
+            <div class="value">Usage must comply with OpenAI Terms of Service. API key must never be committed to version control. Portfolio demo usage must stay within free-tier or paid-tier limits as applicable.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SH7: Infrastructure -->
+    <div class="sh-card">
+      <div class="sh-card-header">
+        <div class="sh-avatar" style="background:#F1F5F9;font-size:22px">🏗️</div>
+        <div class="sh-card-meta">
+          <h4>SH-07 — Infrastructure Providers</h4>
+          <div class="sh-role">Neon DB · Streamlit Community Cloud · GitHub</div>
+          <div class="badge-row">
+            <span class="badge badge-low-i">Interest: Low</span>
+            <span class="badge badge-med-i">Power: Medium</span>
+            <span class="badge badge-monitor">Monitor</span>
+          </div>
+        </div>
+      </div>
+      <div class="sh-body">
+        <div class="sh-grid">
+          <div class="sh-field">
+            <div class="label">Neon DB</div>
+            <div class="value">Provides PostgreSQL hosting on the free tier. Risk: connection limits on free tier may affect concurrent demo usage. Engagement: monitor connection pooling; use a lightweight ORM or direct psycopg2 with proper connection management.</div>
+          </div>
+          <div class="sh-field">
+            <div class="label">Streamlit Community Cloud</div>
+            <div class="value">Provides free deployment. Risk: cold-start latency on infrequently accessed apps may create a poor first impression during a demo. Engagement: keep app lean; use <code>st.cache_data</code> and <code>st.cache_resource</code> appropriately.</div>
+          </div>
+          <div class="sh-field">
+            <div class="label">GitHub</div>
+            <div class="value">Version control and Streamlit Cloud deployment trigger. Risk: accidental commit of secrets if <code>.gitignore</code> is not set up correctly from Day 1. Engagement: configure <code>.gitignore</code> in project scaffold before any other files are committed.</div>
+          </div>
+          <div class="sh-field">
+            <div class="label">Engagement Approach</div>
+            <div class="value">All three are "monitor" tier — no active engagement required beyond setup. Establish monitoring checks before launch: verify Neon connection health, confirm Streamlit app loads within 5s, confirm GitHub secrets protection is active.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <h2>4. Stakeholder Summary Register</h2>
+    <p>Consolidated one-page reference view of all stakeholders, suitable for use in a presentation or stakeholder briefing.</p>
+
+    <table>
+      <tr>
+        <th>ID</th>
+        <th>Stakeholder</th>
+        <th>Category</th>
+        <th>Interest</th>
+        <th>Power</th>
+        <th>Strategy</th>
+        <th>Primary Expectation</th>
+        <th>Key Risk</th>
+      </tr>
+      <tr>
+        <td><strong>SH-01</strong></td>
+        <td>Hadi Mercer</td>
+        <td>Primary</td>
+        <td><span class="badge badge-high-i">High</span></td>
+        <td><span class="badge badge-high-p">High</span></td>
+        <td><span class="badge badge-collaborate">Manage Closely</span></td>
+        <td>Portfolio-quality, deployable product with rigorous BA documentation</td>
+        <td>Scope creep; perfectionism stalling delivery</td>
+      </tr>
+      <tr>
+        <td><strong>SH-02</strong></td>
+        <td>Hiring Managers</td>
+        <td>Secondary</td>
+        <td><span class="badge badge-high-i">High</span></td>
+        <td><span class="badge badge-high-p">High</span></td>
+        <td><span class="badge badge-collaborate">Manage Closely</span></td>
+        <td>Credible BA methodology demonstrated through working software</td>
+        <td>Dismissal as AI-generated; weak demo first impression</td>
+      </tr>
+      <tr>
+        <td><strong>SH-03</strong></td>
+        <td>Portfolio Reviewers</td>
+        <td>Secondary</td>
+        <td><span class="badge badge-high-i">High</span></td>
+        <td><span class="badge badge-med-i">Medium-High</span></td>
+        <td><span class="badge badge-collaborate">Manage Closely</span></td>
+        <td>Correct BABOK application; traceable, rigorous documentation</td>
+        <td>BABOK misapplication identified; methodology dismissed as superficial</td>
+      </tr>
+      <tr>
+        <td><strong>SH-04</strong></td>
+        <td>Recruiters</td>
+        <td>Secondary</td>
+        <td><span class="badge badge-med-i">Medium</span></td>
+        <td><span class="badge badge-low-p">Medium-Low</span></td>
+        <td><span class="badge badge-inform">Keep Informed</span></td>
+        <td>Live link; recognisable tech stack; clear problem statement</td>
+        <td>Portfolio not scannable; confused by complexity</td>
+      </tr>
+      <tr>
+        <td><strong>SH-05</strong></td>
+        <td>Junior BAs (Persona)</td>
+        <td>Tertiary</td>
+        <td><span class="badge badge-high-i">High</span></td>
+        <td><span class="badge badge-low-p">Low</span></td>
+        <td><span class="badge badge-inform">Keep Informed</span></td>
+        <td>Structured guidance; methodology embedded in UX; professional outputs</td>
+        <td>UX design disconnected from real junior BA experience</td>
+      </tr>
+      <tr>
+        <td><strong>SH-06</strong></td>
+        <td>OpenAI</td>
+        <td>External</td>
+        <td><span class="badge badge-low-i">Low</span></td>
+        <td><span class="badge badge-high-p">High</span></td>
+        <td><span class="badge badge-satisfy">Keep Satisfied</span></td>
+        <td>Compliance with ToS; valid API key management</td>
+        <td>API unavailability during demo; pricing / deprecation changes</td>
+      </tr>
+      <tr>
+        <td><strong>SH-07</strong></td>
+        <td>Infrastructure (Neon, Streamlit, GitHub)</td>
+        <td>External</td>
+        <td><span class="badge badge-low-i">Low</span></td>
+        <td><span class="badge badge-med-i">Medium</span></td>
+        <td><span class="badge badge-monitor">Monitor</span></td>
+        <td>Uptime; correct configuration; no committed secrets</td>
+        <td>Cold-start latency; free-tier connection limits; accidental secret commit</td>
+      </tr>
+    </table>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <h2>5. Engagement Plan by Strategy</h2>
+
+    <h3>5.1 Manage Closely (SH-01, SH-02, SH-03)</h3>
+    <p>These stakeholders have both high power and high interest. Every deliverable must be calibrated to their expectations.</p>
+    <table>
+      <tr><th>Action</th><th>Applies To</th><th>Timing</th></tr>
+      <tr><td>Approval checkpoint after each pre-build document</td><td>SH-01</td><td>After every document in the pre-build sequence</td></tr>
+      <tr><td>Hiring manager "interview mode" walkthrough script</td><td>SH-02</td><td>Produced as a final pre-launch artefact</td></tr>
+      <tr><td>BABOK knowledge area label on all 52 modules</td><td>SH-03</td><td>During module seed data phase</td></tr>
+      <tr><td>Portfolio README with clear methodology narrative</td><td>SH-02, SH-03</td><td>Written before deployment</td></tr>
+      <tr><td>FRD traceability throughout all documents</td><td>SH-01, SH-03</td><td>Maintained across all pre-build documents</td></tr>
+    </table>
+
+    <h3>5.2 Keep Informed (SH-04, SH-05)</h3>
+    <p>These stakeholders are best served by clear, accessible communication rather than deep engagement.</p>
+    <table>
+      <tr><th>Action</th><th>Applies To</th><th>Timing</th></tr>
+      <tr><td>Recruiter-scannable README section (50 words max)</td><td>SH-04</td><td>During deployment phase</td></tr>
+      <tr><td>Live application link prominent in all portfolio surfaces</td><td>SH-04</td><td>At launch</td></tr>
+      <tr><td>Junior BA persona consulted at every UX decision point</td><td>SH-05</td><td>Ongoing during build</td></tr>
+      <tr><td>User journey map kept visible as design reference</td><td>SH-05</td><td>Throughout build phase</td></tr>
+    </table>
+
+    <h3>5.3 Keep Satisfied (SH-06)</h3>
+    <table>
+      <tr><th>Action</th><th>Timing</th></tr>
+      <tr><td>Pin <code>openai</code> package version in <code>requirements.txt</code></td><td>Project scaffold phase</td></tr>
+      <tr><td>Implement error handling on all API calls with user-facing messages</td><td>During co-pilot build phase</td></tr>
+      <tr><td>Store API key in Streamlit Secrets only — never hardcoded</td><td>Day 1 of build</td></tr>
+      <tr><td>Monitor OpenAI changelog for breaking changes monthly</td><td>Ongoing post-launch</td></tr>
+    </table>
+
+    <h3>5.4 Monitor (SH-07)</h3>
+    <table>
+      <tr><th>Action</th><th>Timing</th></tr>
+      <tr><td>Configure <code>.gitignore</code> (secrets, env files, local cache) before first commit</td><td>Project scaffold — Day 1</td></tr>
+      <tr><td>Verify Neon DB connection pooling is within free-tier limits</td><td>Pre-launch testing</td></tr>
+      <tr><td>Confirm Streamlit Cloud app cold-start is under 8 seconds</td><td>Pre-launch testing</td></tr>
+      <tr><td>Set up GitHub branch protection on <code>main</code></td><td>Project scaffold phase</td></tr>
+    </table>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="signoff">
+      <h2>6. Document Sign-Off</h2>
+      <p>This stakeholder register is submitted for review as part of the BA Compass pre-build documentation package. Approval confirms that all identified stakeholders are accurately represented and that the engagement strategies are appropriate for the build phase.</p>
+      <table>
+        <tr><th>Role</th><th>Name</th><th>Date</th><th>Status</th></tr>
+        <tr><td>Author / Product Owner</td><td>Hadi Mercer</td><td>March 2026</td><td>Pending Review</td></tr>
+        <tr><td>Reviewer</td><td>—</td><td>—</td><td>—</td></tr>
+      </table>
+      <div>
+        <div class="signoff-line">Approved by: ___________________________</div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /page -->
+</body>
+</html>

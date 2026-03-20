@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BA Compass — Risk Register v1.0</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:#1B2A4A;--accent:#2E75B6;--accent-lt:#D5E8F0;--accent-bg:#EAF2F8;
+    --bg:#FFFFFF;--surface:#F8FAFC;--border:#D1D5DB;--border-lt:#E5E7EB;
+    --text:#1E293B;--text-secondary:#64748B;--text-muted:#94A3B8;
+    --green:#16A34A;--green-lt:#DCFCE7;
+    --amber:#D97706;--amber-lt:#FEF3C7;--amber-bg:#FFFBEB;
+    --red:#DC2626;--red-lt:#FEE2E2;--red-bg:#FFF1F2;
+    --orange:#EA580C;--orange-lt:#FFEDD5;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'DM Sans',sans-serif;color:var(--text);background:#F1F5F9;line-height:1.6}
+  .page{max-width:1100px;margin:40px auto;background:var(--bg);border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.04);overflow:hidden}
+  .cover{background:linear-gradient(135deg,var(--navy) 0%,#243B67 100%);padding:80px 60px 60px;color:#fff}
+  .cover h1{font-size:42px;font-weight:700;letter-spacing:-0.5px;margin-bottom:4px}
+  .cover .subtitle{font-size:20px;font-weight:400;color:#93B5D6;margin-bottom:32px}
+  .cover .doc-type{display:inline-block;font-size:13px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent-lt);border:1px solid rgba(255,255,255,0.2);padding:6px 16px;border-radius:4px;margin-bottom:40px}
+  .cover-meta{display:flex;gap:40px;margin-top:24px;font-size:14px;color:#93B5D6}
+  .cover-meta strong{color:#B8D4EA;font-weight:500}
+  .content{padding:48px 60px 60px}
+  h2{font-size:24px;font-weight:700;color:var(--navy);margin:48px 0 8px;padding-bottom:8px;border-bottom:2px solid var(--accent)}
+  h2:first-child{margin-top:0}
+  h3{font-size:18px;font-weight:600;color:var(--accent);margin:32px 0 12px}
+  p{margin-bottom:12px;font-size:15px}
+  .note{border-left:4px solid var(--accent);background:var(--accent-bg);padding:12px 16px;margin:16px 0 24px;font-size:14px;color:var(--text-secondary);border-radius:0 6px 6px 0}
+  table{width:100%;border-collapse:collapse;margin:16px 0 24px;font-size:14px}
+  th{background:var(--navy);color:#fff;font-weight:600;text-align:left;padding:10px 14px;font-size:13px;letter-spacing:.3px}
+  th:first-child{border-radius:6px 0 0 0}th:last-child{border-radius:0 6px 0 0}
+  td{padding:10px 14px;border-bottom:1px solid var(--border-lt);vertical-align:top}
+  tr:nth-child(even) td{background:var(--surface)}
+  .signoff{margin-top:48px;padding-top:24px;border-top:2px solid var(--border)}
+  .signoff-line{margin-top:40px;padding-top:12px;border-top:1px solid var(--text-muted);display:inline-block;min-width:300px;font-size:14px;color:var(--text-muted)}
+  code{font-family:'DM Mono',monospace;font-size:13px;background:#F1F5F9;padding:2px 6px;border-radius:3px;color:#1B2A4A}
+
+  /* Risk rating badges */
+  .badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px;white-space:nowrap}
+  .r-critical{background:var(--red-lt);color:var(--red)}
+  .r-high{background:var(--orange-lt);color:var(--orange)}
+  .r-medium{background:var(--amber-lt);color:var(--amber)}
+  .r-low{background:var(--green-lt);color:var(--green)}
+  .l-high{background:var(--red-lt);color:var(--red)}
+  .l-medium{background:var(--amber-lt);color:var(--amber)}
+  .l-low{background:var(--green-lt);color:var(--green)}
+  .i-high{background:var(--red-lt);color:var(--red)}
+  .i-medium{background:var(--amber-lt);color:var(--amber)}
+  .i-low{background:var(--green-lt);color:var(--green)}
+
+  /* Heat map */
+  .heatmap-wrap{margin:24px 0 32px;overflow-x:auto}
+  .heatmap{display:grid;grid-template-columns:80px repeat(3,1fr);grid-template-rows:auto repeat(3,80px);gap:3px;width:100%;max-width:600px}
+  .hm-cell{display:flex;align-items:center;justify-content:center;border-radius:6px;padding:8px;font-size:12px;font-weight:600;text-align:center}
+  .hm-header{background:var(--navy);color:#fff;border-radius:6px;font-size:12px;font-weight:600;padding:10px 8px;text-align:center;display:flex;align-items:center;justify-content:center}
+  .hm-axis{background:var(--surface);color:var(--navy);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;border-radius:6px;border:1px solid var(--border)}
+  .hm-low-low{background:#DCFCE7;color:#14532D}
+  .hm-low-med{background:#D1FAE5;color:#065F46}
+  .hm-low-high{background:var(--amber-lt);color:#92400E}
+  .hm-med-low{background:#D1FAE5;color:#065F46}
+  .hm-med-med{background:var(--amber-lt);color:#92400E}
+  .hm-med-high{background:var(--orange-lt);color:var(--orange)}
+  .hm-high-low{background:var(--amber-lt);color:#92400E}
+  .hm-high-med{background:var(--orange-lt);color:var(--orange)}
+  .hm-high-high{background:var(--red-lt);color:var(--red)}
+  .hm-dot{display:inline-block;width:22px;height:22px;border-radius:50%;background:var(--navy);color:#fff;font-size:10px;font-weight:700;line-height:22px;text-align:center;margin:2px}
+
+  /* Risk cards */
+  .risk-section-label{font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);padding:8px 0 4px;margin-top:24px;border-bottom:1px solid var(--border-lt)}
+  .risk-card{border:1px solid var(--border);border-radius:8px;margin:12px 0;overflow:hidden}
+  .risk-card-header{display:flex;align-items:center;gap:12px;padding:14px 18px;background:var(--surface);border-bottom:1px solid var(--border-lt)}
+  .risk-id{font-size:12px;font-weight:700;font-family:'DM Mono',monospace;color:var(--text-muted);min-width:50px}
+  .risk-title{font-size:14px;font-weight:700;color:var(--navy);flex:1}
+  .risk-badges{display:flex;gap:6px;flex-wrap:wrap}
+  .risk-body{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;font-size:13px}
+  .risk-field{padding:12px 18px;border-right:1px solid var(--border-lt);border-bottom:1px solid var(--border-lt)}
+  .risk-field:last-child{border-right:none}
+  .risk-field.full{grid-column:1/-1;border-right:none}
+  .risk-field .label{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px}
+  .risk-field .value{color:var(--text);line-height:1.5}
+  .risk-field.mitigation .value{color:#14532D;font-weight:500}
+  .risk-field.contingency .value{color:#92400E}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="cover">
+    <div class="doc-type">Risk Register</div>
+    <h1>BA Compass</h1>
+    <div class="subtitle">Business Analysis Co-Pilot</div>
+    <div class="cover-meta">
+      <span><strong>Version</strong> 1.0</span>
+      <span><strong>Prepared by</strong> Hadi Mercer</span>
+      <span><strong>Date</strong> March 2026</span>
+      <span><strong>Status</strong> Draft — Pending Approval</span>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <h2>1. Purpose &amp; Scope</h2>
+    <p>This risk register documents all identified risks associated with the design, build, and deployment of BA Compass (F2). It covers three risk categories: product risks (relating to the quality and correctness of the application's outputs), technical risks (relating to implementation, infrastructure, and API dependencies), and portfolio risks (relating to the strategic objectives of the project as a career-transition portfolio piece).</p>
+    <p>Each risk is rated by likelihood and impact, assigned a composite risk rating, and given a mitigation strategy and contingency response. The register is produced as the final pre-build document — informed by all prior analysis — and is intended to remain active as a reference throughout the build phase.</p>
+
+    <div class="note">Risk ratings use a 3×3 likelihood/impact matrix (Low / Medium / High). Composite ratings: High × High = Critical; High × Medium or Medium × High = High; Medium × Medium = Medium; all others = Low. Owner is Hadi Mercer for all risks in V1 (solo engagement).</div>
+
+    <h3>1.1 Risk Summary</h3>
+    <table>
+      <tr><th>#</th><th>Risk</th><th>Category</th><th>Likelihood</th><th>Impact</th><th>Rating</th></tr>
+      <tr><td><strong>R-01</strong></td><td>Classification accuracy insufficient for user trust</td><td>Product</td><td><span class="badge l-high">High</span></td><td><span class="badge i-high">High</span></td><td><span class="badge r-critical">Critical</span></td></tr>
+      <tr><td><strong>R-02</strong></td><td>Co-pilot output quality inconsistent across modules</td><td>Product</td><td><span class="badge l-high">High</span></td><td><span class="badge i-medium">Medium</span></td><td><span class="badge r-high">High</span></td></tr>
+      <tr><td><strong>R-03</strong></td><td>Scope creep expanding V1 beyond buildable limits</td><td>Product</td><td><span class="badge l-high">High</span></td><td><span class="badge i-high">High</span></td><td><span class="badge r-critical">Critical</span></td></tr>
+      <tr><td><strong>R-04</strong></td><td>BABOK alignment superficial or incorrect</td><td>Product</td><td><span class="badge l-medium">Medium</span></td><td><span class="badge i-high">High</span></td><td><span class="badge r-high">High</span></td></tr>
+      <tr><td><strong>R-05</strong></td><td>Gap analysis produces false confidence (misses real gaps)</td><td>Product</td><td><span class="badge l-medium">Medium</span></td><td><span class="badge i-high">High</span></td><td><span class="badge r-high">High</span></td></tr>
+      <tr><td><strong>R-06</strong></td><td>OpenAI API unavailability during portfolio demo</td><td>Technical</td><td><span class="badge l-low">Low</span></td><td><span class="badge i-high">High</span></td><td><span class="badge r-medium">Medium</span></td></tr>
+      <tr><td><strong>R-07</strong></td><td>Neon DB free-tier connection limits cause failures</td><td>Technical</td><td><span class="badge l-medium">Medium</span></td><td><span class="badge i-medium">Medium</span></td><td><span class="badge r-medium">Medium</span></td></tr>
+      <tr><td><strong>R-08</strong></td><td>Streamlit cold-start latency creates poor demo impression</td><td>Technical</td><td><span class="badge l-high">High</span></td><td><span class="badge i-medium">Medium</span></td><td><span class="badge r-high">High</span></td></tr>
+      <tr><td><strong>R-09</strong></td><td>API key or secrets accidentally committed to GitHub</td><td>Technical</td><td><span class="badge l-medium">Medium</span></td><td><span class="badge i-high">High</span></td><td><span class="badge r-high">High</span></td></tr>
+      <tr><td><strong>R-10</strong></td><td>OpenAI pricing or model deprecation forces rework</td><td>Technical</td><td><span class="badge l-low">Low</span></td><td><span class="badge i-medium">Medium</span></td><td><span class="badge r-low">Low</span></td></tr>
+      <tr><td><strong>R-11</strong></td><td>Portfolio dismissed as AI-generated, not Hadi's own work</td><td>Portfolio</td><td><span class="badge l-medium">Medium</span></td><td><span class="badge i-high">High</span></td><td><span class="badge r-high">High</span></td></tr>
+      <tr><td><strong>R-12</strong></td><td>Build timeline extends beyond hiring window</td><td>Portfolio</td><td><span class="badge l-medium">Medium</span></td><td><span class="badge i-high">High</span></td><td><span class="badge r-high">High</span></td></tr>
+      <tr><td><strong>R-13</strong></td><td>Product complexity outweighs demonstrated value in review</td><td>Portfolio</td><td><span class="badge l-low">Low</span></td><td><span class="badge i-medium">Medium</span></td><td><span class="badge r-low">Low</span></td></tr>
+      <tr><td><strong>R-14</strong></td><td>UI quality fails to meet portfolio visual standard</td><td>Portfolio</td><td><span class="badge l-medium">Medium</span></td><td><span class="badge i-medium">Medium</span></td><td><span class="badge r-medium">Medium</span></td></tr>
+    </table>
+
+    <!-- ═══════════ HEAT MAP ═══════════ -->
+    <h2>2. Risk Heat Map</h2>
+    <p>The heat map plots all 14 risks by likelihood (vertical) and impact (horizontal). Risk IDs are positioned in the cell corresponding to their individual likelihood and impact ratings.</p>
+
+    <div class="heatmap-wrap">
+      <div class="heatmap">
+        <!-- Row 0: headers -->
+        <div class="hm-cell" style="background:transparent"></div>
+        <div class="hm-header">Low Impact</div>
+        <div class="hm-header">Medium Impact</div>
+        <div class="hm-header">High Impact</div>
+        <!-- Row 1: High likelihood -->
+        <div class="hm-axis">High<br>Likelihood</div>
+        <div class="hm-cell hm-high-low">—</div>
+        <div class="hm-cell hm-high-med">
+          <div><div class="hm-dot">R02</div><div class="hm-dot">R08</div></div>
+        </div>
+        <div class="hm-cell hm-high-high">
+          <div><div class="hm-dot">R01</div><div class="hm-dot">R03</div></div>
+        </div>
+        <!-- Row 2: Medium likelihood -->
+        <div class="hm-axis">Medium<br>Likelihood</div>
+        <div class="hm-cell hm-med-low">—</div>
+        <div class="hm-cell hm-med-med">
+          <div><div class="hm-dot">R07</div><div class="hm-dot">R14</div></div>
+        </div>
+        <div class="hm-cell hm-med-high">
+          <div><div class="hm-dot">R04</div><div class="hm-dot">R05</div><div class="hm-dot">R09</div><div class="hm-dot">R11</div><div class="hm-dot">R12</div></div>
+        </div>
+        <!-- Row 3: Low likelihood -->
+        <div class="hm-axis">Low<br>Likelihood</div>
+        <div class="hm-cell hm-low-low">—</div>
+        <div class="hm-cell hm-low-med">
+          <div><div class="hm-dot">R10</div><div class="hm-dot">R13</div></div>
+        </div>
+        <div class="hm-cell hm-low-high">
+          <div><div class="hm-dot">R06</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <h2>3. Risk Detail — Product Risks</h2>
+    <p>Product risks relate to the quality, accuracy, and user trust of BA Compass's core outputs — particularly the classification engine and the co-pilot artifact generation.</p>
+
+    <!-- R-01 -->
+    <div class="risk-card">
+      <div class="risk-card-header">
+        <span class="risk-id">R-01</span>
+        <span class="risk-title">Classification accuracy insufficient for user trust</span>
+        <div class="risk-badges">
+          <span class="badge r-critical">Critical</span>
+          <span class="badge l-high">Likelihood: High</span>
+          <span class="badge i-high">Impact: High</span>
+        </div>
+      </div>
+      <div class="risk-body">
+        <div class="risk-field full">
+          <div class="label">Description</div>
+          <div class="value">The intake classification engine is the most critical feature in BA Compass. If GPT-4o's engagement type and scale tier recommendation is frequently wrong, implausible, or poorly reasoned, users will lose confidence in the entire roadmap generated from it. Classification error at the foundation cascades into every downstream output.</div>
+        </div>
+        <div class="risk-field">
+          <div class="label">Trigger Conditions</div>
+          <div class="value">Ambiguous intake responses; edge-case engagement types; insufficient prompt specificity; model hallucination on classification rationale</div>
+        </div>
+        <div class="risk-field mitigation">
+          <div class="label">Mitigation</div>
+          <div class="value">Treat classification prompt as a first-class engineering deliverable. Develop and iterate the prompt in isolation before building UI around it. Test against all 8 engagement types × 3 scale tiers with synthetic inputs. Make AI reasoning transparent in the UI — users who can see why a classification was made are more likely to trust it or make an informed override.</div>
+        </div>
+        <div class="risk-field contingency">
+          <div class="label">Contingency</div>
+          <div class="value">User override is a V1 requirement — not a nice-to-have. If classification accuracy cannot be reliably improved, the product remains usable because the user is always in control. Reclassification must also be available at any point post-intake.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- R-02 -->
+    <div class="risk-card">
+      <div class="risk-card-header">
+        <span class="risk-id">R-02</span>
+        <span class="risk-title">Co-pilot output quality inconsistent across modules</span>
+        <div class="risk-badges">
+          <span class="badge r-high">High</span>
+          <span class="badge l-high">Likelihood: High</span>
+          <span class="badge i-medium">Impact: Medium</span>
+        </div>
+      </div>
+      <div class="risk-body">
+        <div class="risk-field full">
+          <div class="label">Description</div>
+          <div class="value">With 52 modules, each requiring its own prompt, the co-pilot experience will almost certainly be uneven across the module library at V1 launch. Some modules (e.g. stakeholder register, process flow documentation) will produce strong outputs; others (e.g. benefits realisation, regulatory impact analysis) may produce generic or shallow drafts.</div>
+        </div>
+        <div class="risk-field">
+          <div class="label">Trigger Conditions</div>
+          <div class="value">Prompts written hastily for less-familiar modules; modules with highly context-dependent outputs; modules where BA methodology is nuanced and harder to encode</div>
+        </div>
+        <div class="risk-field mitigation">
+          <div class="label">Mitigation</div>
+          <div class="value">Prioritise prompt quality for the 15–20 modules most likely to be used in a portfolio demo. Build a prompt review phase into the build sequence — each prompt tested with 3+ synthetic inputs before being considered stable. Use a consistent prompt template structure across all modules to reduce variance.</div>
+        </div>
+        <div class="risk-field contingency">
+          <div class="label">Contingency</div>
+          <div class="value">Weaker modules can be labelled "beta" in V1 UI without impacting the overall product impression. A strong core module set (10–15 modules) is sufficient for a compelling demo. Flag weak modules for iteration post-launch.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- R-03 -->
+    <div class="risk-card">
+      <div class="risk-card-header">
+        <span class="risk-id">R-03</span>
+        <span class="risk-title">Scope creep expanding V1 beyond buildable limits</span>
+        <div class="risk-badges">
+          <span class="badge r-critical">Critical</span>
+          <span class="badge l-high">Likelihood: High</span>
+          <span class="badge i-high">Impact: High</span>
+        </div>
+      </div>
+      <div class="risk-body">
+        <div class="risk-field full">
+          <div class="label">Description</div>
+          <div class="value">Hadi's deep domain knowledge is an asset during product definition and a risk during build. The same expertise that produces a rigorous 52-module library can generate a continuous stream of "what if we also added..." additions that push V1 scope beyond what can be built, tested, and polished within a portfolio timeline.</div>
+        </div>
+        <div class="risk-field">
+          <div class="label">Trigger Conditions</div>
+          <div class="value">Discovery of edge cases during build; comparison with existing BA tools; feedback during document review; iterating too deeply on a single phase before completing others</div>
+        </div>
+        <div class="risk-field mitigation">
+          <div class="label">Mitigation</div>
+          <div class="value">The Product Definition Document is locked — it is the authoritative scope boundary. Any new idea encountered during build is logged in a "post-V1 ideas" backlog, not added to V1. Build phase follows the 10-phase sequence strictly — no phase begins until the prior is stable. Phase gate reviews enforce discipline.</div>
+        </div>
+        <div class="risk-field contingency">
+          <div class="label">Contingency</div>
+          <div class="value">If scope creep has already entered a phase, conduct an explicit descope exercise: list every in-progress addition, evaluate each against the V1 definition, remove anything not in the original spec. A working V1 with clean scope is a stronger portfolio piece than a partially-built V1.5.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- R-04 -->
+    <div class="risk-card">
+      <div class="risk-card-header">
+        <span class="risk-id">R-04</span>
+        <span class="risk-title">BABOK alignment superficial or incorrect</span>
+        <div class="risk-badges">
+          <span class="badge r-high">High</span>
+          <span class="badge l-medium">Likelihood: Medium</span>
+          <span class="badge i-high">Impact: High</span>
+        </div>
+      </div>
+      <div class="risk-body">
+        <div class="risk-field full">
+          <div class="label">Description</div>
+          <div class="value">BA Compass's core claim is that it encodes BABOK methodology, not just wraps an LLM. If the module library uses BABOK terminology superficially, maps modules to the wrong knowledge areas, or the co-pilot prompts do not reflect genuine BA practice, a knowledgeable reviewer (IIBA member, senior BA hiring manager) will identify this immediately — and it will invalidate the entire portfolio narrative.</div>
+        </div>
+        <div class="risk-field">
+          <div class="label">Trigger Conditions</div>
+          <div class="value">Module knowledge area assignments made by convention rather than BABOK v3 reference; prompt language that sounds like BA methodology but misses key concepts; reviewers with deep IIBA/BABOK knowledge</div>
+        </div>
+        <div class="risk-field mitigation">
+          <div class="label">Mitigation</div>
+          <div class="value">Map all 52 modules to BABOK v3 knowledge areas using the BABOK Guide directly as reference, not from memory. Have at least one section of the documentation reviewed by an IIBA-certified peer if accessible. Ensure co-pilot prompts reference the correct BABOK tasks and techniques for each module type.</div>
+        </div>
+        <div class="risk-field contingency">
+          <div class="label">Contingency</div>
+          <div class="value">If a misalignment is identified during review, correct it in the seed data before launch — the module library is a static data file, not compiled code. A post-launch patch is possible without touching application logic.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- R-05 -->
+    <div class="risk-card">
+      <div class="risk-card-header">
+        <span class="risk-id">R-05</span>
+        <span class="risk-title">Gap analysis produces false confidence — misses real gaps</span>
+        <div class="risk-badges">
+          <span class="badge r-high">High</span>
+          <span class="badge l-medium">Likelihood: Medium</span>
+          <span class="badge i-high">Impact: High</span>
+        </div>
+      </div>
+      <div class="risk-body">
+        <div class="risk-field full">
+          <div class="label">Description</div>
+          <div class="value">The gap analysis feature is a high-value differentiator. However, if the AI reviews artifacts and fails to flag genuine gaps — either because the prompt is under-specified, the AI is too agreeable, or the engagement context is incomplete — users may submit deliverable packages that appear validated but contain real weaknesses. This is worse than having no gap analysis at all.</div>
+        </div>
+        <div class="risk-field">
+          <div class="label">Trigger Conditions</div>
+          <div class="value">Gap analysis prompt too generic; AI lacks sufficient engagement context at review time; artifacts are thin but not obviously incomplete; model optimised for positive framing</div>
+        </div>
+        <div class="risk-field mitigation">
+          <div class="label">Mitigation</div>
+          <div class="value">Gap analysis prompt must be explicitly instructed to be critical and specific — not to validate, but to challenge. Include all 10 intake dimensions in the gap analysis context. Test the prompt against known-incomplete artifact sets to verify it flags real gaps. Use a structured output format that requires the AI to assess each BABOK knowledge area independently.</div>
+        </div>
+        <div class="risk-field contingency">
+          <div class="label">Contingency</div>
+          <div class="value">Add a disclaimer in the UI: gap analysis is an AI-assisted review, not a guarantee of completeness. Frame it as "a second pass before you submit" — valuable, but not a substitute for professional judgment. This is also an honest statement of the product's current capability.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <h2>4. Risk Detail — Technical Risks</h2>
+    <p>Technical risks relate to the reliability of the infrastructure, API dependencies, and implementation decisions that underpin the application.</p>
+
+    <!-- R-06 -->
+    <div class="risk-card">
+      <div class="risk-card-header">
+        <span class="risk-id">R-06</span>
+        <span class="risk-title">OpenAI API unavailability during portfolio demo</span>
+        <div class="risk-badges">
+          <span class="badge r-medium">Medium</span>
+          <span class="badge l-low">Likelihood: Low</span>
+          <span class="badge i-high">Impact: High</span>
+        </div>
+      </div>
+      <div class="risk-body">
+        <div class="risk-field full">
+          <div class="label">Description</div>
+          <div class="value">OpenAI API outages are infrequent but not impossible. An outage during a live portfolio walkthrough with a hiring manager or at a critical review moment would make the core features of BA Compass non-functional and leave a deeply negative impression.</div>
+        </div>
+        <div class="risk-field mitigation">
+          <div class="label">Mitigation</div>
+          <div class="value">Implement graceful error handling on all API calls — clear, professional user-facing messages rather than raw error traces. Monitor OpenAI's status page at <code>status.openai.com</code> before scheduled demos. Consider caching classification and co-pilot responses for a demo project so a recorded walkthrough is always available as backup.</div>
+        </div>
+        <div class="risk-field contingency">
+          <div class="label">Contingency</div>
+          <div class="value">Maintain a screen recording of a complete demo walkthrough as a fallback. If live demo is not possible, a polished recording with commentary is a credible alternative for async portfolio review.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- R-07 -->
+    <div class="risk-card">
+      <div class="risk-card-header">
+        <span class="risk-id">R-07</span>
+        <span class="risk-title">Neon DB free-tier connection limits cause failures</span>
+        <div class="risk-badges">
+          <span class="badge r-medium">Medium</span>
+          <span class="badge l-medium">Likelihood: Medium</span>
+          <span class="badge i-medium">Impact: Medium</span>
+        </div>
+      </div>
+      <div class="risk-body">
+        <div class="risk-field full">
+          <div class="label">Description</div>
+          <div class="value">Neon DB's free tier has connection and compute limits. Streamlit creates a new Python process per user session, which can exhaust connection pools under concurrent load or if connections are not properly closed. For a solo-user V1 application this is unlikely, but poor connection management could cause intermittent failures.</div>
+        </div>
+        <div class="risk-field mitigation">
+          <div class="label">Mitigation</div>
+          <div class="value">Use <code>st.cache_resource</code> to manage a single shared database connection per Streamlit instance. Implement connection pooling via <code>psycopg2</code> connection pool or use Neon's built-in connection pooler (PgBouncer). Always close connections in <code>finally</code> blocks. Avoid opening connections inside loops.</div>
+        </div>
+        <div class="risk-field contingency">
+          <div class="label">Contingency</div>
+          <div class="value">If free-tier limits become a problem post-launch, Neon's paid tier is low-cost and can be upgraded without schema or connection string changes. Budget impact is minimal.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- R-08 -->
+    <div class="risk-card">
+      <div class="risk-card-header">
+        <span class="risk-id">R-08</span>
+        <span class="risk-title">Streamlit cold-start latency creates poor demo impression</span>
+        <div class="risk-badges">
+          <span class="badge r-high">High</span>
+          <span class="badge l-high">Likelihood: High</span>
+          <span class="badge i-medium">Impact: Medium</span>
+        </div>
+      </div>
+      <div class="risk-body">
+        <div class="risk-field full">
+          <div class="label">Description</div>
+          <div class="value">Streamlit Community Cloud apps that have not been accessed recently go to sleep and require a cold start on next visit — typically 10–30 seconds of a loading spinner before the app responds. For a hiring manager clicking a portfolio link, this creates an immediate negative first impression and may result in them closing the tab before the app loads.</div>
+        </div>
+        <div class="risk-field mitigation">
+          <div class="label">Mitigation</div>
+          <div class="value">Add a "wake up" ping to the app before any scheduled demo. Keep the app lightweight to minimise cold-start time. Use <code>st.cache_data</code> and <code>st.cache_resource</code> throughout to minimise re-computation on subsequent interactions. Ensure the loading state displays a purposeful, branded screen rather than a blank white page.</div>
+        </div>
+        <div class="risk-field contingency">
+          <div class="label">Contingency</div>
+          <div class="value">Pre-warm the app by visiting it ~2 minutes before any demo. For portfolio links shared on LinkedIn or in applications, include a note that the app may take up to 30 seconds to load on first visit — sets expectations and prevents abandonment.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- R-09 -->
+    <div class="risk-card">
+      <div class="risk-card-header">
+        <span class="risk-id">R-09</span>
+        <span class="risk-title">API key or secrets accidentally committed to GitHub</span>
+        <div class="risk-badges">
+          <span class="badge r-high">High</span>
+          <span class="badge l-medium">Likelihood: Medium</span>
+          <span class="badge i-high">Impact: High</span>
+        </div>
+      </div>
+      <div class="risk-body">
+        <div class="risk-field full">
+          <div class="label">Description</div>
+          <div class="value">A committed API key or database credential on a public GitHub repository creates an immediate security incident — the key must be rotated, and the commit history may expose the secret even after removal. For a portfolio repository reviewed by hiring managers, this would be professionally embarrassing and potentially costly if the key is misused before rotation.</div>
+        </div>
+        <div class="risk-field mitigation">
+          <div class="label">Mitigation</div>
+          <div class="value">Configure <code>.gitignore</code> before the first commit — <code>.env</code>, <code>secrets.toml</code>, and any local config files must be listed. All secrets stored in Streamlit Secrets only — never in code or config files that could be committed. Enable GitHub secret scanning on the repository. Use a pre-commit check to scan for key patterns before pushing.</div>
+        </div>
+        <div class="risk-field contingency">
+          <div class="label">Contingency</div>
+          <div class="value">If a secret is committed: immediately rotate the key in the relevant provider dashboard, use <code>git filter-branch</code> or BFG Repo Cleaner to purge the secret from history, and force-push the clean history. Do not rely on a simple deletion commit — the secret remains in history.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- R-10 -->
+    <div class="risk-card">
+      <div class="risk-card-header">
+        <span class="risk-id">R-10</span>
+        <span class="risk-title">OpenAI pricing or model deprecation forces rework</span>
+        <div class="risk-badges">
+          <span class="badge r-low">Low</span>
+          <span class="badge l-low">Likelihood: Low</span>
+          <span class="badge i-medium">Impact: Medium</span>
+        </div>
+      </div>
+      <div class="risk-body">
+        <div class="risk-field full">
+          <div class="label">Description</div>
+          <div class="value">GPT-4o may be deprecated or significantly repriced. For a portfolio application with modest usage, pricing changes are unlikely to be material. Model deprecation would require updating the model string and potentially re-tuning prompts for a successor model.</div>
+        </div>
+        <div class="risk-field mitigation">
+          <div class="label">Mitigation</div>
+          <div class="value">Store the model name as a config constant, not a hardcoded string. All prompts stored as editable config — swapping models requires changing one constant and re-testing prompts, not rewriting application logic.</div>
+        </div>
+        <div class="risk-field contingency">
+          <div class="label">Contingency</div>
+          <div class="value">Monitor OpenAI's model deprecation schedule. GPT-4o deprecation typically provides 6+ months notice. A prompt re-test against a successor model is a few hours of work if prompts are well-structured.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <h2>5. Risk Detail — Portfolio Risks</h2>
+    <p>Portfolio risks relate to the strategic objective of BA Compass as a career-transition portfolio piece. These risks are distinct from technical failure — the application can work perfectly and still fail to achieve its portfolio purpose if the following risks are not managed.</p>
+
+    <!-- R-11 -->
+    <div class="risk-card">
+      <div class="risk-card-header">
+        <span class="risk-id">R-11</span>
+        <span class="risk-title">Portfolio dismissed as AI-generated, not Hadi's own work</span>
+        <div class="risk-badges">
+          <span class="badge r-high">High</span>
+          <span class="badge l-medium">Likelihood: Medium</span>
+          <span class="badge i-high">Impact: High</span>
+        </div>
+      </div>
+      <div class="risk-body">
+        <div class="risk-field full">
+          <div class="label">Description</div>
+          <div class="value">An evaluator who sees a polished, comprehensive BA application may conclude that it was produced entirely by AI with minimal intellectual contribution from the candidate — particularly in a hiring climate where AI-generated portfolios are common. If Hadi cannot fluently explain every design decision, the dismissal is validated.</div>
+        </div>
+        <div class="risk-field mitigation">
+          <div class="label">Mitigation</div>
+          <div class="value">Every pre-build document must be something Hadi can speak to fluently in an interview — the process of producing them is as valuable as the documents themselves. Prepare a 2-minute walkthrough narrative that articulates methodology decisions, not just features. The portfolio narrative emphasises that AI handles implementation; Hadi provides the BA methodology expertise that the AI cannot encode without him.</div>
+        </div>
+        <div class="risk-field contingency">
+          <div class="label">Contingency</div>
+          <div class="value">If challenged, be direct: "I built this with AI as a coding tool, the same way a developer uses Stack Overflow or a compiler. The product logic — the 52-module BABOK library, the 8 engagement types, the intake dimension model — came from my BA knowledge. The AI couldn't have done that without me specifying it." That is a credible and honest answer.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- R-12 -->
+    <div class="risk-card">
+      <div class="risk-card-header">
+        <span class="risk-id">R-12</span>
+        <span class="risk-title">Build timeline extends beyond hiring window</span>
+        <div class="risk-badges">
+          <span class="badge r-high">High</span>
+          <span class="badge l-medium">Likelihood: Medium</span>
+          <span class="badge i-high">Impact: High</span>
+        </div>
+      </div>
+      <div class="risk-body">
+        <div class="risk-field full">
+          <div class="label">Description</div>
+          <div class="value">F2 is a large, complex build. If the build phase runs long — due to scope creep, technical challenges, or competing priorities — the portfolio may not be ready when active hiring conversations are underway. A partially built application is worse than no application in a portfolio context.</div>
+        </div>
+        <div class="risk-field mitigation">
+          <div class="label">Mitigation</div>
+          <div class="value">The 10-phase build sequence defines a minimum viable completion point: phases 1–5 (scaffold, module data, intake, roadmap navigator, co-pilot) deliver the core value proposition and are demo-able as a complete product. Phases 6–10 add depth. Target phases 1–5 as the go/no-go milestone for active job applications. Do not wait for phases 6–10 before putting the portfolio in front of hiring managers.</div>
+        </div>
+        <div class="risk-field contingency">
+          <div class="label">Contingency</div>
+          <div class="value">If timeline pressure is acute, S1–S4 (already live) are sufficient to demonstrate technical capability. F2 phases 1–5 are sufficient to demonstrate BA methodology depth. Frame an in-progress F2 as "currently in active development" with a clear build log — this demonstrates momentum, not incompleteness.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- R-13 -->
+    <div class="risk-card">
+      <div class="risk-card-header">
+        <span class="risk-id">R-13</span>
+        <span class="risk-title">Product complexity outweighs demonstrated value in review</span>
+        <div class="risk-badges">
+          <span class="badge r-low">Low</span>
+          <span class="badge l-low">Likelihood: Low</span>
+          <span class="badge i-medium">Impact: Medium</span>
+        </div>
+      </div>
+      <div class="risk-body">
+        <div class="risk-field full">
+          <div class="label">Description</div>
+          <div class="value">BA Compass is architecturally complex — 52 modules, 24 templates, 10 intake dimensions, multi-phase workflow. A reviewer who cannot quickly understand what the product does and why may be impressed by its ambition but unable to articulate its value — which makes it harder to advocate for Hadi internally.</div>
+        </div>
+        <div class="risk-field mitigation">
+          <div class="label">Mitigation</div>
+          <div class="value">The application's landing page and the first 90 seconds of any demo must communicate the core value proposition in plain language: "A junior BA assigned a new engagement doesn't know where to start. BA Compass tells them." Everything else is supporting detail. Design the demo flow to hit this message first, then reveal complexity progressively.</div>
+        </div>
+        <div class="risk-field contingency">
+          <div class="label">Contingency</div>
+          <div class="value">Prepare a 30-second elevator pitch that reduces BA Compass to one sentence. Use it at the start of every walkthrough, every LinkedIn post, every README. Complexity is a positive signal once the value proposition lands.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- R-14 -->
+    <div class="risk-card">
+      <div class="risk-card-header">
+        <span class="risk-id">R-14</span>
+        <span class="risk-title">UI quality fails to meet portfolio visual standard</span>
+        <div class="risk-badges">
+          <span class="badge r-medium">Medium</span>
+          <span class="badge l-medium">Likelihood: Medium</span>
+          <span class="badge i-medium">Impact: Medium</span>
+        </div>
+      </div>
+      <div class="risk-body">
+        <div class="risk-field full">
+          <div class="label">Description</div>
+          <div class="value">Hadi has high visual quality standards — explicitly referencing S4 (Lens) as the visual benchmark. Default Streamlit widgets and layout are unlikely to meet this bar without significant customisation via CSS injection and custom components. Building to this standard takes longer than building to default Streamlit quality.</div>
+        </div>
+        <div class="risk-field mitigation">
+          <div class="label">Mitigation</div>
+          <div class="value">Invest in the visual system during the scaffold phase — establish custom CSS, component patterns, and the dark-theme colour palette before building any feature screens. A consistent visual system applied consistently is more efficient than retrofitting styles screen by screen. Use S4 (Lens) as a living reference during build.</div>
+        </div>
+        <div class="risk-field contingency">
+          <div class="label">Contingency</div>
+          <div class="value">If time pressure forces a choice between UI polish and feature completeness, prioritise the screens that appear in the demo flow. A demo that hits 5 polished screens is stronger than a full application with inconsistent quality throughout.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <h2>6. Risk Response Summary</h2>
+    <p>Consolidated reference view of all risks, their ratings, owners, and response strategy types.</p>
+
+    <table>
+      <tr><th>ID</th><th>Risk</th><th>Rating</th><th>Response Type</th><th>Owner</th><th>Review Point</th></tr>
+      <tr><td><strong>R-01</strong></td><td>Classification accuracy</td><td><span class="badge r-critical">Critical</span></td><td>Mitigate + Accept residual</td><td>Hadi Mercer</td><td>Phase 3 (Intake build)</td></tr>
+      <tr><td><strong>R-02</strong></td><td>Co-pilot output consistency</td><td><span class="badge r-high">High</span></td><td>Mitigate + Accept residual</td><td>Hadi Mercer</td><td>Phase 5 (Co-pilot build)</td></tr>
+      <tr><td><strong>R-03</strong></td><td>Scope creep</td><td><span class="badge r-critical">Critical</span></td><td>Prevent via governance</td><td>Hadi Mercer</td><td>Every phase gate</td></tr>
+      <tr><td><strong>R-04</strong></td><td>BABOK alignment</td><td><span class="badge r-high">High</span></td><td>Mitigate</td><td>Hadi Mercer</td><td>Phase 2 (Module seed data)</td></tr>
+      <tr><td><strong>R-05</strong></td><td>Gap analysis false confidence</td><td><span class="badge r-high">High</span></td><td>Mitigate + Inform users</td><td>Hadi Mercer</td><td>Phase 6 (Gap analysis build)</td></tr>
+      <tr><td><strong>R-06</strong></td><td>API unavailability</td><td><span class="badge r-medium">Medium</span></td><td>Accept + Contingency plan</td><td>Hadi Mercer</td><td>Pre-demo checklist</td></tr>
+      <tr><td><strong>R-07</strong></td><td>DB connection limits</td><td><span class="badge r-medium">Medium</span></td><td>Mitigate</td><td>Hadi Mercer</td><td>Phase 1 (Scaffold)</td></tr>
+      <tr><td><strong>R-08</strong></td><td>Streamlit cold-start</td><td><span class="badge r-high">High</span></td><td>Mitigate + Communicate</td><td>Hadi Mercer</td><td>Pre-launch testing</td></tr>
+      <tr><td><strong>R-09</strong></td><td>Secrets committed to Git</td><td><span class="badge r-high">High</span></td><td>Prevent (Day 1)</td><td>Hadi Mercer</td><td>Phase 1 (Scaffold) — Day 1</td></tr>
+      <tr><td><strong>R-10</strong></td><td>Model deprecation</td><td><span class="badge r-low">Low</span></td><td>Monitor</td><td>Hadi Mercer</td><td>Quarterly post-launch</td></tr>
+      <tr><td><strong>R-11</strong></td><td>AI-generated dismissal</td><td><span class="badge r-high">High</span></td><td>Mitigate via narrative</td><td>Hadi Mercer</td><td>Pre-launch</td></tr>
+      <tr><td><strong>R-12</strong></td><td>Build timeline slip</td><td><span class="badge r-high">High</span></td><td>Mitigate via MVP scope gate</td><td>Hadi Mercer</td><td>Phase 5 milestone</td></tr>
+      <tr><td><strong>R-13</strong></td><td>Complexity vs. value clarity</td><td><span class="badge r-low">Low</span></td><td>Mitigate via demo design</td><td>Hadi Mercer</td><td>Pre-launch</td></tr>
+      <tr><td><strong>R-14</strong></td><td>UI quality standard</td><td><span class="badge r-medium">Medium</span></td><td>Mitigate via early investment</td><td>Hadi Mercer</td><td>Phase 1 (Scaffold)</td></tr>
+    </table>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="signoff">
+      <h2>7. Document Sign-Off</h2>
+      <p>This risk register is submitted for review as the final document in the BA Compass pre-build documentation package. Approval confirms that all identified risks have been acknowledged and that mitigation strategies are accepted as the basis for risk management during the build phase.</p>
+      <table>
+        <tr><th>Role</th><th>Name</th><th>Date</th><th>Status</th></tr>
+        <tr><td>Author / Product Owner</td><td>Hadi Mercer</td><td>March 2026</td><td>Pending Review</td></tr>
+        <tr><td>Reviewer</td><td>—</td><td>—</td><td>—</td></tr>
+      </table>
+      <div>
+        <div class="signoff-line">Approved by: ___________________________</div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /page -->
+</body>
+</html>

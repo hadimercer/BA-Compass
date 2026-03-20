@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BA Compass — Activity Diagram &amp; User Journey Map v1.0</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:#1B2A4A;--accent:#2E75B6;--accent-lt:#D5E8F0;--accent-bg:#EAF2F8;
+    --bg:#FFFFFF;--surface:#F8FAFC;--border:#D1D5DB;--border-lt:#E5E7EB;
+    --text:#1E293B;--text-secondary:#64748B;--text-muted:#94A3B8;
+    --green:#16A34A;--green-lt:#DCFCE7;--amber:#D97706;--amber-lt:#FEF3C7;
+    --red:#DC2626;--red-lt:#FEE2E2;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'DM Sans',sans-serif;color:var(--text);background:#F1F5F9;line-height:1.6}
+  .page{max-width:1100px;margin:40px auto;background:var(--bg);border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.04);overflow:hidden}
+  .cover{background:linear-gradient(135deg,var(--navy) 0%,#243B67 100%);padding:80px 60px 60px;color:#fff}
+  .cover h1{font-size:42px;font-weight:700;letter-spacing:-0.5px;margin-bottom:4px}
+  .cover .subtitle{font-size:20px;font-weight:400;color:#93B5D6;margin-bottom:32px}
+  .cover .doc-type{display:inline-block;font-size:13px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent-lt);border:1px solid rgba(255,255,255,0.2);padding:6px 16px;border-radius:4px;margin-bottom:40px}
+  .cover-meta{display:flex;gap:40px;margin-top:24px;font-size:14px;color:#93B5D6}
+  .cover-meta strong{color:#B8D4EA;font-weight:500}
+  .content{padding:48px 60px 60px}
+  h2{font-size:24px;font-weight:700;color:var(--navy);margin:48px 0 8px;padding-bottom:8px;border-bottom:2px solid var(--accent)}
+  h2:first-child{margin-top:0}
+  h3{font-size:18px;font-weight:600;color:var(--accent);margin:32px 0 12px}
+  p{margin-bottom:12px;font-size:15px}
+  .note{border-left:4px solid var(--accent);background:var(--accent-bg);padding:12px 16px;margin:16px 0 24px;font-size:14px;color:var(--text-secondary);border-radius:0 6px 6px 0}
+  table{width:100%;border-collapse:collapse;margin:16px 0 24px;font-size:14px}
+  th{background:var(--navy);color:#fff;font-weight:600;text-align:left;padding:10px 14px;font-size:13px;letter-spacing:.3px}
+  th:first-child{border-radius:6px 0 0 0}th:last-child{border-radius:0 6px 0 0}
+  td{padding:10px 14px;border-bottom:1px solid var(--border-lt);vertical-align:top}
+  tr:nth-child(even) td{background:var(--surface)}
+  .diagram-wrap{margin:24px 0 32px;border:1px solid var(--border);border-radius:8px;overflow-x:auto;background:#FDFDFE}
+  .diagram-wrap svg{display:block}
+  .signoff{margin-top:48px;padding-top:24px;border-top:2px solid var(--border)}
+  .signoff-line{margin-top:40px;padding-top:12px;border-top:1px solid var(--text-muted);display:inline-block;min-width:300px;font-size:14px;color:var(--text-muted)}
+  code{font-family:'DM Mono',monospace;font-size:13px;background:#F1F5F9;padding:2px 6px;border-radius:3px;color:#1B2A4A}
+
+  /* Journey Map styles */
+  .journey-wrap{margin:24px 0 32px;overflow-x:auto}
+  .journey-table{min-width:1000px;border-collapse:separate;border-spacing:0;width:100%;font-size:13px;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+  .journey-table .phase-header{background:var(--navy);color:#fff;font-weight:700;text-align:center;padding:14px 10px;font-size:13px;letter-spacing:.3px;vertical-align:middle}
+  .journey-table .dim-label{background:var(--surface);font-weight:600;color:var(--navy);font-size:12px;padding:10px 14px;border-right:1px solid var(--border);border-bottom:1px solid var(--border-lt);white-space:nowrap;vertical-align:top;min-width:130px}
+  .journey-table .dim-cell{padding:10px 12px;border-right:1px solid var(--border-lt);border-bottom:1px solid var(--border-lt);vertical-align:top;font-size:13px;color:var(--text);line-height:1.5}
+  .journey-table .dim-cell:last-child{border-right:none}
+  .journey-table .dim-label:first-child{border-left:none}
+  .tag{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;margin:2px 2px 2px 0;white-space:nowrap}
+  .tag-action{background:#EEF2FF;color:#3730A3}
+  .tag-ai{background:var(--accent-bg);color:#1B4F7A}
+  .tag-pain{background:var(--red-lt);color:#991B1B}
+  .tag-value{background:var(--green-lt);color:#14532D}
+  .tag-screen{background:var(--amber-lt);color:#92400E}
+  .emotion-row td{background:#F8FAFC;padding:0}
+  .emotion-chart{width:100%;height:80px;display:block}
+
+  /* Phase color accent bar */
+  .phase-1{border-top:3px solid #6366F1}
+  .phase-2{border-top:3px solid #2E75B6}
+  .phase-3{border-top:3px solid #0891B2}
+  .phase-4{border-top:3px solid #16A34A}
+  .phase-5{border-top:3px solid #D97706}
+  .phase-6{border-top:3px solid #1B2A4A}
+
+  @media print{body{background:#fff}.page{margin:0;box-shadow:none;border-radius:0}.cover{break-after:page}h2{break-after:avoid}.diagram-wrap{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="cover">
+    <div class="doc-type">UML Activity Diagram &amp; User Journey Map</div>
+    <h1>BA Compass</h1>
+    <div class="subtitle">Business Analysis Co-Pilot</div>
+    <div class="cover-meta">
+      <span><strong>Version</strong> 1.0</span>
+      <span><strong>Prepared by</strong> Hadi Mercer</span>
+      <span><strong>Date</strong> March 2026</span>
+      <span><strong>Status</strong> Draft — Pending Approval</span>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <h2>1. Overview</h2>
+    <p>This document presents two complementary artifacts that describe the user's journey through BA Compass from two perspectives: the system's behavioral logic (UML Activity Diagram) and the user's lived experience (User Journey Map).</p>
+    <p>Together, they serve as the bridge between the structural specifications in the FRD and Class Diagram and the human experience the product is designed to deliver.</p>
+
+    <table>
+      <tr><th>#</th><th>Artifact</th><th>Type</th><th>Purpose</th></tr>
+      <tr><td><strong>1</strong></td><td>Full User Journey Activity Diagram</td><td>UML Behavioral</td><td>System-level flow from login to export, with swimlane partitions across User, UI, AI Engine, and Database</td></tr>
+      <tr><td><strong>2</strong></td><td>User Journey Map</td><td>BA / UX Artifact</td><td>Experience-layer map showing user actions, touchpoints, AI interactions, emotional arc, and pain points resolved across six journey phases</td></tr>
+    </table>
+
+    <div class="note">Both artifacts are derived from the Product Definition Document v1.0 and Functional Requirements Document v1.0. All FRD requirement IDs referenced in Part A (§3) are sourced from those documents.</div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- PART A: ACTIVITY DIAGRAM -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <h2>2. UML Activity Diagram — Full User Journey</h2>
+
+    <p>The activity diagram below traces the complete lifecycle of a user session in BA Compass — from authentication through project creation, intake classification, roadmap navigation, co-pilot module work, artifact generation, gap analysis, and final export. It uses standard UML activity notation.</p>
+
+    <h3>2.1 Notation Guide</h3>
+    <table>
+      <tr><th>Symbol</th><th>Meaning</th></tr>
+      <tr><td>● Filled circle</td><td>Initial node — start of flow</td></tr>
+      <tr><td>◎ Circled dot</td><td>Activity final node — end of flow</td></tr>
+      <tr><td>Rounded rectangle</td><td>Action / activity</td></tr>
+      <tr><td>Diamond ◇</td><td>Decision node (guard condition)</td></tr>
+      <tr><td>Thick horizontal bar</td><td>Fork (parallel split) or Join (parallel merge)</td></tr>
+      <tr><td>Swimlane partition</td><td>Responsibility boundary — User, UI/System, AI Engine, Database</td></tr>
+    </table>
+
+    <h3>2.2 Swimlane Partitions</h3>
+    <table>
+      <tr><th>Partition</th><th>Colour</th><th>Represents</th></tr>
+      <tr><td><strong>User</strong></td><td>Indigo header</td><td>All explicit user actions — clicks, inputs, selections, confirmations</td></tr>
+      <tr><td><strong>UI / System</strong></td><td>Navy header</td><td>Streamlit frontend logic, routing, session management, validation</td></tr>
+      <tr><td><strong>AI Engine</strong></td><td>Blue header</td><td>GPT-4o processing — classification, co-pilot responses, gap analysis</td></tr>
+      <tr><td><strong>Database</strong></td><td>Slate header</td><td>Neon DB reads/writes — persistence of all project state and artifacts</td></tr>
+    </table>
+
+    <div class="diagram-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 2060" width="1060" height="2060">
+        <defs>
+          <style>
+            .act{font:13px 'DM Sans',sans-serif;fill:#1E293B;text-anchor:middle;dominant-baseline:middle}
+            .act-sm{font:11.5px 'DM Sans',sans-serif;fill:#1E293B;text-anchor:middle;dominant-baseline:middle}
+            .act-note{font:11px 'DM Sans',sans-serif;fill:#64748B;text-anchor:middle;dominant-baseline:middle}
+            .guard{font:11px 'DM Sans',sans-serif;fill:#D97706;text-anchor:middle;dominant-baseline:middle}
+            .lane-label{font:bold 13px 'DM Sans',sans-serif;fill:#ffffff;text-anchor:middle;dominant-baseline:middle}
+            .arrow{stroke:#475569;stroke-width:1.5;fill:none;marker-end:url(#arr)}
+            .arrow-dashed{stroke:#94A3B8;stroke-width:1.2;fill:none;stroke-dasharray:5,3;marker-end:url(#arr-lt)}
+          </style>
+          <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#475569"/>
+          </marker>
+          <marker id="arr-lt" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#94A3B8"/>
+          </marker>
+        </defs>
+
+        <!-- ── SWIMLANE HEADERS ── -->
+        <!-- Lane 1: User  x=0, w=250 -->
+        <rect x="0" y="0" width="265" height="40" fill="#4338CA"/>
+        <text x="132" y="20" class="lane-label">User</text>
+        <!-- Lane 2: UI/System  x=265, w=265 -->
+        <rect x="265" y="0" width="265" height="40" fill="#1B2A4A"/>
+        <text x="397" y="20" class="lane-label">UI / System</text>
+        <!-- Lane 3: AI Engine  x=530, w=265 -->
+        <rect x="530" y="0" width="265" height="40" fill="#2E75B6"/>
+        <text x="662" y="20" class="lane-label">AI Engine</text>
+        <!-- Lane 4: Database  x=795, w=265 -->
+        <rect x="795" y="0" width="265" height="40" fill="#334155"/>
+        <text x="927" y="20" class="lane-label">Database</text>
+
+        <!-- Lane background fills -->
+        <rect x="0"   y="40" width="265" height="2020" fill="#EEF2FF" opacity=".25"/>
+        <rect x="265" y="40" width="265" height="2020" fill="#EAF2F8" opacity=".25"/>
+        <rect x="530" y="40" width="265" height="2020" fill="#DBEAFE" opacity=".20"/>
+        <rect x="795" y="40" width="265" height="2020" fill="#F1F5F9" opacity=".40"/>
+
+        <!-- Lane dividers -->
+        <line x1="265" y1="40" x2="265" y2="2060" stroke="#CBD5E1" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="530" y1="40" x2="530" y2="2060" stroke="#CBD5E1" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="795" y1="40" x2="795" y2="2060" stroke="#CBD5E1" stroke-width="1" stroke-dasharray="4,4"/>
+
+        <!-- ══════════════════════════════════════════
+             PHASE 1: AUTHENTICATION
+        ═══════════════════════════════════════════ -->
+        <rect x="0" y="40" width="1060" height="22" fill="#6366F1" opacity=".15"/>
+        <text x="530" y="51" style="font:bold 11px 'DM Sans',sans-serif;fill:#3730A3;text-anchor:middle;dominant-baseline:middle">PHASE 1 — AUTHENTICATION</text>
+
+        <!-- Initial node -->
+        <circle cx="132" cy="86" r="10" fill="#1B2A4A"/>
+
+        <!-- Navigate to App -->
+        <line x1="132" y1="96" x2="132" y2="112" class="arrow" marker-end="url(#arr)"/>
+        <rect x="42" y="112" width="180" height="34" rx="17" fill="#fff" stroke="#4338CA" stroke-width="1.5"/>
+        <text x="132" y="129" class="act-sm">Navigate to BA Compass</text>
+
+        <!-- UI: Render login -->
+        <line x1="222" y1="129" x2="282" y2="129" class="arrow" marker-end="url(#arr)"/>
+        <rect x="282" y="112" width="230" height="34" rx="17" fill="#fff" stroke="#1B2A4A" stroke-width="1.5"/>
+        <text x="397" y="129" class="act-sm">Render Login / Register Screen</text>
+
+        <!-- User: Enter credentials -->
+        <line x1="397" y1="146" x2="397" y2="162" class="arrow" marker-end="url(#arr)"/>
+        <!-- Cross-lane: back to user -->
+        <line x1="282" y1="162" x2="222" y2="162" class="arrow-dashed" marker-end="url(#arr-lt)"/>
+        <line x1="282" y1="146" x2="282" y2="170" stroke="#94A3B8" stroke-width="1" stroke-dasharray="3,3"/>
+        <rect x="42" y="162" width="180" height="34" rx="17" fill="#fff" stroke="#4338CA" stroke-width="1.5"/>
+        <text x="132" y="179" class="act-sm">Enter Email + Password</text>
+
+        <!-- UI: Validate + DB check -->
+        <line x1="222" y1="179" x2="282" y2="179" class="arrow" marker-end="url(#arr)"/>
+        <rect x="282" y="162" width="230" height="34" rx="17" fill="#fff" stroke="#1B2A4A" stroke-width="1.5"/>
+        <text x="397" y="179" class="act-sm">Validate Credentials (bcrypt)</text>
+
+        <!-- DB: Verify session -->
+        <line x1="512" y1="179" x2="808" y2="179" class="arrow" marker-end="url(#arr)"/>
+        <rect x="808" y="162" width="230" height="34" rx="17" fill="#fff" stroke="#334155" stroke-width="1.5"/>
+        <text x="923" y="179" class="act-sm">Verify User / Create Session Token</text>
+
+        <!-- Decision: Auth success? -->
+        <line x1="397" y1="196" x2="397" y2="222" class="arrow" marker-end="url(#arr)"/>
+        <polygon points="397,222 435,244 397,266 359,244" fill="#FFFBEB" stroke="#D97706" stroke-width="1.5"/>
+        <text x="397" y="244" class="guard">Auth OK?</text>
+
+        <!-- No: Error -->
+        <line x1="359" y1="244" x2="220" y2="244" class="arrow" marker-end="url(#arr)"/>
+        <text x="288" y="236" class="guard">No</text>
+        <rect x="42" y="230" width="178" height="28" rx="14" fill="#FEE2E2" stroke="#DC2626" stroke-width="1.2"/>
+        <text x="131" y="244" class="act-sm" style="fill:#991B1B">Show Error Message</text>
+        <!-- Loop back -->
+        <path d="M42,244 Q10,244 10,210 Q10,175 42,175" stroke="#DC2626" stroke-width="1.2" fill="none" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+
+        <!-- Yes: Route -->
+        <line x1="397" y1="266" x2="397" y2="286" class="arrow" marker-end="url(#arr)"/>
+        <text x="415" y="278" class="guard">Yes</text>
+
+        <!-- ══════════════════════════════════════════
+             PHASE 2: DASHBOARD
+        ═══════════════════════════════════════════ -->
+        <rect x="0" y="290" width="1060" height="22" fill="#2E75B6" opacity=".12"/>
+        <text x="530" y="301" style="font:bold 11px 'DM Sans',sans-serif;fill:#1B4F7A;text-anchor:middle;dominant-baseline:middle">PHASE 2 — PROJECT DASHBOARD</text>
+
+        <!-- UI: Render dashboard -->
+        <rect x="282" y="318" width="230" height="34" rx="17" fill="#fff" stroke="#1B2A4A" stroke-width="1.5"/>
+        <text x="397" y="335" class="act-sm">Render Project Dashboard</text>
+        <line x1="397" y1="286" x2="397" y2="318" class="arrow" marker-end="url(#arr)"/>
+
+        <!-- DB: Load projects -->
+        <line x1="512" y1="335" x2="808" y2="335" class="arrow" marker-end="url(#arr)"/>
+        <rect x="808" y="318" width="230" height="34" rx="17" fill="#fff" stroke="#334155" stroke-width="1.5"/>
+        <text x="923" y="335" class="act-sm">Load User's Projects</text>
+
+        <!-- Decision: Has projects? -->
+        <line x1="397" y1="352" x2="397" y2="378" class="arrow" marker-end="url(#arr)"/>
+        <polygon points="397,378 435,400 397,422 359,400" fill="#FFFBEB" stroke="#D97706" stroke-width="1.5"/>
+        <text x="397" y="400" class="guard">Projects exist?</text>
+
+        <!-- Yes: Show list -->
+        <text x="415" y="432" class="guard">Yes</text>
+        <line x1="397" y1="422" x2="397" y2="444" class="arrow" marker-end="url(#arr)"/>
+        <rect x="42" y="444" width="210" height="34" rx="17" fill="#fff" stroke="#4338CA" stroke-width="1.5"/>
+        <text x="147" y="461" class="act-sm">View Project List / Select Project</text>
+        <!-- cross-lane arrow -->
+        <line x1="282" y1="461" x2="252" y2="461" class="arrow-dashed" marker-end="url(#arr-lt)"/>
+
+        <!-- No: Empty state -->
+        <text x="358" y="432" class="guard">No</text>
+        <line x1="359" y1="400" x2="220" y2="400" class="arrow" marker-end="url(#arr)"/>
+        <rect x="42" y="386" width="178" height="28" rx="14" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.2"/>
+        <text x="131" y="400" class="act-sm" style="fill:#64748B">Show Empty State Prompt</text>
+
+        <!-- User: Create new project -->
+        <line x1="131" y1="414" x2="131" y2="444" class="arrow" marker-end="url(#arr)"/>
+        <rect x="282" y="444" width="230" height="34" rx="17" fill="#fff" stroke="#1B2A4A" stroke-width="1.5"/>
+        <text x="397" y="461" class="act-sm">Render New Project Form</text>
+        <line x1="252" y1="461" x2="282" y2="461" class="arrow" marker-end="url(#arr)"/>
+
+        <!-- User: Enter project details -->
+        <line x1="282" y1="461" x2="222" y2="478" class="arrow-dashed" marker-end="url(#arr-lt)"/>
+        <rect x="42" y="478" width="180" height="34" rx="17" fill="#fff" stroke="#4338CA" stroke-width="1.5"/>
+        <text x="132" y="495" class="act-sm">Enter Project Name &amp; Context</text>
+        <line x1="222" y1="495" x2="282" y2="495" class="arrow" marker-end="url(#arr)"/>
+        <rect x="282" y="478" width="230" height="34" rx="17" fill="#fff" stroke="#1B2A4A" stroke-width="1.5"/>
+        <text x="397" y="495" class="act-sm">Validate &amp; Save New Project</text>
+        <line x1="512" y1="495" x2="808" y2="495" class="arrow" marker-end="url(#arr)"/>
+        <rect x="808" y="478" width="230" height="34" rx="17" fill="#fff" stroke="#334155" stroke-width="1.5"/>
+        <text x="923" y="495" class="act-sm">Persist Project Record (DB)</text>
+
+        <!-- ══════════════════════════════════════════
+             PHASE 3: INTAKE & CLASSIFICATION
+        ═══════════════════════════════════════════ -->
+        <rect x="0" y="528" width="1060" height="22" fill="#0891B2" opacity=".12"/>
+        <text x="530" y="539" style="font:bold 11px 'DM Sans',sans-serif;fill:#0C4A6E;text-anchor:middle;dominant-baseline:middle">PHASE 3 — INTAKE &amp; CLASSIFICATION</text>
+
+        <line x1="397" y1="512" x2="397" y2="556" class="arrow" marker-end="url(#arr)"/>
+        <rect x="282" y="556" width="230" height="34" rx="17" fill="#fff" stroke="#1B2A4A" stroke-width="1.5"/>
+        <text x="397" y="573" class="act-sm">Launch Conversational Intake</text>
+
+        <!-- AI: Generate opening question -->
+        <line x1="512" y1="573" x2="662" y2="573" class="arrow" marker-end="url(#arr)"/>
+        <rect x="547" y="556" width="230" height="34" rx="17" fill="#EAF2F8" stroke="#2E75B6" stroke-width="1.5"/>
+        <text x="662" y="573" class="act-sm">Generate Opening Intake Question</text>
+
+        <!-- User: Respond to intake -->
+        <line x1="547" y1="573" x2="222" y2="590" class="arrow-dashed" marker-end="url(#arr-lt)"/>
+        <rect x="42" y="590" width="180" height="34" rx="17" fill="#fff" stroke="#4338CA" stroke-width="1.5"/>
+        <text x="132" y="607" class="act-sm">Provide Answers (Conversational)</text>
+        <line x1="222" y1="607" x2="547" y2="607" class="arrow" marker-end="url(#arr)"/>
+
+        <!-- AI: Extract dimensions + loop -->
+        <rect x="547" y="590" width="230" height="34" rx="17" fill="#EAF2F8" stroke="#2E75B6" stroke-width="1.5"/>
+        <text x="662" y="607" class="act-sm">Extract Intake Dimensions</text>
+
+        <!-- Decision: All must-know captured? -->
+        <line x1="662" y1="624" x2="662" y2="648" class="arrow" marker-end="url(#arr)"/>
+        <polygon points="662,648 700,670 662,692 624,670" fill="#FFFBEB" stroke="#D97706" stroke-width="1.5"/>
+        <text x="662" y="670" class="guard">Must-Know complete?</text>
+
+        <!-- No: Ask follow-up -->
+        <text x="594" y="695" class="guard">No</text>
+        <path d="M624,670 Q590,670 590,630 Q590,607 547,607" stroke="#D97706" stroke-width="1.2" fill="none" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+
+        <!-- Yes: Generate recommendation -->
+        <text x="680" y="695" class="guard">Yes</text>
+        <line x1="662" y1="692" x2="662" y2="712" class="arrow" marker-end="url(#arr)"/>
+        <rect x="547" y="712" width="230" height="34" rx="17" fill="#EAF2F8" stroke="#2E75B6" stroke-width="1.5"/>
+        <text x="662" y="729" class="act-sm">Generate Engagement Type + Tier Recommendation</text>
+
+        <!-- DB: Save dimensions -->
+        <line x1="777" y1="729" x2="808" y2="729" class="arrow" marker-end="url(#arr)"/>
+        <rect x="808" y="712" width="230" height="34" rx="17" fill="#fff" stroke="#334155" stroke-width="1.5"/>
+        <text x="923" y="729" class="act-sm">Persist Intake Dimensions</text>
+
+        <!-- UI: Present recommendation -->
+        <line x1="547" y1="729" x2="512" y2="746" class="arrow-dashed" marker-end="url(#arr-lt)"/>
+        <rect x="282" y="746" width="230" height="34" rx="17" fill="#fff" stroke="#1B2A4A" stroke-width="1.5"/>
+        <text x="397" y="763" class="act-sm">Display Classification Recommendation</text>
+
+        <!-- User: Accept or override -->
+        <line x1="282" y1="763" x2="222" y2="763" class="arrow-dashed" marker-end="url(#arr-lt)"/>
+        <rect x="42" y="746" width="180" height="34" rx="17" fill="#fff" stroke="#4338CA" stroke-width="1.5"/>
+        <text x="132" y="763" class="act-sm">Accept or Override Classification</text>
+
+        <!-- Decision: accepted? -->
+        <line x1="132" y1="780" x2="132" y2="806" class="arrow" marker-end="url(#arr)"/>
+        <polygon points="132,806 170,828 132,850 94,828" fill="#FFFBEB" stroke="#D97706" stroke-width="1.5"/>
+        <text x="132" y="828" class="guard">Accepted?</text>
+
+        <!-- Override path -->
+        <text x="60" y="850" class="guard">No — Override</text>
+        <line x1="94" y1="828" x2="50" y2="828" stroke="#D97706" stroke-width="1.2" fill="none"/>
+        <path d="M50,828 Q16,828 16,763 Q16,700 42,746" stroke="#D97706" stroke-width="1.2" fill="none" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+
+        <!-- Accepted: proceed -->
+        <text x="150" y="855" class="guard">Yes</text>
+        <line x1="132" y1="850" x2="397" y2="874" class="arrow" marker-end="url(#arr)"/>
+
+        <!-- ══════════════════════════════════════════
+             PHASE 4: ROADMAP GENERATION
+        ═══════════════════════════════════════════ -->
+        <rect x="0" y="862" width="1060" height="22" fill="#2E75B6" opacity=".12"/>
+        <text x="530" y="873" style="font:bold 11px 'DM Sans',sans-serif;fill:#1B4F7A;text-anchor:middle;dominant-baseline:middle">PHASE 4 — ROADMAP GENERATION &amp; NAVIGATION</text>
+
+        <!-- UI: Match template -->
+        <rect x="282" y="886" width="230" height="34" rx="17" fill="#fff" stroke="#1B2A4A" stroke-width="1.5"/>
+        <text x="397" y="903" class="act-sm">Match to Roadmap Template</text>
+        <line x1="397" y1="874" x2="397" y2="886" class="arrow" marker-end="url(#arr)"/>
+
+        <!-- DB: Fetch template -->
+        <line x1="512" y1="903" x2="808" y2="903" class="arrow" marker-end="url(#arr)"/>
+        <rect x="808" y="886" width="230" height="34" rx="17" fill="#fff" stroke="#334155" stroke-width="1.5"/>
+        <text x="923" y="903" class="act-sm">Fetch Matching Template</text>
+
+        <!-- UI: Instantiate roadmap -->
+        <line x1="397" y1="920" x2="397" y2="940" class="arrow" marker-end="url(#arr)"/>
+        <rect x="282" y="940" width="230" height="34" rx="17" fill="#fff" stroke="#1B2A4A" stroke-width="1.5"/>
+        <text x="397" y="957" class="act-sm">Instantiate Live Roadmap Items</text>
+
+        <!-- DB: Persist roadmap items -->
+        <line x1="512" y1="957" x2="808" y2="957" class="arrow" marker-end="url(#arr)"/>
+        <rect x="808" y="940" width="230" height="34" rx="17" fill="#fff" stroke="#334155" stroke-width="1.5"/>
+        <text x="923" y="957" class="act-sm">Persist ProjectRoadmapItems</text>
+
+        <!-- UI: Render navigator -->
+        <line x1="397" y1="974" x2="397" y2="994" class="arrow" marker-end="url(#arr)"/>
+        <rect x="282" y="994" width="230" height="34" rx="17" fill="#fff" stroke="#1B2A4A" stroke-width="1.5"/>
+        <text x="397" y="1011" class="act-sm">Render Roadmap Navigator View</text>
+
+        <!-- User: Select module -->
+        <line x1="282" y1="1011" x2="222" y2="1011" class="arrow-dashed" marker-end="url(#arr-lt)"/>
+        <rect x="42" y="994" width="180" height="34" rx="17" fill="#fff" stroke="#4338CA" stroke-width="1.5"/>
+        <text x="132" y="1011" class="act-sm">Select a Module (Free-Form)</text>
+
+        <!-- Decision: dependency? -->
+        <line x1="132" y1="1028" x2="132" y2="1052" class="arrow" marker-end="url(#arr)"/>
+        <polygon points="132,1052 170,1074 132,1096 94,1074" fill="#FFFBEB" stroke="#D97706" stroke-width="1.5"/>
+        <text x="132" y="1074" class="guard">Incomplete dependency?</text>
+
+        <!-- Yes: warn -->
+        <text x="60" y="1096" class="guard">Yes</text>
+        <line x1="94" y1="1074" x2="50" y2="1074" stroke="#D97706" stroke-width="1.2" fill="none"/>
+        <rect x="42" y="1096" width="180" height="28" rx="14" fill="#FEF3C7" stroke="#D97706" stroke-width="1.2"/>
+        <text x="132" y="1110" class="act-sm" style="fill:#92400E">Show Dependency Warning</text>
+        <!-- User continues anyway -->
+        <line x1="132" y1="1124" x2="132" y2="1144" class="arrow" marker-end="url(#arr)"/>
+        <rect x="42" y="1144" width="180" height="28" rx="14" fill="#fff" stroke="#4338CA" stroke-width="1.5"/>
+        <text x="132" y="1158" class="act-sm">Acknowledge &amp; Continue</text>
+
+        <!-- No: proceed directly -->
+        <text x="150" y="1096" class="guard">No</text>
+        <line x1="170" y1="1074" x2="220" y2="1074" stroke="#475569" stroke-width="1.5" fill="none"/>
+        <line x1="220" y1="1074" x2="220" y2="1170" stroke="#475569" stroke-width="1.5" fill="none"/>
+
+        <!-- Join: both paths merge -->
+        <line x1="132" y1="1172" x2="220" y2="1172" stroke="#475569" stroke-width="1.5" fill="none"/>
+        <rect x="42" y="1169" width="360" height="6" rx="3" fill="#1B2A4A"/>
+
+        <!-- ══════════════════════════════════════════
+             PHASE 5: CO-PILOT MODULE WORK
+        ═══════════════════════════════════════════ -->
+        <rect x="0" y="1183" width="1060" height="22" fill="#16A34A" opacity=".10"/>
+        <text x="530" y="1194" style="font:bold 11px 'DM Sans',sans-serif;fill:#14532D;text-anchor:middle;dominant-baseline:middle">PHASE 5 — CO-PILOT MODULE WORK</text>
+
+        <!-- UI: Enter module -->
+        <line x1="222" y1="1175" x2="282" y2="1205" class="arrow" marker-end="url(#arr)"/>
+        <rect x="282" y="1205" width="230" height="34" rx="17" fill="#fff" stroke="#1B2A4A" stroke-width="1.5"/>
+        <text x="397" y="1222" class="act-sm">Render Module Co-Pilot Screen</text>
+
+        <!-- AI: Load module context -->
+        <line x1="512" y1="1222" x2="662" y2="1222" class="arrow" marker-end="url(#arr)"/>
+        <rect x="547" y="1205" width="230" height="34" rx="17" fill="#EAF2F8" stroke="#2E75B6" stroke-width="1.5"/>
+        <text x="662" y="1222" class="act-sm">Load Module Context + Project Dimensions</text>
+
+        <!-- DB: Fetch prior artifacts -->
+        <line x1="777" y1="1222" x2="808" y2="1222" class="arrow" marker-end="url(#arr)"/>
+        <rect x="808" y="1205" width="230" height="34" rx="17" fill="#fff" stroke="#334155" stroke-width="1.5"/>
+        <text x="923" y="1222" class="act-sm">Fetch Prior Artifacts for Module</text>
+
+        <!-- AI: Generate first question -->
+        <line x1="662" y1="1239" x2="662" y2="1259" class="arrow" marker-end="url(#arr)"/>
+        <rect x="547" y="1259" width="230" height="34" rx="17" fill="#EAF2F8" stroke="#2E75B6" stroke-width="1.5"/>
+        <text x="662" y="1276" class="act-sm">Generate Guided Question / Prompt</text>
+
+        <!-- User: Respond -->
+        <line x1="547" y1="1276" x2="222" y2="1293" class="arrow-dashed" marker-end="url(#arr-lt)"/>
+        <rect x="42" y="1276" width="180" height="34" rx="17" fill="#fff" stroke="#4338CA" stroke-width="1.5"/>
+        <text x="132" y="1293" class="act-sm">Provide Answers / Input</text>
+
+        <!-- AI: Generate / refine content -->
+        <line x1="222" y1="1293" x2="547" y2="1310" class="arrow" marker-end="url(#arr)"/>
+        <rect x="547" y="1293" width="230" height="34" rx="17" fill="#EAF2F8" stroke="#2E75B6" stroke-width="1.5"/>
+        <text x="662" y="1310" class="act-sm">Generate / Refine Artifact Content</text>
+
+        <!-- UI: Display draft -->
+        <line x1="547" y1="1310" x2="512" y2="1327" class="arrow-dashed" marker-end="url(#arr-lt)"/>
+        <rect x="282" y="1327" width="230" height="34" rx="17" fill="#fff" stroke="#1B2A4A" stroke-width="1.5"/>
+        <text x="397" y="1344" class="act-sm">Display Draft Artifact</text>
+
+        <!-- Decision: More iteration? -->
+        <line x1="397" y1="1361" x2="397" y2="1385" class="arrow" marker-end="url(#arr)"/>
+        <polygon points="397,1385 435,1407 397,1429 359,1407" fill="#FFFBEB" stroke="#D97706" stroke-width="1.5"/>
+        <text x="397" y="1407" class="guard">Refine further?</text>
+
+        <!-- Yes: loop back -->
+        <text x="360" y="1434" class="guard">Yes</text>
+        <path d="M359,1407 Q300,1407 300,1310 Q300,1276 282,1276" stroke="#D97706" stroke-width="1.2" fill="none" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+
+        <!-- No: save -->
+        <text x="415" y="1434" class="guard">No</text>
+        <line x1="397" y1="1429" x2="397" y2="1449" class="arrow" marker-end="url(#arr)"/>
+
+        <!-- DB: Save artifact -->
+        <rect x="282" y="1449" width="230" height="34" rx="17" fill="#fff" stroke="#1B2A4A" stroke-width="1.5"/>
+        <text x="397" y="1466" class="act-sm">Save Artifact + Version to DB</text>
+        <line x1="512" y1="1466" x2="808" y2="1466" class="arrow" marker-end="url(#arr)"/>
+        <rect x="808" y="1449" width="230" height="34" rx="17" fill="#fff" stroke="#334155" stroke-width="1.5"/>
+        <text x="923" y="1466" class="act-sm">Persist Artifact Record</text>
+
+        <!-- Update module status -->
+        <line x1="397" y1="1483" x2="397" y2="1503" class="arrow" marker-end="url(#arr)"/>
+        <rect x="282" y="1503" width="230" height="34" rx="17" fill="#fff" stroke="#1B2A4A" stroke-width="1.5"/>
+        <text x="397" y="1520" class="act-sm">Update Module Status (complete/skip)</text>
+        <line x1="512" y1="1520" x2="808" y2="1520" class="arrow" marker-end="url(#arr)"/>
+        <rect x="808" y="1503" width="230" height="34" rx="17" fill="#fff" stroke="#334155" stroke-width="1.5"/>
+        <text x="923" y="1520" class="act-sm">Persist Status Update</text>
+
+        <!-- Decision: More modules? -->
+        <line x1="282" y1="1520" x2="222" y2="1537" class="arrow-dashed" marker-end="url(#arr-lt)"/>
+        <line x1="132" y1="1537" x2="132" y2="1561" class="arrow" marker-end="url(#arr)"/>
+        <polygon points="132,1561 170,1583 132,1605 94,1583" fill="#FFFBEB" stroke="#D97706" stroke-width="1.5"/>
+        <text x="132" y="1583" class="guard">More modules?</text>
+
+        <!-- Yes: back to navigator -->
+        <text x="60" y="1607" class="guard">Yes</text>
+        <path d="M94,1583 Q30,1583 30,1011 Q30,998 42,998" stroke="#D97706" stroke-width="1.2" fill="none" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+
+        <!-- No: proceed to gap analysis -->
+        <text x="150" y="1607" class="guard">No</text>
+        <line x1="170" y1="1583" x2="397" y2="1617" class="arrow" marker-end="url(#arr)"/>
+
+        <!-- ══════════════════════════════════════════
+             PHASE 6: GAP ANALYSIS
+        ═══════════════════════════════════════════ -->
+        <rect x="0" y="1609" width="1060" height="22" fill="#D97706" opacity=".12"/>
+        <text x="530" y="1620" style="font:bold 11px 'DM Sans',sans-serif;fill:#92400E;text-anchor:middle;dominant-baseline:middle">PHASE 6 — GAP ANALYSIS &amp; TRACEABILITY</text>
+
+        <rect x="282" y="1633" width="230" height="34" rx="17" fill="#fff" stroke="#1B2A4A" stroke-width="1.5"/>
+        <text x="397" y="1650" class="act-sm">Trigger Gap Analysis</text>
+        <line x1="397" y1="1617" x2="397" y2="1633" class="arrow" marker-end="url(#arr)"/>
+
+        <line x1="512" y1="1650" x2="662" y2="1650" class="arrow" marker-end="url(#arr)"/>
+        <rect x="547" y="1633" width="230" height="34" rx="17" fill="#EAF2F8" stroke="#2E75B6" stroke-width="1.5"/>
+        <text x="662" y="1650" class="act-sm">Analyse Artifacts vs. Engagement Requirements</text>
+
+        <line x1="662" y1="1667" x2="662" y2="1687" class="arrow" marker-end="url(#arr)"/>
+        <rect x="547" y="1687" width="230" height="34" rx="17" fill="#EAF2F8" stroke="#2E75B6" stroke-width="1.5"/>
+        <text x="662" y="1704" class="act-sm">Flag Gaps + Generate Traceability Matrix</text>
+
+        <line x1="547" y1="1704" x2="512" y2="1721" class="arrow-dashed" marker-end="url(#arr-lt)"/>
+        <rect x="282" y="1721" width="230" height="34" rx="17" fill="#fff" stroke="#1B2A4A" stroke-width="1.5"/>
+        <text x="397" y="1738" class="act-sm">Display Gap Report + Matrix</text>
+
+        <line x1="282" y1="1738" x2="222" y2="1738" class="arrow-dashed" marker-end="url(#arr-lt)"/>
+        <rect x="42" y="1721" width="180" height="34" rx="17" fill="#fff" stroke="#4338CA" stroke-width="1.5"/>
+        <text x="132" y="1738" class="act-sm">Review Gaps / Address or Acknowledge</text>
+
+        <!-- ══════════════════════════════════════════
+             PHASE 7: EXPORT
+        ═══════════════════════════════════════════ -->
+        <rect x="0" y="1763" width="1060" height="22" fill="#1B2A4A" opacity=".10"/>
+        <text x="530" y="1774" style="font:bold 11px 'DM Sans',sans-serif;fill:#1B2A4A;text-anchor:middle;dominant-baseline:middle">PHASE 7 — EXPORT &amp; DELIVERY</text>
+
+        <line x1="132" y1="1755" x2="132" y2="1791" class="arrow" marker-end="url(#arr)"/>
+        <rect x="42" y="1791" width="180" height="34" rx="17" fill="#fff" stroke="#4338CA" stroke-width="1.5"/>
+        <text x="132" y="1808" class="act-sm">Select Export Scope (Single / Full Package)</text>
+
+        <line x1="222" y1="1808" x2="282" y2="1808" class="arrow" marker-end="url(#arr)"/>
+        <rect x="282" y="1791" width="230" height="34" rx="17" fill="#fff" stroke="#1B2A4A" stroke-width="1.5"/>
+        <text x="397" y="1808" class="act-sm">Compile &amp; Format Export Package</text>
+
+        <line x1="512" y1="1808" x2="808" y2="1808" class="arrow" marker-end="url(#arr)"/>
+        <rect x="808" y="1791" width="230" height="34" rx="17" fill="#fff" stroke="#334155" stroke-width="1.5"/>
+        <text x="923" y="1808" class="act-sm">Read All Artifacts for Project</text>
+
+        <line x1="397" y1="1825" x2="397" y2="1845" class="arrow" marker-end="url(#arr)"/>
+        <rect x="282" y="1845" width="230" height="34" rx="17" fill="#fff" stroke="#1B2A4A" stroke-width="1.5"/>
+        <text x="397" y="1862" class="act-sm">Render Download Link</text>
+
+        <line x1="282" y1="1862" x2="222" y2="1862" class="arrow-dashed" marker-end="url(#arr-lt)"/>
+        <rect x="42" y="1845" width="180" height="34" rx="17" fill="#DCFCE7" stroke="#16A34A" stroke-width="1.5"/>
+        <text x="132" y="1862" class="act-sm" style="fill:#14532D">Download Export Package</text>
+
+        <!-- Final node -->
+        <line x1="132" y1="1879" x2="132" y2="1914" class="arrow" marker-end="url(#arr)"/>
+        <circle cx="132" cy="1924" r="12" fill="#fff" stroke="#1B2A4A" stroke-width="2"/>
+        <circle cx="132" cy="1924" r="7" fill="#1B2A4A"/>
+
+        <!-- Legend -->
+        <rect x="680" y="1910" width="350" height="120" rx="8" fill="#F8FAFC" stroke="#D1D5DB" stroke-width="1"/>
+        <text x="855" y="1932" style="font:bold 12px 'DM Sans',sans-serif;fill:#1B2A4A;text-anchor:middle">Legend</text>
+        <rect x="700" y="1944" width="100" height="20" rx="10" fill="#fff" stroke="#4338CA" stroke-width="1.5"/>
+        <text x="750" y="1954" class="act-note">User Action</text>
+        <rect x="820" y="1944" width="100" height="20" rx="10" fill="#EAF2F8" stroke="#2E75B6" stroke-width="1.5"/>
+        <text x="870" y="1954" class="act-note">AI Action</text>
+        <rect x="700" y="1972" width="100" height="20" rx="10" fill="#fff" stroke="#1B2A4A" stroke-width="1.5"/>
+        <text x="750" y="1982" class="act-note">UI/System Action</text>
+        <rect x="820" y="1972" width="100" height="20" rx="10" fill="#fff" stroke="#334155" stroke-width="1.5"/>
+        <text x="870" y="1982" class="act-note">Database Action</text>
+        <polygon points="860,2003 880,2015 860,2027 840,2015" fill="#FFFBEB" stroke="#D97706" stroke-width="1.2"/>
+        <text x="910" y="2015" class="act-note">Decision Node</text>
+
+      </svg>
+    </div>
+
+    <h3>2.3 Activity-to-Requirement Traceability</h3>
+    <p>The table below maps each major activity group in the diagram to the corresponding FRD functional requirement IDs, ensuring the diagram is fully grounded in documented requirements.</p>
+
+    <table>
+      <tr><th>Activity Group</th><th>Phase</th><th>FRD Requirement(s)</th><th>Notes</th></tr>
+      <tr><td>Navigate to App / Login / Register</td><td>1 — Authentication</td><td>FR-01, FR-02, NFR-03</td><td>Email/password auth with bcrypt; session token issued on success</td></tr>
+      <tr><td>Render Dashboard / Load Projects</td><td>2 — Dashboard</td><td>FR-04, FR-05</td><td>Empty state shown for new users; project list for returning users</td></tr>
+      <tr><td>Create New Project / Validate</td><td>2 — Dashboard</td><td>FR-06, FR-07</td><td>Project name and context captured; persisted to Neon DB</td></tr>
+      <tr><td>Conversational Intake / Extract Dimensions</td><td>3 — Intake</td><td>FR-08, FR-09, FR-10</td><td>10 intake dimensions across 3 tiers; AI drives conversation</td></tr>
+      <tr><td>Generate Recommendation / Accept or Override</td><td>3 — Classification</td><td>FR-11, FR-12, FR-13</td><td>AI outputs Engagement Type + Scale Tier; user can override</td></tr>
+      <tr><td>Match Template / Instantiate Roadmap</td><td>4 — Roadmap</td><td>FR-14, FR-15, FR-16</td><td>24 pre-built templates; instantiated as live ProjectRoadmapItems</td></tr>
+      <tr><td>Select Module / Dependency Warning</td><td>4 — Navigation</td><td>FR-17, FR-18</td><td>Free-form navigation; soft warnings for incomplete dependencies</td></tr>
+      <tr><td>Co-Pilot Q&amp;A Loop / Generate Content</td><td>5 — Co-Pilot</td><td>FR-19, FR-20, FR-21, FR-22</td><td>AI uses project context + module context; iterative refinement supported</td></tr>
+      <tr><td>Save Artifact / Update Module Status</td><td>5 — Artifact Persistence</td><td>FR-23, FR-24</td><td>Versioned artifact storage; module status updated in DB</td></tr>
+      <tr><td>Gap Analysis / Traceability Matrix</td><td>6 — Quality</td><td>FR-25, FR-26, FR-27</td><td>AI reviews all artifacts against engagement requirements; matrix generated</td></tr>
+      <tr><td>Export Scope Selection / Download</td><td>7 — Export</td><td>FR-28, FR-29, FR-30</td><td>Single artifact or full package; formatted output for download</td></tr>
+    </table>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- PART B: USER JOURNEY MAP -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <h2>3. User Journey Map</h2>
+
+    <p>The user journey map captures the end-to-end experience of a junior-to-mid-level BA engaging with BA Compass — from first login through to downloading a completed artifact package. Unlike the Activity Diagram, this artifact documents the human experience layer: what the user is doing, thinking, feeling, and where the product creates or resolves friction.</p>
+
+    <div class="note">Target user persona: A junior BA or recent graduate assigned to their first medium-complexity engagement. They are analytically capable but uncertain about methodology — what to do first, what belongs in each deliverable, and how to structure outputs that will pass scrutiny. They are working without a senior mentor.</div>
+
+    <h3>3.1 Journey Phases</h3>
+
+    <table>
+      <tr><th>#</th><th>Phase</th><th>Description</th><th>Primary Goal</th></tr>
+      <tr><td><strong>1</strong></td><td>Arrival &amp; Onboarding</td><td>User registers or logs in for the first time; sees the dashboard</td><td>Establish account; understand what the tool does</td></tr>
+      <tr><td><strong>2</strong></td><td>Project Intake</td><td>User creates a project; AI leads conversational classification</td><td>Name and define the engagement; get a classification they trust</td></tr>
+      <tr><td><strong>3</strong></td><td>Orientation</td><td>Roadmap is generated; user reads the recommended module structure</td><td>Understand scope and feel ready to begin work</td></tr>
+      <tr><td><strong>4</strong></td><td>Deep Work</td><td>User navigates modules; completes co-pilot sessions; produces artifacts</td><td>Produce high-quality, methodologically sound outputs</td></tr>
+      <tr><td><strong>5</strong></td><td>Quality Review</td><td>Gap analysis runs; traceability matrix generated; user reviews and addresses flags</td><td>Ensure completeness and professional rigour</td></tr>
+      <tr><td><strong>6</strong></td><td>Delivery</td><td>User exports artifact package; engagement is closed</td><td>Deliver a complete, professional BA deliverable package</td></tr>
+    </table>
+
+    <h3>3.2 Journey Map — Full Detail</h3>
+
+    <div class="journey-wrap">
+      <table class="journey-table">
+        <colgroup>
+          <col style="width:130px">
+          <col style="width:148px">
+          <col style="width:148px">
+          <col style="width:148px">
+          <col style="width:148px">
+          <col style="width:148px">
+          <col style="width:148px">
+        </colgroup>
+        <thead>
+          <tr>
+            <th style="background:#F8FAFC;color:var(--navy);padding:14px 10px;border-right:1px solid var(--border);font-size:12px"></th>
+            <th class="phase-header phase-1">Phase 1<br><span style="font-weight:400;font-size:11px">Arrival &amp; Onboarding</span></th>
+            <th class="phase-header phase-2">Phase 2<br><span style="font-weight:400;font-size:11px">Project Intake</span></th>
+            <th class="phase-header phase-3">Phase 3<br><span style="font-weight:400;font-size:11px">Orientation</span></th>
+            <th class="phase-header phase-4">Phase 4<br><span style="font-weight:400;font-size:11px">Deep Work</span></th>
+            <th class="phase-header phase-5">Phase 5<br><span style="font-weight:400;font-size:11px">Quality Review</span></th>
+            <th class="phase-header phase-6">Phase 6<br><span style="font-weight:400;font-size:11px">Delivery</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- User Actions -->
+          <tr>
+            <td class="dim-label">👤 User Actions</td>
+            <td class="dim-cell">Navigates to app. Registers with email/password or logs in. Views empty dashboard.</td>
+            <td class="dim-cell">Clicks "New Project." Enters project name and brief context. Responds to AI intake questions conversationally. Reviews and accepts (or overrides) classification.</td>
+            <td class="dim-cell">Reads generated roadmap. Inspects module list and recommended sequence. Explores module descriptions. Decides where to begin.</td>
+            <td class="dim-cell">Opens a module. Reads the co-pilot prompt. Answers guided questions. Reviews AI-generated draft. Iterates. Marks module complete or skipped. Moves to next module — in any order.</td>
+            <td class="dim-cell">Triggers gap analysis. Reads flag report. Reviews traceability matrix. Returns to modules to address gaps or acknowledges and moves on.</td>
+            <td class="dim-cell">Selects export scope (single artifact or full package). Downloads file. Reviews final output. Closes the project.</td>
+          </tr>
+          <!-- Touchpoints -->
+          <tr>
+            <td class="dim-label">🖥️ Touchpoints</td>
+            <td class="dim-cell">
+              <span class="tag tag-screen">Login Screen</span>
+              <span class="tag tag-screen">Registration Screen</span>
+              <span class="tag tag-screen">Dashboard (empty state)</span>
+            </td>
+            <td class="dim-cell">
+              <span class="tag tag-screen">New Project Form</span>
+              <span class="tag tag-screen">Intake Chat Interface</span>
+              <span class="tag tag-screen">Classification Card</span>
+            </td>
+            <td class="dim-cell">
+              <span class="tag tag-screen">Roadmap Navigator</span>
+              <span class="tag tag-screen">Module Cards</span>
+              <span class="tag tag-screen">Module Detail Preview</span>
+            </td>
+            <td class="dim-cell">
+              <span class="tag tag-screen">Module Co-Pilot Screen</span>
+              <span class="tag tag-screen">Q&amp;A Input Panel</span>
+              <span class="tag tag-screen">Artifact Draft View</span>
+              <span class="tag tag-screen">Roadmap Status Panel</span>
+            </td>
+            <td class="dim-cell">
+              <span class="tag tag-screen">Gap Analysis Report</span>
+              <span class="tag tag-screen">Traceability Matrix View</span>
+              <span class="tag tag-screen">Module Re-Entry</span>
+            </td>
+            <td class="dim-cell">
+              <span class="tag tag-screen">Export Panel</span>
+              <span class="tag tag-screen">Download Link</span>
+              <span class="tag tag-screen">Project Closed State</span>
+            </td>
+          </tr>
+          <!-- AI Interactions -->
+          <tr>
+            <td class="dim-label">🤖 AI Interactions</td>
+            <td class="dim-cell">None. Authentication is system-handled.</td>
+            <td class="dim-cell">
+              <span class="tag tag-ai">Generates opening question</span>
+              <span class="tag tag-ai">Extracts 10 intake dimensions</span>
+              <span class="tag tag-ai">Recommends Engagement Type + Scale Tier</span>
+              <span class="tag tag-ai">Provides reasoning for recommendation</span>
+            </td>
+            <td class="dim-cell">None at this phase. System selects template and instantiates roadmap based on classification. AI is dormant.</td>
+            <td class="dim-cell">
+              <span class="tag tag-ai">Loads module + project context</span>
+              <span class="tag tag-ai">Generates guided prompts</span>
+              <span class="tag tag-ai">Drafts artifact from responses</span>
+              <span class="tag tag-ai">Refines on request</span>
+              <span class="tag tag-ai">Maintains session context</span>
+            </td>
+            <td class="dim-cell">
+              <span class="tag tag-ai">Reviews all artifact content</span>
+              <span class="tag tag-ai">Cross-references engagement requirements</span>
+              <span class="tag tag-ai">Generates gap flags with explanations</span>
+              <span class="tag tag-ai">Produces traceability matrix</span>
+            </td>
+            <td class="dim-cell">None. Export is a system compilation operation. AI output is already persisted.</td>
+          </tr>
+          <!-- Emotional Arc - rendered as SVG chart -->
+          <tr class="emotion-row">
+            <td class="dim-label" style="vertical-align:middle">😐 Emotional State</td>
+            <td colspan="6" style="padding:0;border-bottom:1px solid var(--border-lt)">
+              <svg class="emotion-chart" viewBox="0 0 888 80" xmlns="http://www.w3.org/2000/svg">
+                <!-- Grid -->
+                <line x1="0" y1="20" x2="888" y2="20" stroke="#E5E7EB" stroke-width="1" stroke-dasharray="3,3"/>
+                <line x1="0" y1="40" x2="888" y2="40" stroke="#E5E7EB" stroke-width="1" stroke-dasharray="3,3"/>
+                <line x1="0" y1="60" x2="888" y2="60" stroke="#E5E7EB" stroke-width="1" stroke-dasharray="3,3"/>
+                <!-- Labels -->
+                <text x="4" y="18" style="font:10px 'DM Sans',sans-serif;fill:#94A3B8">High confidence</text>
+                <text x="4" y="42" style="font:10px 'DM Sans',sans-serif;fill:#94A3B8">Neutral</text>
+                <text x="4" y="64" style="font:10px 'DM Sans',sans-serif;fill:#94A3B8">Anxious</text>
+                <!-- Phase dividers -->
+                <line x1="148" y1="0" x2="148" y2="80" stroke="#D1D5DB" stroke-width="1"/>
+                <line x1="296" y1="0" x2="296" y2="80" stroke="#D1D5DB" stroke-width="1"/>
+                <line x1="444" y1="0" x2="444" y2="80" stroke="#D1D5DB" stroke-width="1"/>
+                <line x1="592" y1="0" x2="592" y2="80" stroke="#D1D5DB" stroke-width="1"/>
+                <line x1="740" y1="0" x2="740" y2="80" stroke="#D1D5DB" stroke-width="1"/>
+                <!-- Emotion arc: points per phase midpoint 
+                     Phase1 midpoint~74, Phase2~222, Phase3~370, Phase4~518, Phase5~666, Phase6~814
+                     Y values: 62=anxious, 40=neutral, 18=confident
+                     Arc: starts anxious(62), rises at intake(30), stabilises(38), 
+                          peaks during deep work(18), slight dip gap analysis(45), rises to delivery(20) -->
+                <polyline points="74,62 222,30 370,38 518,18 666,45 814,20"
+                  fill="none" stroke="#2E75B6" stroke-width="2.5" stroke-linejoin="round"/>
+                <!-- Area fill -->
+                <polygon points="74,62 222,30 370,38 518,18 666,45 814,20 814,72 74,72"
+                  fill="#2E75B6" opacity="0.08"/>
+                <!-- Data points -->
+                <circle cx="74"  cy="62" r="5" fill="#2E75B6"/>
+                <circle cx="222" cy="30" r="5" fill="#2E75B6"/>
+                <circle cx="370" cy="38" r="5" fill="#2E75B6"/>
+                <circle cx="518" cy="18" r="5" fill="#16A34A"/>
+                <circle cx="666" cy="45" r="5" fill="#D97706"/>
+                <circle cx="814" cy="20" r="5" fill="#16A34A"/>
+                <!-- Emotion labels -->
+                <text x="74"  y="76" style="font:9px 'DM Sans',sans-serif;fill:#64748B;text-anchor:middle">Uncertain</text>
+                <text x="222" y="24" style="font:9px 'DM Sans',sans-serif;fill:#2E75B6;text-anchor:middle">Gaining clarity</text>
+                <text x="370" y="32" style="font:9px 'DM Sans',sans-serif;fill:#64748B;text-anchor:middle">Ready</text>
+                <text x="518" y="12" style="font:9px 'DM Sans',sans-serif;fill:#16A34A;text-anchor:middle">In flow</text>
+                <text x="666" y="39" style="font:9px 'DM Sans',sans-serif;fill:#D97706;text-anchor:middle">Reflective</text>
+                <text x="814" y="14" style="font:9px 'DM Sans',sans-serif;fill:#16A34A;text-anchor:middle">Confident</text>
+              </svg>
+            </td>
+          </tr>
+          <!-- Pain Points Resolved -->
+          <tr>
+            <td class="dim-label">🔴 Pain (Before)</td>
+            <td class="dim-cell">
+              <span class="tag tag-pain">No structure to start</span>
+              <span class="tag tag-pain">Unclear where BA work begins</span>
+            </td>
+            <td class="dim-cell">
+              <span class="tag tag-pain">Don't know how to classify an engagement</span>
+              <span class="tag tag-pain">Unsure what questions to ask the stakeholder</span>
+              <span class="tag tag-pain">Pick wrong framework and waste effort</span>
+            </td>
+            <td class="dim-cell">
+              <span class="tag tag-pain">Stare at a blank roadmap</span>
+              <span class="tag tag-pain">Unsure which BABOK areas apply</span>
+              <span class="tag tag-pain">Sequence wrong deliverables</span>
+            </td>
+            <td class="dim-cell">
+              <span class="tag tag-pain">Don't know what to include in each artifact</span>
+              <span class="tag tag-pain">Write something that looks wrong but can't tell why</span>
+              <span class="tag tag-pain">Spend hours on formatting instead of thinking</span>
+            </td>
+            <td class="dim-cell">
+              <span class="tag tag-pain">Only discover gaps at review stage</span>
+              <span class="tag tag-pain">No way to trace requirements to deliverables</span>
+            </td>
+            <td class="dim-cell">
+              <span class="tag tag-pain">Inconsistent formatting across deliverables</span>
+              <span class="tag tag-pain">No sense of completeness — "did I do enough?"</span>
+            </td>
+          </tr>
+          <!-- Value Delivered -->
+          <tr>
+            <td class="dim-label">🟢 Value Delivered</td>
+            <td class="dim-cell">
+              <span class="tag tag-value">Clean starting point</span>
+              <span class="tag tag-value">Professional workspace from first login</span>
+            </td>
+            <td class="dim-cell">
+              <span class="tag tag-value">AI surfaces the right questions</span>
+              <span class="tag tag-value">Classification is reasoned and explained</span>
+              <span class="tag tag-value">User retains override control</span>
+            </td>
+            <td class="dim-cell">
+              <span class="tag tag-value">Instant BABOK-aligned roadmap</span>
+              <span class="tag tag-value">Correct module sequence for their engagement</span>
+              <span class="tag tag-value">Nothing important left off</span>
+            </td>
+            <td class="dim-cell">
+              <span class="tag tag-value">Guided prompts remove blank-page anxiety</span>
+              <span class="tag tag-value">AI drafts; user reviews and owns</span>
+              <span class="tag tag-value">Context retained across modules</span>
+              <span class="tag tag-value">Methodology embedded in the questions</span>
+            </td>
+            <td class="dim-cell">
+              <span class="tag tag-value">Gaps caught before delivery</span>
+              <span class="tag tag-value">Traceability built automatically</span>
+              <span class="tag tag-value">Professional quality signal</span>
+            </td>
+            <td class="dim-cell">
+              <span class="tag tag-value">Complete, consistent package</span>
+              <span class="tag tag-value">Demonstrable rigour for reviewers</span>
+              <span class="tag tag-value">Clear signal of engagement completion</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>3.3 Key Insight — The Emotional Arc</h3>
+    <p>The emotional arc is the clearest indicator of where BA Compass creates value. Without the tool, a junior BA operates in a state of persistent low-grade anxiety: uncertain whether they're doing the right things in the right order, producing outputs that meet an invisible quality bar.</p>
+    <p>BA Compass restructures this experience into a predictable confidence curve. The peak dip at Phase 5 (gap analysis) is intentional and healthy — it represents the tool catching problems before they reach the stakeholder, which is precisely the professional value a senior BA mentor would provide. The final state at Phase 6 is high confidence rooted in completeness, not optimism.</p>
+
+    <h3>3.4 Design Implications</h3>
+    <table>
+      <tr><th>Journey Phase</th><th>Design Implication</th><th>FRD Reference</th></tr>
+      <tr><td>Phase 1 — Onboarding</td><td>Empty dashboard must communicate purpose immediately — headline, CTA, and a short "how it works" summary. No blank whitespace.</td><td>FR-04, NFR-07</td></tr>
+      <tr><td>Phase 2 — Intake</td><td>Intake UI must feel conversational, not form-like. Chat interface, not fields. AI reasoning for the classification must be visible.</td><td>FR-08, FR-11, FR-12</td></tr>
+      <tr><td>Phase 3 — Orientation</td><td>Roadmap view must be readable at a glance — visual progress indicators, module status colours, recommended-vs-optional distinction clear.</td><td>FR-15, FR-17</td></tr>
+      <tr><td>Phase 4 — Deep Work</td><td>Co-pilot screen must show context (project dimensions, module purpose) without being cluttered. Refinement loop must be fluid.</td><td>FR-19, FR-20, FR-21</td></tr>
+      <tr><td>Phase 5 — Quality</td><td>Gap report must be specific, not alarming. Frame gaps as "opportunities" not "failures." Traceability matrix should be scannable.</td><td>FR-25, FR-26</td></tr>
+      <tr><td>Phase 6 — Delivery</td><td>Export screen must feel like a milestone moment. Clear scope selector, package contents summary, single prominent download CTA.</td><td>FR-28, FR-29</td></tr>
+    </table>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SIGN-OFF -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="signoff">
+      <h2>4. Document Sign-Off</h2>
+      <p>This document is submitted for review as part of the BA Compass pre-build documentation package. Approval confirms that the activity diagram accurately represents the intended system behaviour and that the user journey map correctly characterises the target user experience.</p>
+
+      <table>
+        <tr><th>Role</th><th>Name</th><th>Date</th><th>Status</th></tr>
+        <tr><td>Author / Product Owner</td><td>Hadi Mercer</td><td>March 2026</td><td>Pending Review</td></tr>
+        <tr><td>Technical Reviewer</td><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td>UX Reviewer</td><td>—</td><td>—</td><td>—</td></tr>
+      </table>
+
+      <div>
+        <div class="signoff-line">Approved by: ___________________________</div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /page -->
+</body>
+</html>

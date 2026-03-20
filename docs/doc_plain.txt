@@ -1,0 +1,1958 @@
+F2
+Business Analysis Co-Pilot
+PRODUCT DEFINITION DOCUMENT  ·  v1.0
+
+Pre-Build Sign-Off Document
+Prepared by: Hadi Mercer  ·  March 2026
+
+8
+Engagement Types
+52
+BABOK Modules
+24
+Roadmap Templates
+
+1. Product Vision &amp; Problem Statement
+1.1 The Problem
+A junior business analyst is assigned a project or task. They may have strong domain knowledge — they understand the process, the people, and the business context — but they do not have a formal BA framework in their head. They do not know which artifacts to produce, which questions to ask, what 'done' looks like, or how to sequence their work. Without guidance, they either miss critical steps, produce incomplete deliverables, or spend significant time researching methodology instead of doing the work.
+
+This problem is not unique to career changers. It affects any analyst who is new to a BA role, working in an unfamiliar domain, or tackling a type of engagement they have not handled before.
+
+1.2 The Solution
+F2 is a BA workspace application where AI is embedded throughout the workflow. It acts as a knowledgeable senior BA sitting beside the user. The user brings domain knowledge and business context. F2 provides the methodology, the structure, the artifact templates, and the guided assistance to produce professional-quality BA deliverables.
+
+F2 is not a chatbot wrapper around an LLM. It is a methodology engine with AI layered on top. The BA processes, phases, and artifacts are pre-built and BABOK-aligned. The AI's job is to help the user navigate that structure intelligently — not to invent it on the fly.
+
+1.3 The Core Promise
+
+F2 gives anyone with functional understanding of a business process and basic problem-solving ability the capacity to operate as a full-fledged BA at a high level.
+The tool provides the BA brain. The user provides the business knowledge. Together they produce work that is structured, defensible, and BABOK-aligned.
+
+1.4 Portfolio Context
+F2 is Flagship 2 in a 6-project BA portfolio built to demonstrate an HR-to-BA career transition. As a flagship, F2 must demonstrate depth — not just that the builder can use an API, but that they understand BA methodology well enough to encode it as product logic.
+
+Project
+Description
+F1 — Operational Process Intelligence Platform
+Flagship 1 — process mining and analytics
+F2 — Business Analysis Co-Pilot
+Flagship 2 — THIS DOCUMENT
+S1 — HR Process Automation Hub
+Live supporting project
+S2 — Comp &amp; Benchmarking Dashboard
+Live supporting project
+S3 — Meridian Portfolio Health Dashboard
+Live supporting project
+S4 — Lens Sentiment &amp; Text Analytics Tool
+Live supporting project
+
+2. User Model
+2.1 Primary User — The Junior BA
+The primary user is someone with functional domain expertise who is new to formal BA practice. They have been assigned a project or task and need structured guidance to navigate it professionally.
+
+Attribute
+Description
+Domain knowledge
+Strong — they understand the business context, the process, and the people involved
+BA methodology knowledge
+Limited to moderate — may know some artifacts but lacks a complete framework
+Technical comfort
+Moderate — comfortable with business software, forms, and structured tools
+Primary need
+Guidance on what to do, in what order, and how to produce each deliverable
+Fear
+Missing something important, producing incomplete work, or looking unprepared
+Success metric
+Delivers a professional, complete BA artifact package with confidence
+
+2.2 V1 Scope — Solo User Only
+Version 1 of F2 is a single-user application. Each user logs in, creates their own projects, and works independently. Collaboration features — shared projects, role-based access, stakeholder review workflows — are explicitly out of scope for V1 and will be addressed in V2.
+
+V1 Constraint
+One user. One project at a time. Full persistence across sessions. No multi-user collaboration in this version.
+
+3. Central Object Model
+3.1 The Project
+The central object in F2 is the Project. Everything — intake data, classifications, roadmap, modules, artifacts, and outputs — lives under a Project. A user can have multiple projects simultaneously. Each project is independent.
+
+Field
+Description
+Project name
+User-defined name for the engagement
+Description
+Brief free-text summary of what was assigned
+Engagement type
+Classified at intake — one of 8 BABOK-aligned types
+Scale tier
+Classified at intake — Initiative, Engagement, or Request
+Intake dimensions
+All 10 classification dimensions, populated progressively
+Live roadmap
+The module sequence assigned to this project, editable
+Module statuses
+Not Started / In Progress / Complete / Skipped per module
+Artifacts
+All outputs produced within this project
+Created date
+Timestamp of project creation
+Last modified
+Timestamp of most recent activity
+
+3.2 Scale Tiers
+Every project is classified into one of three scale tiers. The tier determines the depth of the roadmap generated. The AI recommends a tier at intake based on what the user describes; the user can override it.
+
+Tier
+Description
+Initiative
+Multi-phase engagement. Multiple stakeholders. Full artifact suite. Timeline: weeks to months. Example: enterprise system implementation, org-wide transformation.
+Engagement
+Mid-size engagement. A few stakeholders. Targeted artifact set. Timeline: days to weeks. Example: departmental process improvement, new analytics capability.
+Request
+Small, bounded ask. One or two stakeholders. Minimal artifacts. Timeline: hours to days. Example: document requirements for a new report, fix a specific process step.
+
+4. Intake &amp; Classification System
+4.1 Why Intake is the Most Critical Feature
+Intake is where the tool earns the user's trust. If the classification is wrong — the wrong engagement type, the wrong scale, the wrong process mapped — then every subsequent step is built on a bad foundation. The intake system must be thorough enough to get this right consistently, while remaining fast enough that the user does not feel interrogated.
+
+4.2 The Two Classification Dimensions
+The roadmap template selected for a project is determined by two primary dimensions: Engagement Type and Scale Tier. These are the must-know dimensions — the AI cannot generate a roadmap without them.
+
+4.3 The Ten Intake Dimensions
+Beyond the two primary dimensions, eight additional dimensions refine the roadmap and guide the AI's assistance throughout the project. These are captured progressively — not all at once at intake.
+
+Dimension
+Description &amp; Why It Matters
+1. Engagement Type
+What kind of work is this fundamentally? Determines which template is selected. Must-know at intake.
+2. Scale / Complexity Tier
+How big and complex is this engagement? Determines roadmap depth. Must-know at intake.
+3. Trigger / Origin
+What caused this work to exist? Problem escalation, opportunity, mandate, directive, or request. Affects stakeholder dynamics and urgency framing.
+4. Solution Clarity
+How much does anyone already know about the solution? Open exploration vs. formalizing a decided answer changes the BA's job significantly.
+5. Stakeholder Landscape
+How complex is the human side? Single stakeholder vs. conflicting multi-party engagements require very different approaches.
+6. Domain / Functional Area
+What part of the business does this touch? Affects language, examples, and artifact relevance.
+7. Deliverable Expectation
+Has anyone specified what needs to be produced? Open vs. pre-defined deliverables changes how the roadmap is scoped.
+8. Timeline / Urgency
+How much time does the BA have? A scope filter — the tool should flag when timeline and roadmap depth are misaligned.
+9. Data / Evidence Availability
+Is there existing material to work from? Determines whether gap analysis becomes critical early and whether uploads should be prompted.
+10. Change Impact
+How disruptive is the expected outcome? Determines whether change management artifacts are included in the roadmap.
+
+4.4 Tiered Capture Logic
+Not all dimensions are captured at the same time. The intake system uses a three-tier capture approach to avoid overwhelming the user on Day 1.
+
+Tier
+Dimensions
+When Captured
+Must-Know
+Engagement Type, Scale Tier, Trigger / Origin, Solution Clarity
+At intake — before roadmap is generated
+Should-Know Early
+Stakeholder Landscape, Deliverable Expectation, Timeline / Urgency
+First session — within first module or two
+Emerges During Work
+Domain / Functional Area, Data / Evidence Availability, Change Impact
+As the engagement develops — AI prompts when relevant
+
+4.5 Intake Experience
+The intake experience is conversational on the surface but structured underneath. The AI asks open-ended questions and listens to natural language input — the user can paste an email, describe a problem verbally, or paste a brief. The AI is systematically working through the must-know dimensions under the hood before it commits to a classification.
+
+Once the AI has enough signal, it presents its recommended classification — Engagement Type + Scale Tier — with a plain-language explanation of why. The user can accept the recommendation or override it. The roadmap is then generated from the corresponding pre-built template.
+
+Living Roadmap Principle
+The roadmap is not fully locked at intake. It is a living document. As new dimensions become clear during the work, the AI can suggest module additions, flag scope mismatches, and warn on dependency violations. This matches how real BA engagements actually evolve.
+
+5. UX Model — Navigator + Co-Pilot Hybrid
+5.1 The Hybrid Model
+F2 uses a hybrid UX model that combines two distinct modes of interaction depending on where the user is in their work.
+
+Mode
+Where It Applies
+What It Does
+Navigator
+Project level — the roadmap view
+The user always sees the full roadmap. All modules are visible. Progress is tracked. The user understands at a glance where they are, what is ahead, and what is blocked. Free-form navigation — any module can be entered in any order.
+Co-Pilot
+Module level — inside a specific module
+When the user dives into a module, AI takes the wheel. It asks questions, fills in content based on answers, flags gaps, suggests improvements, and guides the user to completion. The user is doing the work; the AI is the expert looking over their shoulder.
+
+5.2 Navigation Principle
+Navigation is free-form. Users can access any module from any project without being forced through a rigid sequence. The AI will warn when a user attempts to work on a module whose dependencies are not yet complete — but it will not block them. The user is always in control.
+
+5.3 The Roadmap as the Home Base
+When a user opens a project, they land on the roadmap view. This is their home base for the entire engagement. The roadmap shows every module in the project's sequence, the status of each, and the overall completion progress. It is the map that is always visible — even when the GPS (co-pilot mode) is talking.
+
+6. Product Architecture
+6.1 Three-Layer Architecture
+F2 is built on three distinct layers. Each layer has a clear responsibility. Together they form a modular workflow engine.
+
+Layer
+Description
+Layer 1 — Module Library
+A fixed set of 52 pre-built BA modules, each representing a discrete unit of work. BABOK-aligned. Defined by the builder. Static in V1. Each module has a name, knowledge area, description, inputs required, and artifacts produced.
+Layer 2 — Roadmap Templates
+24 pre-built combinations of modules assembled for each Engagement Type + Scale Tier combination. These are the best-practice sequences for each scenario. Static in V1. The template is the starting configuration for a new project.
+Layer 3 — Live Roadmap
+The instance created for a specific project. Starts as a copy of the selected template. Fully editable — modules can be added, removed, or reordered. Belongs to the project. Can diverge from the template as the engagement evolves.
+
+6.2 AI Intelligence Layer
+The AI operates on top of the three-layer architecture. It does not generate the methodology — it navigates it intelligently. The AI's responsibilities are:
+
+Intake classification — read natural language input and map it to an Engagement Type + Scale Tier
+Dimension extraction — systematically work through intake dimensions during the intake conversation
+Roadmap suggestions — recommend module additions when new dimensions reveal gaps
+Dependency warnings — flag when a user attempts a module whose prerequisites are incomplete
+Scope conflict alerts — flag when timeline and roadmap depth are misaligned
+Co-pilot assistance — guide the user through each module with targeted questions and content generation
+Gap analysis — review completed artifacts and flag what is weak, missing, or inconsistent
+
+6.3 Data Model Sketch
+The following tables form the core data model for F2. This is a design sketch — exact schema will be finalized during the technical build phase.
+
+Table
+Purpose &amp; Key Fields
+users
+Auth table. user_id, email, created_at. Managed by Supabase Auth.
+projects
+One row per project. project_id, user_id, name, description, engagement_type, scale_tier, status, created_at, updated_at.
+project_dimensions
+Intake dimension values for each project. project_id, dimension_name, dimension_value, captured_at. One row per dimension per project.
+modules
+The module library. module_id, name, knowledge_area, description, typical_inputs, typical_outputs. Static reference table.
+roadmap_templates
+Pre-built template definitions. template_id, engagement_type, scale_tier, module_sequence (ordered array of module_ids).
+project_roadmap
+The live roadmap for a project. roadmap_item_id, project_id, module_id, sequence_order, status (not_started / in_progress / complete / skipped), notes, created_at, updated_at.
+artifacts
+Outputs produced within modules. artifact_id, project_id, module_id, artifact_type, content (text / structured JSON), version, created_at, updated_at.
+
+7. Module Library — Complete Reference
+52 modules across 6 BABOK knowledge areas plus cross-cutting modules. This is the authoritative library for V1. All roadmap templates draw exclusively from this library.
+
+7.1 Business Analysis Planning &amp; Monitoring
+Module Name
+Description
+BA Approach Definition
+Define how BA work will be conducted on this engagement — formality level, methodology (agile, waterfall, hybrid), tools, and governance expectations.
+Stakeholder Engagement Planning
+Plan how and when each stakeholder will be engaged — communication preferences, frequency, channels, and escalation paths.
+BA Governance Setup
+Define how decisions are made, how changes to requirements are controlled, and who holds approval authority.
+Information Management Planning
+Define how artifacts are stored, versioned, shared, and retired across the engagement lifecycle.
+Performance Metrics Definition
+Define how the quality and effectiveness of BA work will be measured on this specific engagement.
+
+7.2 Elicitation &amp; Collaboration
+Module Name
+Description
+Elicitation Planning
+Select the elicitation techniques most appropriate for this engagement type and stakeholder group before beginning information gathering.
+Stakeholder Interviews
+Structured one-on-one or small-group sessions to extract stakeholder needs, pain points, expectations, and constraints.
+Workshops &amp; Focus Groups
+Facilitated group sessions designed to surface requirements, resolve conflicts, or build alignment across multiple stakeholders.
+Observation &amp; Job Shadowing
+Direct observation of current-state processes to capture undocumented workflows and real-world deviations from documented procedures.
+Survey &amp; Questionnaire Design
+Structured data collection instruments for gathering input from larger stakeholder groups efficiently.
+Document Analysis
+Systematic review of existing documentation, reports, policies, and systems to extract requirements and understand current state.
+Benchmarking &amp; Market Analysis
+External reference points — industry standards, competitor approaches, regulatory benchmarks — to inform requirements and solution design.
+Brainstorming Facilitation
+Structured ideation sessions with stakeholders to generate solution options, identify risks, or explore problem dimensions.
+Elicitation Results Documentation
+Capture, organize, and summarize the raw outputs of elicitation activities before moving to analysis and requirements structuring.
+
+7.3 Requirements Life Cycle Management
+Module Name
+Description
+Requirements Traceability Setup
+Define the traceability framework — how requirements will be linked to business objectives, user stories, test cases, and delivered features.
+Requirements Prioritization
+Rank requirements by business value, urgency, dependency, and implementation feasibility using a structured prioritization method.
+Requirements Change Management
+Define and operate the process for handling changes to requirements after they have been baselined and approved.
+Requirements Baselining
+Formally lock a version of requirements as the agreed-upon foundation for design, development, and testing.
+Requirements Sign-off &amp; Approval
+Facilitate formal stakeholder review and documented approval of requirements before handoff.
+Traceability Matrix
+Produce and maintain the live linkage document connecting requirements to user stories, test cases, and business objectives.
+
+7.4 Strategy Analysis
+Module Name
+Description
+Current State Assessment
+Document and analyze the existing situation — processes, systems, data flows, pain points, and performance gaps.
+Problem Statement Definition
+Formally articulate the core problem being solved, grounded in evidence from elicitation and current state analysis.
+Root Cause Analysis
+Identify the underlying causes of the problem rather than surface symptoms, using structured techniques such as 5-Whys or fishbone diagrams.
+Business Need Definition
+Articulate what the business actually needs as an outcome — distinct from any specific solution or technology.
+Future State Design
+Define the desired end state after the solution is implemented — processes, systems, roles, and performance expectations.
+Gap Analysis
+Structured comparison of current state versus future state, identifying exactly what needs to change and what the change effort entails.
+Risk Assessment
+Identify, assess, and document risks to the solution, the engagement process, or the change program.
+Assumption &amp; Constraint Documentation
+Capture what is being assumed as true and what boundaries or limitations exist that the solution must operate within.
+Business Case Development
+Articulate the full justification for the proposed solution — costs, benefits, risks, alternatives, and expected ROI.
+Change Strategy Definition
+Define the approach for transitioning the organization from current state to future state, including change management considerations.
+
+7.5 Requirements Analysis &amp; Design Definition
+Module Name
+Description
+Stakeholder Requirements Documentation
+Document what each stakeholder group needs from the solution in their own terms, before translation into formal requirements.
+Business Requirements Documentation
+Document the high-level business objectives the solution must satisfy — the 'what' at the business level, not the system level.
+Functional Requirements Documentation (FRD)
+Document in detail what the system, process, or solution must do — specific behaviors, functions, and capabilities required.
+Non-Functional Requirements Documentation
+Document performance, security, usability, scalability, and compliance requirements that constrain how the solution must operate.
+User Story Writing
+Express requirements in agile format — as user stories with acceptance criteria — suitable for iterative development teams.
+Process Modeling — Current State
+Create visual representations of how processes work today using standard notation (swimlane diagrams, BPMN, or equivalent).
+Process Modeling — Future State
+Create visual representations of how processes will work after the solution is implemented.
+Use Case Development
+Document actor-system interaction scenarios for system-related engagements, covering both normal and exception flows.
+Data Requirements Definition
+Define what data the solution requires — sources, formats, transformations, storage, and governance requirements.
+Business Rules Documentation
+Document the logic, conditions, and constraints that govern how the solution must behave under various circumstances.
+Acceptance Criteria Definition
+Define the specific, testable conditions that must be met for each requirement to be considered successfully delivered.
+Solution Prototyping &amp; Wireframing
+Produce low-fidelity representations of the solution for stakeholder validation before detailed design or development begins.
+Requirements Verification
+Internal quality check confirming that requirements are complete, consistent, unambiguous, and traceable before stakeholder review.
+Requirements Validation
+Stakeholder-facing confirmation that documented requirements accurately reflect actual business needs and intended outcomes.
+
+7.6 Solution Evaluation
+Module Name
+Description
+Solution Performance Assessment
+Measure whether the implemented solution meets the success criteria defined during requirements — post-deployment evaluation.
+Solution Limitation Identification
+Document what the delivered solution cannot do or where it falls short of the original requirements, for stakeholder awareness.
+Enterprise Limitation Identification
+Document organizational or environmental constraints that are limiting the solution's ability to deliver full expected value.
+Value Delivery Assessment
+Evaluate whether the business need has been met post-implementation — has the problem actually been solved?
+UAT Planning &amp; Support
+Define user acceptance test scenarios and support stakeholders through the formal acceptance testing process.
+Post-Implementation Review
+Conduct a structured retrospective on the engagement — what worked, what did not, what would be done differently next time.
+
+7.7 Cross-Cutting Modules
+Module Name
+Description
+Stakeholder Register
+Master reference document listing all stakeholders with their roles, influence level, interest level, and planned engagement approach.
+RACI Matrix
+Responsibility assignment matrix mapping tasks and decisions to stakeholders across the Responsible / Accountable / Consulted / Informed framework.
+Glossary &amp; Terminology Definition
+Shared language document capturing key terms and their agreed definitions to prevent ambiguity across the engagement.
+Meeting &amp; Workshop Facilitation Log
+Running record of key decisions made, actions assigned, and attendees present across all formal sessions.
+Lessons Learned Documentation
+Structured capture of insights, surprises, and recommendations from this engagement for the benefit of future BA work.
+
+8. Roadmap Templates — Complete Reference
+24 pre-built roadmap templates across 8 engagement types and 3 scale tiers. Each template is a sequenced list of modules drawn from the BABOK-aligned module library. Templates are starting configurations — the live roadmap for any project can be edited from these baselines.
+
+Process Improvement  ·  Request Scale
+Trigger: A specific step or handoff in a process is causing a known problem. Fix is localized.
+#
+Module
+BABOK Knowledge Area
+1
+Problem Statement Definition
+Strategy Analysis
+2
+Current State Assessment
+Strategy Analysis
+3
+Stakeholder Interviews
+Elicitation &amp; Collaboration
+4
+Root Cause Analysis
+Strategy Analysis
+5
+Functional Requirements Documentation
+Requirements Analysis &amp; Design
+6
+Future State Design
+Strategy Analysis
+7
+Acceptance Criteria Definition
+Requirements Analysis &amp; Design
+
+Process Improvement  ·  Engagement Scale
+Trigger: A process across a team or department needs improvement. Multiple pain points, a few stakeholders.
+#
+Module
+BABOK Knowledge Area
+1
+Problem Statement Definition
+Strategy Analysis
+2
+Stakeholder Register
+Cross-Cutting
+3
+Stakeholder Engagement Planning
+Planning &amp; Monitoring
+4
+Current State Assessment
+Strategy Analysis
+5
+Process Modeling — Current State
+Requirements Analysis &amp; Design
+6
+Stakeholder Interviews
+Elicitation &amp; Collaboration
+7
+Root Cause Analysis
+Strategy Analysis
+8
+Gap Analysis
+Strategy Analysis
+9
+Business Requirements Documentation
+Requirements Analysis &amp; Design
+10
+Functional Requirements Documentation
+Requirements Analysis &amp; Design
+11
+Future State Design
+Strategy Analysis
+12
+Process Modeling — Future State
+Requirements Analysis &amp; Design
+13
+Assumption &amp; Constraint Documentation
+Strategy Analysis
+14
+Acceptance Criteria Definition
+Requirements Analysis &amp; Design
+15
+Requirements Sign-off &amp; Approval
+Requirements Life Cycle Mgmt
+
+Process Improvement  ·  Initiative Scale
+Trigger: An end-to-end process spanning multiple teams or systems needs transformation.
+#
+Module
+BABOK Knowledge Area
+1
+BA Approach Definition
+Planning &amp; Monitoring
+2
+Stakeholder Register
+Cross-Cutting
+3
+Stakeholder Engagement Planning
+Planning &amp; Monitoring
+4
+BA Governance Setup
+Planning &amp; Monitoring
+5
+Problem Statement Definition
+Strategy Analysis
+6
+Business Need Definition
+Strategy Analysis
+7
+Current State Assessment
+Strategy Analysis
+8
+Process Modeling — Current State
+Requirements Analysis &amp; Design
+9
+Stakeholder Interviews
+Elicitation &amp; Collaboration
+10
+Workshops &amp; Focus Groups
+Elicitation &amp; Collaboration
+11
+Document Analysis
+Elicitation &amp; Collaboration
+12
+Elicitation Results Documentation
+Elicitation &amp; Collaboration
+13
+Root Cause Analysis
+Strategy Analysis
+14
+Risk Assessment
+Strategy Analysis
+15
+Assumption &amp; Constraint Documentation
+Strategy Analysis
+16
+Business Requirements Documentation
+Requirements Analysis &amp; Design
+17
+Functional Requirements Documentation
+Requirements Analysis &amp; Design
+18
+Non-Functional Requirements Documentation
+Requirements Analysis &amp; Design
+19
+Gap Analysis
+Strategy Analysis
+20
+Future State Design
+Strategy Analysis
+21
+Process Modeling — Future State
+Requirements Analysis &amp; Design
+22
+Change Strategy Definition
+Strategy Analysis
+23
+Business Case Development
+Strategy Analysis
+24
+Requirements Prioritization
+Requirements Life Cycle Mgmt
+25
+Requirements Traceability Setup
+Requirements Life Cycle Mgmt
+26
+Traceability Matrix
+Requirements Life Cycle Mgmt
+27
+Acceptance Criteria Definition
+Requirements Analysis &amp; Design
+28
+Requirements Baselining
+Requirements Life Cycle Mgmt
+29
+Requirements Sign-off &amp; Approval
+Requirements Life Cycle Mgmt
+30
+UAT Planning &amp; Support
+Solution Evaluation
+31
+Post-Implementation Review
+Solution Evaluation
+32
+Lessons Learned Documentation
+Cross-Cutting
+
+New System / Technology Implementation  ·  Request Scale
+Trigger: A small tool or feature addition is needed. Scope is narrow and solution is largely known.
+#
+Module
+BABOK Knowledge Area
+1
+Problem Statement Definition
+Strategy Analysis
+2
+Stakeholder Interviews
+Elicitation &amp; Collaboration
+3
+Functional Requirements Documentation
+Requirements Analysis &amp; Design
+4
+Non-Functional Requirements Documentation
+Requirements Analysis &amp; Design
+5
+Acceptance Criteria Definition
+Requirements Analysis &amp; Design
+6
+UAT Planning &amp; Support
+Solution Evaluation
+
+New System / Technology Implementation  ·  Engagement Scale
+Trigger: A departmental system is being implemented or replaced. Multiple stakeholders, moderate complexity.
+#
+Module
+BABOK Knowledge Area
+1
+Problem Statement Definition
+Strategy Analysis
+2
+Business Need Definition
+Strategy Analysis
+3
+Stakeholder Register
+Cross-Cutting
+4
+Stakeholder Engagement Planning
+Planning &amp; Monitoring
+5
+Stakeholder Interviews
+Elicitation &amp; Collaboration
+6
+Document Analysis
+Elicitation &amp; Collaboration
+7
+Current State Assessment
+Strategy Analysis
+8
+Assumption &amp; Constraint Documentation
+Strategy Analysis
+9
+Business Requirements Documentation
+Requirements Analysis &amp; Design
+10
+Functional Requirements Documentation
+Requirements Analysis &amp; Design
+11
+Non-Functional Requirements Documentation
+Requirements Analysis &amp; Design
+12
+Data Requirements Definition
+Requirements Analysis &amp; Design
+13
+Business Rules Documentation
+Requirements Analysis &amp; Design
+14
+Use Case Development
+Requirements Analysis &amp; Design
+15
+User Story Writing
+Requirements Analysis &amp; Design
+16
+Acceptance Criteria Definition
+Requirements Analysis &amp; Design
+17
+Requirements Prioritization
+Requirements Life Cycle Mgmt
+18
+Requirements Sign-off &amp; Approval
+Requirements Life Cycle Mgmt
+19
+UAT Planning &amp; Support
+Solution Evaluation
+
+New System / Technology Implementation  ·  Initiative Scale
+Trigger: Enterprise-wide system implementation or platform replacement. High complexity, high stakes.
+#
+Module
+BABOK Knowledge Area
+1
+BA Approach Definition
+Planning &amp; Monitoring
+2
+Stakeholder Register
+Cross-Cutting
+3
+Stakeholder Engagement Planning
+Planning &amp; Monitoring
+4
+BA Governance Setup
+Planning &amp; Monitoring
+5
+Information Management Planning
+Planning &amp; Monitoring
+6
+Problem Statement Definition
+Strategy Analysis
+7
+Business Need Definition
+Strategy Analysis
+8
+Business Case Development
+Strategy Analysis
+9
+Current State Assessment
+Strategy Analysis
+10
+Process Modeling — Current State
+Requirements Analysis &amp; Design
+11
+Stakeholder Interviews
+Elicitation &amp; Collaboration
+12
+Workshops &amp; Focus Groups
+Elicitation &amp; Collaboration
+13
+Document Analysis
+Elicitation &amp; Collaboration
+14
+Benchmarking &amp; Market Analysis
+Elicitation &amp; Collaboration
+15
+Elicitation Results Documentation
+Elicitation &amp; Collaboration
+16
+Root Cause Analysis
+Strategy Analysis
+17
+Risk Assessment
+Strategy Analysis
+18
+Assumption &amp; Constraint Documentation
+Strategy Analysis
+19
+Business Requirements Documentation
+Requirements Analysis &amp; Design
+20
+Functional Requirements Documentation
+Requirements Analysis &amp; Design
+21
+Non-Functional Requirements Documentation
+Requirements Analysis &amp; Design
+22
+Data Requirements Definition
+Requirements Analysis &amp; Design
+23
+Business Rules Documentation
+Requirements Analysis &amp; Design
+24
+Use Case Development
+Requirements Analysis &amp; Design
+25
+User Story Writing
+Requirements Analysis &amp; Design
+26
+Acceptance Criteria Definition
+Requirements Analysis &amp; Design
+27
+Solution Prototyping &amp; Wireframing
+Requirements Analysis &amp; Design
+28
+Requirements Verification
+Requirements Analysis &amp; Design
+29
+Requirements Validation
+Requirements Analysis &amp; Design
+30
+Requirements Prioritization
+Requirements Life Cycle Mgmt
+31
+Requirements Traceability Setup
+Requirements Life Cycle Mgmt
+32
+Traceability Matrix
+Requirements Life Cycle Mgmt
+33
+Requirements Baselining
+Requirements Life Cycle Mgmt
+34
+Requirements Sign-off &amp; Approval
+Requirements Life Cycle Mgmt
+35
+Change Strategy Definition
+Strategy Analysis
+36
+UAT Planning &amp; Support
+Solution Evaluation
+37
+Solution Performance Assessment
+Solution Evaluation
+38
+Post-Implementation Review
+Solution Evaluation
+39
+Lessons Learned Documentation
+Cross-Cutting
+
+Data &amp; Reporting  ·  Request Scale
+Trigger: Someone needs a new report or dashboard. Requirements are fairly clear.
+#
+Module
+BABOK Knowledge Area
+1
+Problem Statement Definition
+Strategy Analysis
+2
+Stakeholder Interviews
+Elicitation &amp; Collaboration
+3
+Data Requirements Definition
+Requirements Analysis &amp; Design
+4
+Functional Requirements Documentation
+Requirements Analysis &amp; Design
+5
+Acceptance Criteria Definition
+Requirements Analysis &amp; Design
+
+Data &amp; Reporting  ·  Engagement Scale
+Trigger: A reporting suite or analytics capability is being built for a team or department.
+#
+Module
+BABOK Knowledge Area
+1
+Problem Statement Definition
+Strategy Analysis
+2
+Stakeholder Register
+Cross-Cutting
+3
+Stakeholder Interviews
+Elicitation &amp; Collaboration
+4
+Document Analysis
+Elicitation &amp; Collaboration
+5
+Current State Assessment
+Strategy Analysis
+6
+Data Requirements Definition
+Requirements Analysis &amp; Design
+7
+Business Requirements Documentation
+Requirements Analysis &amp; Design
+8
+Functional Requirements Documentation
+Requirements Analysis &amp; Design
+9
+Non-Functional Requirements Documentation
+Requirements Analysis &amp; Design
+10
+Business Rules Documentation
+Requirements Analysis &amp; Design
+11
+Acceptance Criteria Definition
+Requirements Analysis &amp; Design
+12
+Solution Prototyping &amp; Wireframing
+Requirements Analysis &amp; Design
+13
+Requirements Sign-off &amp; Approval
+Requirements Life Cycle Mgmt
+14
+UAT Planning &amp; Support
+Solution Evaluation
+
+Data &amp; Reporting  ·  Initiative Scale
+Trigger: Enterprise data strategy, data warehouse, or organization-wide analytics transformation.
+#
+Module
+BABOK Knowledge Area
+1
+BA Approach Definition
+Planning &amp; Monitoring
+2
+Stakeholder Register
+Cross-Cutting
+3
+Stakeholder Engagement Planning
+Planning &amp; Monitoring
+4
+BA Governance Setup
+Planning &amp; Monitoring
+5
+Problem Statement Definition
+Strategy Analysis
+6
+Business Need Definition
+Strategy Analysis
+7
+Business Case Development
+Strategy Analysis
+8
+Current State Assessment
+Strategy Analysis
+9
+Stakeholder Interviews
+Elicitation &amp; Collaboration
+10
+Workshops &amp; Focus Groups
+Elicitation &amp; Collaboration
+11
+Document Analysis
+Elicitation &amp; Collaboration
+12
+Benchmarking &amp; Market Analysis
+Elicitation &amp; Collaboration
+13
+Elicitation Results Documentation
+Elicitation &amp; Collaboration
+14
+Root Cause Analysis
+Strategy Analysis
+15
+Risk Assessment
+Strategy Analysis
+16
+Assumption &amp; Constraint Documentation
+Strategy Analysis
+17
+Data Requirements Definition
+Requirements Analysis &amp; Design
+18
+Business Requirements Documentation
+Requirements Analysis &amp; Design
+19
+Functional Requirements Documentation
+Requirements Analysis &amp; Design
+20
+Non-Functional Requirements Documentation
+Requirements Analysis &amp; Design
+21
+Business Rules Documentation
+Requirements Analysis &amp; Design
+22
+Process Modeling — Current State
+Requirements Analysis &amp; Design
+23
+Future State Design
+Strategy Analysis
+24
+Gap Analysis
+Strategy Analysis
+25
+Solution Prototyping &amp; Wireframing
+Requirements Analysis &amp; Design
+26
+Requirements Verification
+Requirements Analysis &amp; Design
+27
+Requirements Validation
+Requirements Analysis &amp; Design
+28
+Requirements Prioritization
+Requirements Life Cycle Mgmt
+29
+Requirements Traceability Setup
+Requirements Life Cycle Mgmt
+30
+Traceability Matrix
+Requirements Life Cycle Mgmt
+31
+Acceptance Criteria Definition
+Requirements Analysis &amp; Design
+32
+Requirements Baselining
+Requirements Life Cycle Mgmt
+33
+Requirements Sign-off &amp; Approval
+Requirements Life Cycle Mgmt
+34
+UAT Planning &amp; Support
+Solution Evaluation
+35
+Value Delivery Assessment
+Solution Evaluation
+36
+Post-Implementation Review
+Solution Evaluation
+37
+Lessons Learned Documentation
+Cross-Cutting
+
+Regulatory &amp; Compliance  ·  Request Scale
+Trigger: A specific policy or regulatory requirement needs to be documented and addressed.
+#
+Module
+BABOK Knowledge Area
+1
+Problem Statement Definition
+Strategy Analysis
+2
+Document Analysis
+Elicitation &amp; Collaboration
+3
+Assumption &amp; Constraint Documentation
+Strategy Analysis
+4
+Functional Requirements Documentation
+Requirements Analysis &amp; Design
+5
+Acceptance Criteria Definition
+Requirements Analysis &amp; Design
+
+Regulatory &amp; Compliance  ·  Engagement Scale
+Trigger: A compliance program affecting a department or process needs to be designed and implemented.
+#
+Module
+BABOK Knowledge Area
+1
+Problem Statement Definition
+Strategy Analysis
+2
+Business Need Definition
+Strategy Analysis
+3
+Stakeholder Register
+Cross-Cutting
+4
+Stakeholder Engagement Planning
+Planning &amp; Monitoring
+5
+Document Analysis
+Elicitation &amp; Collaboration
+6
+Current State Assessment
+Strategy Analysis
+7
+Gap Analysis
+Strategy Analysis
+8
+Risk Assessment
+Strategy Analysis
+9
+Assumption &amp; Constraint Documentation
+Strategy Analysis
+10
+Business Requirements Documentation
+Requirements Analysis &amp; Design
+11
+Functional Requirements Documentation
+Requirements Analysis &amp; Design
+12
+Business Rules Documentation
+Requirements Analysis &amp; Design
+13
+Future State Design
+Strategy Analysis
+14
+Acceptance Criteria Definition
+Requirements Analysis &amp; Design
+15
+Requirements Sign-off &amp; Approval
+Requirements Life Cycle Mgmt
+16
+UAT Planning &amp; Support
+Solution Evaluation
+
+Regulatory &amp; Compliance  ·  Initiative Scale
+Trigger: Organization-wide compliance transformation, regulatory overhaul, or major audit response.
+#
+Module
+BABOK Knowledge Area
+1
+BA Approach Definition
+Planning &amp; Monitoring
+2
+Stakeholder Register
+Cross-Cutting
+3
+Stakeholder Engagement Planning
+Planning &amp; Monitoring
+4
+BA Governance Setup
+Planning &amp; Monitoring
+5
+Information Management Planning
+Planning &amp; Monitoring
+6
+Problem Statement Definition
+Strategy Analysis
+7
+Business Need Definition
+Strategy Analysis
+8
+Business Case Development
+Strategy Analysis
+9
+Document Analysis
+Elicitation &amp; Collaboration
+10
+Current State Assessment
+Strategy Analysis
+11
+Stakeholder Interviews
+Elicitation &amp; Collaboration
+12
+Workshops &amp; Focus Groups
+Elicitation &amp; Collaboration
+13
+Elicitation Results Documentation
+Elicitation &amp; Collaboration
+14
+Root Cause Analysis
+Strategy Analysis
+15
+Risk Assessment
+Strategy Analysis
+16
+Assumption &amp; Constraint Documentation
+Strategy Analysis
+17
+Business Rules Documentation
+Requirements Analysis &amp; Design
+18
+Business Requirements Documentation
+Requirements Analysis &amp; Design
+19
+Functional Requirements Documentation
+Requirements Analysis &amp; Design
+20
+Non-Functional Requirements Documentation
+Requirements Analysis &amp; Design
+21
+Gap Analysis
+Strategy Analysis
+22
+Future State Design
+Strategy Analysis
+23
+Process Modeling — Future State
+Requirements Analysis &amp; Design
+24
+Change Strategy Definition
+Strategy Analysis
+25
+Requirements Verification
+Requirements Analysis &amp; Design
+26
+Requirements Validation
+Requirements Analysis &amp; Design
+27
+Requirements Prioritization
+Requirements Life Cycle Mgmt
+28
+Requirements Traceability Setup
+Requirements Life Cycle Mgmt
+29
+Traceability Matrix
+Requirements Life Cycle Mgmt
+30
+Acceptance Criteria Definition
+Requirements Analysis &amp; Design
+31
+Requirements Baselining
+Requirements Life Cycle Mgmt
+32
+Requirements Sign-off &amp; Approval
+Requirements Life Cycle Mgmt
+33
+UAT Planning &amp; Support
+Solution Evaluation
+34
+Solution Performance Assessment
+Solution Evaluation
+35
+Post-Implementation Review
+Solution Evaluation
+36
+Lessons Learned Documentation
+Cross-Cutting
+
+Organizational Change  ·  Request Scale
+Trigger: A role, team structure, or responsibility is being adjusted in a limited scope.
+#
+Module
+BABOK Knowledge Area
+1
+Problem Statement Definition
+Strategy Analysis
+2
+Stakeholder Interviews
+Elicitation &amp; Collaboration
+3
+Current State Assessment
+Strategy Analysis
+4
+Assumption &amp; Constraint Documentation
+Strategy Analysis
+5
+Functional Requirements Documentation
+Requirements Analysis &amp; Design
+6
+Acceptance Criteria Definition
+Requirements Analysis &amp; Design
+
+Organizational Change  ·  Engagement Scale
+Trigger: A department restructure, role redesign, or team merger with moderate stakeholder impact.
+#
+Module
+BABOK Knowledge Area
+1
+Problem Statement Definition
+Strategy Analysis
+2
+Business Need Definition
+Strategy Analysis
+3
+Stakeholder Register
+Cross-Cutting
+4
+Stakeholder Engagement Planning
+Planning &amp; Monitoring
+5
+Stakeholder Interviews
+Elicitation &amp; Collaboration
+6
+Current State Assessment
+Strategy Analysis
+7
+Root Cause Analysis
+Strategy Analysis
+8
+Gap Analysis
+Strategy Analysis
+9
+Risk Assessment
+Strategy Analysis
+10
+Assumption &amp; Constraint Documentation
+Strategy Analysis
+11
+Business Requirements Documentation
+Requirements Analysis &amp; Design
+12
+Future State Design
+Strategy Analysis
+13
+Change Strategy Definition
+Strategy Analysis
+14
+RACI Matrix
+Cross-Cutting
+15
+Acceptance Criteria Definition
+Requirements Analysis &amp; Design
+16
+Requirements Sign-off &amp; Approval
+Requirements Life Cycle Mgmt
+
+Organizational Change  ·  Initiative Scale
+Trigger: Enterprise-wide transformation, merger, operating model redesign, or workforce restructuring.
+#
+Module
+BABOK Knowledge Area
+1
+BA Approach Definition
+Planning &amp; Monitoring
+2
+Stakeholder Register
+Cross-Cutting
+3
+Stakeholder Engagement Planning
+Planning &amp; Monitoring
+4
+BA Governance Setup
+Planning &amp; Monitoring
+5
+Information Management Planning
+Planning &amp; Monitoring
+6
+Problem Statement Definition
+Strategy Analysis
+7
+Business Need Definition
+Strategy Analysis
+8
+Business Case Development
+Strategy Analysis
+9
+Current State Assessment
+Strategy Analysis
+10
+Process Modeling — Current State
+Requirements Analysis &amp; Design
+11
+Stakeholder Interviews
+Elicitation &amp; Collaboration
+12
+Workshops &amp; Focus Groups
+Elicitation &amp; Collaboration
+13
+Survey &amp; Questionnaire Design
+Elicitation &amp; Collaboration
+14
+Elicitation Results Documentation
+Elicitation &amp; Collaboration
+15
+Root Cause Analysis
+Strategy Analysis
+16
+Risk Assessment
+Strategy Analysis
+17
+Assumption &amp; Constraint Documentation
+Strategy Analysis
+18
+Business Requirements Documentation
+Requirements Analysis &amp; Design
+19
+Functional Requirements Documentation
+Requirements Analysis &amp; Design
+20
+Gap Analysis
+Strategy Analysis
+21
+Future State Design
+Strategy Analysis
+22
+Process Modeling — Future State
+Requirements Analysis &amp; Design
+23
+Change Strategy Definition
+Strategy Analysis
+24
+RACI Matrix
+Cross-Cutting
+25
+Performance Metrics Definition
+Planning &amp; Monitoring
+26
+Requirements Prioritization
+Requirements Life Cycle Mgmt
+27
+Requirements Sign-off &amp; Approval
+Requirements Life Cycle Mgmt
+28
+Value Delivery Assessment
+Solution Evaluation
+29
+Post-Implementation Review
+Solution Evaluation
+30
+Lessons Learned Documentation
+Cross-Cutting
+
+New Product / Service Development  ·  Request Scale
+Trigger: A small internal tool, feature, or service enhancement is being built.
+#
+Module
+BABOK Knowledge Area
+1
+Problem Statement Definition
+Strategy Analysis
+2
+Stakeholder Interviews
+Elicitation &amp; Collaboration
+3
+Business Need Definition
+Strategy Analysis
+4
+User Story Writing
+Requirements Analysis &amp; Design
+5
+Acceptance Criteria Definition
+Requirements Analysis &amp; Design
+6
+Functional Requirements Documentation
+Requirements Analysis &amp; Design
+
+New Product / Service Development  ·  Engagement Scale
+Trigger: A new internal or customer-facing product or service with defined scope and stakeholders.
+#
+Module
+BABOK Knowledge Area
+1
+Problem Statement Definition
+Strategy Analysis
+2
+Business Need Definition
+Strategy Analysis
+3
+Stakeholder Register
+Cross-Cutting
+4
+Stakeholder Engagement Planning
+Planning &amp; Monitoring
+5
+Stakeholder Interviews
+Elicitation &amp; Collaboration
+6
+Elicitation Planning
+Elicitation &amp; Collaboration
+7
+Document Analysis
+Elicitation &amp; Collaboration
+8
+Current State Assessment
+Strategy Analysis
+9
+Business Requirements Documentation
+Requirements Analysis &amp; Design
+10
+Functional Requirements Documentation
+Requirements Analysis &amp; Design
+11
+Non-Functional Requirements Documentation
+Requirements Analysis &amp; Design
+12
+User Story Writing
+Requirements Analysis &amp; Design
+13
+Acceptance Criteria Definition
+Requirements Analysis &amp; Design
+14
+Solution Prototyping &amp; Wireframing
+Requirements Analysis &amp; Design
+15
+Business Rules Documentation
+Requirements Analysis &amp; Design
+16
+Requirements Prioritization
+Requirements Life Cycle Mgmt
+17
+Requirements Sign-off &amp; Approval
+Requirements Life Cycle Mgmt
+18
+UAT Planning &amp; Support
+Solution Evaluation
+
+New Product / Service Development  ·  Initiative Scale
+Trigger: Full product launch, new service line, or platform build with cross-functional teams.
+#
+Module
+BABOK Knowledge Area
+1
+BA Approach Definition
+Planning &amp; Monitoring
+2
+Stakeholder Register
+Cross-Cutting
+3
+Stakeholder Engagement Planning
+Planning &amp; Monitoring
+4
+BA Governance Setup
+Planning &amp; Monitoring
+5
+Information Management Planning
+Planning &amp; Monitoring
+6
+Problem Statement Definition
+Strategy Analysis
+7
+Business Need Definition
+Strategy Analysis
+8
+Business Case Development
+Strategy Analysis
+9
+Benchmarking &amp; Market Analysis
+Elicitation &amp; Collaboration
+10
+Current State Assessment
+Strategy Analysis
+11
+Stakeholder Interviews
+Elicitation &amp; Collaboration
+12
+Workshops &amp; Focus Groups
+Elicitation &amp; Collaboration
+13
+Survey &amp; Questionnaire Design
+Elicitation &amp; Collaboration
+14
+Elicitation Planning
+Elicitation &amp; Collaboration
+15
+Elicitation Results Documentation
+Elicitation &amp; Collaboration
+16
+Root Cause Analysis
+Strategy Analysis
+17
+Risk Assessment
+Strategy Analysis
+18
+Assumption &amp; Constraint Documentation
+Strategy Analysis
+19
+Business Requirements Documentation
+Requirements Analysis &amp; Design
+20
+Functional Requirements Documentation
+Requirements Analysis &amp; Design
+21
+Non-Functional Requirements Documentation
+Requirements Analysis &amp; Design
+22
+Data Requirements Definition
+Requirements Analysis &amp; Design
+23
+Business Rules Documentation
+Requirements Analysis &amp; Design
+24
+User Story Writing
+Requirements Analysis &amp; Design
+25
+Use Case Development
+Requirements Analysis &amp; Design
+26
+Acceptance Criteria Definition
+Requirements Analysis &amp; Design
+27
+Solution Prototyping &amp; Wireframing
+Requirements Analysis &amp; Design
+28
+Requirements Verification
+Requirements Analysis &amp; Design
+29
+Requirements Validation
+Requirements Analysis &amp; Design
+30
+Requirements Prioritization
+Requirements Life Cycle Mgmt
+31
+Requirements Traceability Setup
+Requirements Life Cycle Mgmt
+32
+Traceability Matrix
+Requirements Life Cycle Mgmt
+33
+Requirements Baselining
+Requirements Life Cycle Mgmt
+34
+Requirements Sign-off &amp; Approval
+Requirements Life Cycle Mgmt
+35
+Change Strategy Definition
+Strategy Analysis
+36
+UAT Planning &amp; Support
+Solution Evaluation
+37
+Solution Performance Assessment
+Solution Evaluation
+38
+Value Delivery Assessment
+Solution Evaluation
+39
+Post-Implementation Review
+Solution Evaluation
+40
+Lessons Learned Documentation
+Cross-Cutting
+
+Vendor Selection &amp; Procurement  ·  Request Scale
+Trigger: A specific tool or service needs to be sourced. Options are limited and decision is straightforward.
+#
+Module
+BABOK Knowledge Area
+1
+Problem Statement Definition
+Strategy Analysis
+2
+Stakeholder Interviews
+Elicitation &amp; Collaboration
+3
+Business Need Definition
+Strategy Analysis
+4
+Functional Requirements Documentation
+Requirements Analysis &amp; Design
+5
+Non-Functional Requirements Documentation
+Requirements Analysis &amp; Design
+6
+Assumption &amp; Constraint Documentation
+Strategy Analysis
+
+Vendor Selection &amp; Procurement  ·  Engagement Scale
+Trigger: A departmental vendor selection with defined evaluation criteria and multiple options.
+#
+Module
+BABOK Knowledge Area
+1
+Problem Statement Definition
+Strategy Analysis
+2
+Business Need Definition
+Strategy Analysis
+3
+Stakeholder Register
+Cross-Cutting
+4
+Stakeholder Interviews
+Elicitation &amp; Collaboration
+5
+Document Analysis
+Elicitation &amp; Collaboration
+6
+Benchmarking &amp; Market Analysis
+Elicitation &amp; Collaboration
+7
+Functional Requirements Documentation
+Requirements Analysis &amp; Design
+8
+Non-Functional Requirements Documentation
+Requirements Analysis &amp; Design
+9
+Business Rules Documentation
+Requirements Analysis &amp; Design
+10
+Assumption &amp; Constraint Documentation
+Strategy Analysis
+11
+Risk Assessment
+Strategy Analysis
+12
+Requirements Prioritization
+Requirements Life Cycle Mgmt
+13
+Requirements Sign-off &amp; Approval
+Requirements Life Cycle Mgmt
+
+Vendor Selection &amp; Procurement  ·  Initiative Scale
+Trigger: Enterprise vendor selection, platform procurement, or outsourcing decision with major business impact.
+#
+Module
+BABOK Knowledge Area
+1
+BA Approach Definition
+Planning &amp; Monitoring
+2
+Stakeholder Register
+Cross-Cutting
+3
+Stakeholder Engagement Planning
+Planning &amp; Monitoring
+4
+BA Governance Setup
+Planning &amp; Monitoring
+5
+Problem Statement Definition
+Strategy Analysis
+6
+Business Need Definition
+Strategy Analysis
+7
+Business Case Development
+Strategy Analysis
+8
+Current State Assessment
+Strategy Analysis
+9
+Stakeholder Interviews
+Elicitation &amp; Collaboration
+10
+Workshops &amp; Focus Groups
+Elicitation &amp; Collaboration
+11
+Document Analysis
+Elicitation &amp; Collaboration
+12
+Benchmarking &amp; Market Analysis
+Elicitation &amp; Collaboration
+13
+Elicitation Results Documentation
+Elicitation &amp; Collaboration
+14
+Risk Assessment
+Strategy Analysis
+15
+Assumption &amp; Constraint Documentation
+Strategy Analysis
+16
+Business Requirements Documentation
+Requirements Analysis &amp; Design
+17
+Functional Requirements Documentation
+Requirements Analysis &amp; Design
+18
+Non-Functional Requirements Documentation
+Requirements Analysis &amp; Design
+19
+Business Rules Documentation
+Requirements Analysis &amp; Design
+20
+Requirements Prioritization
+Requirements Life Cycle Mgmt
+21
+Requirements Verification
+Requirements Analysis &amp; Design
+22
+Requirements Baselining
+Requirements Life Cycle Mgmt
+23
+Requirements Sign-off &amp; Approval
+Requirements Life Cycle Mgmt
+24
+Solution Performance Assessment
+Solution Evaluation
+25
+Value Delivery Assessment
+Solution Evaluation
+26
+Post-Implementation Review
+Solution Evaluation
+27
+Lessons Learned Documentation
+Cross-Cutting
+
+Strategic Initiative  ·  Request Scale
+Trigger: A focused strategic question or decision needs structured analysis and a recommendation.
+#
+Module
+BABOK Knowledge Area
+1
+Problem Statement Definition
+Strategy Analysis
+2
+Business Need Definition
+Strategy Analysis
+3
+Stakeholder Interviews
+Elicitation &amp; Collaboration
+4
+Document Analysis
+Elicitation &amp; Collaboration
+5
+Assumption &amp; Constraint Documentation
+Strategy Analysis
+6
+Business Case Development
+Strategy Analysis
+
+Strategic Initiative  ·  Engagement Scale
+Trigger: A strategic program with defined objectives, stakeholders, and a deliverable recommendation.
+#
+Module
+BABOK Knowledge Area
+1
+Problem Statement Definition
+Strategy Analysis
+2
+Business Need Definition
+Strategy Analysis
+3
+Stakeholder Register
+Cross-Cutting
+4
+Stakeholder Engagement Planning
+Planning &amp; Monitoring
+5
+Stakeholder Interviews
+Elicitation &amp; Collaboration
+6
+Workshops &amp; Focus Groups
+Elicitation &amp; Collaboration
+7
+Document Analysis
+Elicitation &amp; Collaboration
+8
+Benchmarking &amp; Market Analysis
+Elicitation &amp; Collaboration
+9
+Current State Assessment
+Strategy Analysis
+10
+Root Cause Analysis
+Strategy Analysis
+11
+Risk Assessment
+Strategy Analysis
+12
+Assumption &amp; Constraint Documentation
+Strategy Analysis
+13
+Gap Analysis
+Strategy Analysis
+14
+Future State Design
+Strategy Analysis
+15
+Business Case Development
+Strategy Analysis
+16
+Change Strategy Definition
+Strategy Analysis
+17
+Requirements Sign-off &amp; Approval
+Requirements Life Cycle Mgmt
+
+Strategic Initiative  ·  Initiative Scale
+Trigger: Organization-wide transformation, operating model redesign, or multi-year strategic program.
+#
+Module
+BABOK Knowledge Area
+1
+BA Approach Definition
+Planning &amp; Monitoring
+2
+Stakeholder Register
+Cross-Cutting
+3
+Stakeholder Engagement Planning
+Planning &amp; Monitoring
+4
+BA Governance Setup
+Planning &amp; Monitoring
+5
+Information Management Planning
+Planning &amp; Monitoring
+6
+Performance Metrics Definition
+Planning &amp; Monitoring
+7
+Problem Statement Definition
+Strategy Analysis
+8
+Business Need Definition
+Strategy Analysis
+9
+Business Case Development
+Strategy Analysis
+10
+Current State Assessment
+Strategy Analysis
+11
+Process Modeling — Current State
+Requirements Analysis &amp; Design
+12
+Stakeholder Interviews
+Elicitation &amp; Collaboration
+13
+Workshops &amp; Focus Groups
+Elicitation &amp; Collaboration
+14
+Survey &amp; Questionnaire Design
+Elicitation &amp; Collaboration
+15
+Benchmarking &amp; Market Analysis
+Elicitation &amp; Collaboration
+16
+Elicitation Results Documentation
+Elicitation &amp; Collaboration
+17
+Root Cause Analysis
+Strategy Analysis
+18
+Risk Assessment
+Strategy Analysis
+19
+Assumption &amp; Constraint Documentation
+Strategy Analysis
+20
+Gap Analysis
+Strategy Analysis
+21
+Future State Design
+Strategy Analysis
+22
+Process Modeling — Future State
+Requirements Analysis &amp; Design
+23
+Change Strategy Definition
+Strategy Analysis
+24
+Business Requirements Documentation
+Requirements Analysis &amp; Design
+25
+Functional Requirements Documentation
+Requirements Analysis &amp; Design
+26
+Requirements Prioritization
+Requirements Life Cycle Mgmt
+27
+Requirements Traceability Setup
+Requirements Life Cycle Mgmt
+28
+Traceability Matrix
+Requirements Life Cycle Mgmt
+29
+Requirements Sign-off &amp; Approval
+Requirements Life Cycle Mgmt
+30
+Value Delivery Assessment
+Solution Evaluation
+31
+Post-Implementation Review
+Solution Evaluation
+32
+Lessons Learned Documentation
+Cross-Cutting
+
+9. Technology Stack
+Component
+Technology &amp; Notes
+Language
+Python 3.9+
+Frontend
+Streamlit — dark theme, high visual quality standard (reference: Lens S4)
+AI Model
+OpenAI API — GPT-4o. Anthropic API considered for V2 once functionality proven.
+OpenAI SDK
+openai Python package
+Database
+PostgreSQL via Neon DB — full persistence required, no in-memory-only session state
+Authentication
+Supabase Auth — email + password, same pattern as S3/Meridian
+Charts
+Plotly if data visualization is needed
+Deployment
+Streamlit Community Cloud
+Version Control
+GitHub — repo: hadimercer/ba-copilot (name TBD)
+API Key Management
+Streamlit Secrets only — never hardcoded, never committed to repo
+Terminal / Shell
+PowerShell only — Windows environment
+
+Rejected Technologies — Do Not Suggest
+Technology
+Reason Rejected
+Flask / FastAPI
+Streamlit is the established stack for this portfolio
+SQLite
+Persistence must survive deployment — Neon DB required
+In-memory-only session state
+Users log in, projects must persist across sessions
+Anthropic API (V1)
+OpenAI first — Anthropic considered for V2
+React
+Outside the Python/Streamlit stack
+
+10. Prioritized Build Sequence
+V1 Build Phases
+The following sequence is recommended for V1 development. Each phase must be complete and stable before the next begins. Prompt quality is treated as a first-class deliverable — AI prompts should be iterated and tested in isolation before UI is built around them.
+
+Phase
+Deliverable
+Priority
+Phase 1
+Project scaffold — auth, project creation, database schema, navigation shell
+Foundation
+Phase 2
+Module library and template data — all 52 modules and 24 templates seeded into the database
+Core data
+Phase 3
+Intake &amp; classification — conversational intake UI, AI classification logic, dimension capture, roadmap generation from template
+Critical path
+Phase 4
+Roadmap navigator view — project home, module list, status tracking, progress visualization
+Core UX
+Phase 5
+Co-pilot module experience — first 3-4 modules built with full AI co-pilot interaction (Problem Statement, Stakeholder Interviews, Current State Assessment, Requirements Elicitation)
+Core value
+Phase 6
+Artifact generation — structured output for key artifacts (FRD, user stories, acceptance criteria, stakeholder register)
+Deliverable quality
+Phase 7
+Gap analysis — AI review of completed artifacts, flagging weaknesses and inconsistencies
+Intelligence layer
+Phase 8
+Traceability matrix — automated linkage of requirements to user stories and test cases
+Intelligence layer
+Phase 9
+Export &amp; packaging — deliverable export in professional format
+Completion
+Phase 10
+Polish, testing, deployment
+Launch readiness
+
+V1 Scope Boundaries
+The following are explicitly out of scope for V1:
+
+Multi-user collaboration — shared projects, role-based access, stakeholder review workflows
+Module library editing — adding, modifying, or removing modules via UI
+Custom template creation — users cannot create their own roadmap templates
+Anthropic API — OpenAI GPT-4o only in V1
+Mobile optimization — desktop/web first
+Integrations — no Jira, Confluence, or other external tool integrations in V1
+
+11. Sign-Off
+This document represents the complete product definition for F2 — Business Analysis Co-Pilot. No code, wireframes, or architecture work should begin until this document has been reviewed and explicitly approved.
+
+Sign-Off Checklist
+[ ]  Product vision and problem statement confirmed[ ]  User model and V1 scope boundaries confirmed[ ]  Central object model (Project) confirmed[ ]  Intake dimensions and tiered capture logic confirmed[ ]  Navigator + Co-Pilot hybrid UX model confirmed[ ]  Three-layer architecture confirmed[ ]  52-module BABOK library confirmed[ ]  24 roadmap templates confirmed[ ]  Tech stack confirmed[ ]  V1 build sequence confirmedSigned off by: ____________________________    Date: ________________
