@@ -12,19 +12,12 @@ def render(current_user: dict) -> None:
 
     # ── Transparent row-button overlay CSS ───────────────────────────────────
     st.markdown("""<style>
-    /* Collapse internal gap in first column so card and button are directly adjacent */
-    section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
-        div[data-testid="stColumn"]:first-child div[data-testid="stVerticalBlock"],
-    section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
-        div[data-testid="column"]:first-child div[data-testid="stVerticalBlock"] {
-        gap: 0 !important;
-    }
-    /* Row entry overlay — card is sibling in same column, simple -row_height offset */
+    /* Row entry overlay — -108px = row height (72px) + observed column-internal gap (36px) */
     section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
         div[data-testid="stColumn"]:first-child div[data-testid="stButton"] button,
     section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
         div[data-testid="column"]:first-child div[data-testid="stButton"] button {
-        height:72px !important; margin-top:-72px !important; background:transparent !important;
+        height:72px !important; margin-top:-108px !important; background:transparent !important;
         border:none !important; color:transparent !important; border-radius:10px !important;
         box-shadow:none !important;
     }
