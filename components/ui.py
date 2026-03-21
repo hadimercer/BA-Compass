@@ -585,17 +585,17 @@ def inject_css(hide_sidebar: bool = False) -> None:
 def render_sidebar(current_page: str) -> None:
     """Render the BA Compass sidebar with current-page state and logout."""
     nav_items = [
-        ("dashboard", "Dashboard", "pages/dashboard.py"),
-        ("divider", "divider", None),
-        ("project_intake", "Project Intake", "pages/project_intake.py"),
-        ("roadmap", "Roadmap", "pages/roadmap.py"),
-        ("module_copilot", "Co-Pilot", "pages/module_copilot.py"),
-        ("gap_analysis", "Gap Analysis", "pages/gap_analysis.py"),
-        ("export", "Export", "pages/export.py"),
+        ("dashboard", "Dashboard"),
+        ("divider", "divider"),
+        ("intake", "Project Intake"),
+        ("roadmap", "Roadmap"),
+        ("module", "Co-Pilot"),
+        ("gap_analysis", "Gap Analysis"),
+        ("export", "Export"),
     ]
 
     # Expand this set as each page is fully implemented
-    NAVIGABLE = {"dashboard", "project_intake", "roadmap", "module_copilot", "gap_analysis", "export"}
+    NAVIGABLE = {"dashboard", "intake", "roadmap", "module", "gap_analysis", "export"}
 
     with st.sidebar:
         st.markdown(
@@ -608,23 +608,38 @@ def render_sidebar(current_page: str) -> None:
             unsafe_allow_html=True,
         )
 
-        for key, label, page_path in nav_items:
+        pid = st.session_state.get("active_project_id")
+        if pid:
+            pname = st.session_state.get("active_project_name", "Active Project")
+            st.markdown(
+                f"<div style='font-size:0.72rem;color:#4A9FD4;padding:0.3rem 0.7rem 0;"
+                f"letter-spacing:0.05em;text-transform:uppercase;'>Current Project</div>"
+                f"<div style='font-size:0.82rem;color:#F0F4F8;padding:0.1rem 0.7rem 0.65rem;"
+                f"font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"
+                f"max-width:200px;'>{pname}</div>",
+                unsafe_allow_html=True,
+            )
+
+        for key, label in nav_items:
             if key == "divider":
                 st.divider()
                 continue
 
             if key == current_page:
                 st.markdown(f"<div class='sidebar-link active'>{label}</div>", unsafe_allow_html=True)
-            elif key in NAVIGABLE and page_path:
+            elif key in NAVIGABLE:
                 if st.button(label, key=f"nav_{key}", use_container_width=True):
-                    st.switch_page(page_path)
+                    st.session_state["page"] = key
+                    st.rerun()
             else:
                 st.markdown(f"<div class='sidebar-link disabled'>{label}</div>", unsafe_allow_html=True)
 
         st.divider()
         if st.button("Log out", key="sidebar_logout", use_container_width=True):
             logout_user()
-            st.switch_page("pages/login.py")
+            st.session_state["page"] = "login"
+            st.session_state.pop("_user", None)
+            st.rerun()
             st.stop()
 
 

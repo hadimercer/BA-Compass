@@ -202,7 +202,9 @@ def require_auth() -> dict[str, Any]:
         st.stop()
 
     if user is None:
-        st.switch_page("pages/login.py")
+        st.session_state["page"] = "login"
+        st.session_state.pop("_user", None)
+        st.rerun()
         st.stop()
 
     st.query_params["token"] = st.session_state["session_token"]

@@ -150,6 +150,27 @@ def get_completed_artifacts_summary(project_id: str, exclude_module_id: str) -> 
     return result
 
 
+def set_last_active_project(user_id: str, project_id: str) -> None:
+    """Persist the last active project ID to the user record."""
+    run_query(
+        "UPDATE users SET last_active_project_id = %s WHERE user_id = %s",
+        (project_id, user_id),
+        fetch=False,
+    )
+
+
+def get_last_active_project(user_id: str) -> str | None:
+    """Return the user's last active project ID, or None."""
+    rows = run_query(
+        "SELECT last_active_project_id FROM users WHERE user_id = %s LIMIT 1",
+        (user_id,),
+        fetch=True,
+    )
+    if rows and rows[0].get("last_active_project_id"):
+        return str(rows[0]["last_active_project_id"])
+    return None
+
+
 def run_query(sql: str, params: tuple = None, fetch: bool = True) -> list[Any] | None:
     """Execute a SQL statement and return results.
 
