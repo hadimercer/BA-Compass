@@ -145,8 +145,14 @@ def render(current_user: dict) -> None:
 
     # ── Page layout ───────────────────────────────────────────────────────────
 
-    # CSS reset — counter roadmap transparent-button bleed into this page
+    # CSS reset — counter roadmap gap-collapse and transparent-button bleed
     st.markdown("""<style>
+    section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
+        div[data-testid="stColumn"]:first-child div[data-testid="stVerticalBlock"],
+    section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
+        div[data-testid="column"]:first-child div[data-testid="stVerticalBlock"] {
+        gap: 1rem !important;
+    }
     section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
         div[data-testid="stColumn"]:first-child div[data-testid="stButton"] button,
     section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]

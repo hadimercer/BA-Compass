@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from collections import defaultdict
-
 import streamlit as st
 
 from components.db import run_query
@@ -14,12 +12,19 @@ def render(current_user: dict) -> None:
 
     # ── Transparent row-button overlay CSS ───────────────────────────────────
     st.markdown("""<style>
-    /* Fix 1 — row entry overlay (first column, both selector variants) */
+    /* Collapse internal gap in first column so card and button are directly adjacent */
+    section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
+        div[data-testid="stColumn"]:first-child div[data-testid="stVerticalBlock"],
+    section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
+        div[data-testid="column"]:first-child div[data-testid="stVerticalBlock"] {
+        gap: 0 !important;
+    }
+    /* Row entry overlay — card is sibling in same column, simple -row_height offset */
     section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
         div[data-testid="stColumn"]:first-child div[data-testid="stButton"] button,
     section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
         div[data-testid="column"]:first-child div[data-testid="stButton"] button {
-        height:72px; margin-top:calc(-72px - 1rem); background:transparent !important;
+        height:72px !important; margin-top:-72px !important; background:transparent !important;
         border:none !important; color:transparent !important; border-radius:10px !important;
         box-shadow:none !important;
     }
@@ -29,12 +34,12 @@ def render(current_user: dict) -> None:
         div[data-testid="column"]:first-child div[data-testid="stButton"] button:hover {
         background:rgba(74,159,212,0.06) !important; cursor:pointer;
     }
-    /* Fix 2 — ··· popover trigger (last column, no chrome) */
+    /* ··· popover — col_menu starts at same Y as the row card, no offset needed */
     section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
         div[data-testid="stColumn"]:last-child button,
     section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
         div[data-testid="column"]:last-child button {
-        height:72px; margin-top:calc(-72px - 1rem); background:transparent !important;
+        height:72px !important; margin-top:0 !important; background:transparent !important;
         border:none !important; box-shadow:none !important; border-radius:10px !important;
         color:rgba(139,156,189,0.55) !important; font-size:1rem !important;
         letter-spacing:0.05em !important;
@@ -191,53 +196,43 @@ def render(current_user: dict) -> None:
         unsafe_allow_html=True,
     )
 
-    # ── Module rows grouped by knowledge area ─────────────────────────────────
+    # ── Module rows (sorted by sequence_order) ───────────────────────────────
 
-    grouped: dict[str, list[dict]] = defaultdict(list)
-    ka_order: list[str] = []
     for item in roadmap:
-        ka = item["knowledge_area"]
-        if ka not in ka_order:
-            ka_order.append(ka)
-        grouped[ka].append(item)
+        item_id = str(item["roadmap_item_id"])
+        module_id = str(item["module_id"])
+        name = item["name"]
+        status = item["status"]
+        seq = item["sequence_order"]
 
-    for ka in ka_order:
-        st.markdown(f"<div class='ka-header'>{ka}</div>", unsafe_allow_html=True)
+        dot_color = {
+            "not_started": "#6B7280",
+            "in_progress": "#4A9FD4",
+            "complete": "#10B981",
+            "skipped": "rgba(139,156,189,0.35)",
+        }.get(status, "#6B7280")
 
-        items = grouped[ka]
+        row_bg = "rgba(16,185,129,0.05)" if status == "complete" else "rgba(30,37,56,0.6)"
+        left_border = "3px solid #10B981" if status == "complete" else "1px solid rgba(45,53,80,0.6)"
 
-        for idx, item in enumerate(items):
-            item_id = str(item["roadmap_item_id"])
-            module_id = str(item["module_id"])
-            name = item["name"]
-            status = item["status"]
-            seq = item["sequence_order"]
+        artifact_sub = ""
+        if status == "complete":
+            art = artifact_by_module.get(module_id)
+            if art:
+                artifact_sub = (
+                    f"<div style='font-size:0.72rem;color:#6EE7B7;margin-top:0.1rem;'>"
+                    f"Artifact v{art['version']}: {art['module_name']}"
+                    f"</div>"
+                )
 
-            dot_color = {
-                "not_started": "#6B7280",
-                "in_progress": "#4A9FD4",
-                "complete": "#10B981",
-                "skipped": "rgba(139,156,189,0.35)",
-            }.get(status, "#6B7280")
-
-            row_bg = "rgba(16,185,129,0.05)" if status == "complete" else "rgba(30,37,56,0.6)"
-            left_border = "3px solid #10B981" if status == "complete" else "1px solid rgba(45,53,80,0.6)"
-
-            artifact_sub = ""
-            if status == "complete":
-                art = artifact_by_module.get(module_id)
-                if art:
-                    artifact_sub = (
-                        f"<div style='font-size:0.72rem;color:#6EE7B7;margin-top:0.1rem;'>"
-                        f"Artifact v{art['version']}: {art['module_name']}"
-                        f"</div>"
-                    )
-
+        col_enter, col_menu = st.columns([11, 1])
+        with col_enter:
+            # Card rendered first, button second — button overlays card via margin-top:-72px
             st.markdown(f"""
             <div style="display:flex;align-items:center;padding:0.65rem 1rem;border-radius:10px;
                 border-left:{left_border};border-top:1px solid rgba(45,53,80,0.6);
                 border-right:1px solid rgba(45,53,80,0.6);border-bottom:1px solid rgba(45,53,80,0.6);
-                background:{row_bg};margin-bottom:0;height:72px;">
+                background:{row_bg};height:72px;pointer-events:none;">
               <span style="font-size:0.7rem;color:#8B9CBD;min-width:1.4rem;margin-right:0.6rem;">{seq}</span>
               <span style="width:10px;height:10px;border-radius:50%;background:{dot_color};
                            flex-shrink:0;margin-right:0.75rem;display:inline-block;"></span>
@@ -248,31 +243,28 @@ def render(current_user: dict) -> None:
                 {artifact_sub}
               </div>
             </div>""", unsafe_allow_html=True)
-
-            col_enter, col_menu = st.columns([11, 1])
-            with col_enter:
-                if st.button(" ", key=f"enter_{item_id}", use_container_width=True):
-                    st.session_state["active_module_id"] = module_id
-                    st.session_state["active_roadmap_item_id"] = item_id
-                    st.session_state["page"] = "module"
-                    st.rerun()
-            with col_menu:
-                with st.popover("···"):
-                    if status in ("not_started", "in_progress"):
-                        if st.button("Mark Complete", key=f"mc_{item_id}", use_container_width=True):
-                            _update_status(item_id, "complete")
-                            st.rerun()
-                        if st.button("Mark Skipped", key=f"ms_{item_id}", use_container_width=True):
-                            _update_status(item_id, "skipped")
-                            st.rerun()
-                    elif status == "complete":
-                        if st.button("Reopen & Revise", key=f"rr_{item_id}", use_container_width=True):
-                            _update_status(item_id, "in_progress")
-                            st.rerun()
-                        if st.button("Mark Skipped", key=f"ms_{item_id}", use_container_width=True):
-                            _update_status(item_id, "skipped")
-                            st.rerun()
-                    elif status == "skipped":
-                        if st.button("Reopen", key=f"ro_{item_id}", use_container_width=True):
-                            _update_status(item_id, "not_started")
-                            st.rerun()
+            if st.button(" ", key=f"enter_{item_id}", use_container_width=True):
+                st.session_state["active_module_id"] = module_id
+                st.session_state["active_roadmap_item_id"] = item_id
+                st.session_state["page"] = "module"
+                st.rerun()
+        with col_menu:
+            with st.popover("···"):
+                if status in ("not_started", "in_progress"):
+                    if st.button("Mark Complete", key=f"mc_{item_id}", use_container_width=True):
+                        _update_status(item_id, "complete")
+                        st.rerun()
+                    if st.button("Mark Skipped", key=f"ms_{item_id}", use_container_width=True):
+                        _update_status(item_id, "skipped")
+                        st.rerun()
+                elif status == "complete":
+                    if st.button("Reopen & Revise", key=f"rr_{item_id}", use_container_width=True):
+                        _update_status(item_id, "in_progress")
+                        st.rerun()
+                    if st.button("Mark Skipped", key=f"ms_{item_id}", use_container_width=True):
+                        _update_status(item_id, "skipped")
+                        st.rerun()
+                elif status == "skipped":
+                    if st.button("Reopen", key=f"ro_{item_id}", use_container_width=True):
+                        _update_status(item_id, "not_started")
+                        st.rerun()
