@@ -17,7 +17,7 @@ if st.session_state.get("pending_redirect"):
     st.switch_page("pages/dashboard.py")
     st.stop()
 
-inject_css()
+inject_css(hide_sidebar=True)
 
 auth_state_error = ""
 try:

@@ -7,8 +7,12 @@ import streamlit as st
 from components.auth import logout_user
 
 
-def inject_css() -> None:
-    """Inject the global BA Compass dark theme and component styling."""
+def inject_css(hide_sidebar: bool = False) -> None:
+    """Inject the global BA Compass dark theme and component styling.
+
+    Args:
+        hide_sidebar: When True, hides the sidebar entirely (for login/register pages).
+    """
     st.markdown(
         """
         <style>
@@ -63,17 +67,10 @@ def inject_css() -> None:
 
             section[data-testid="stSidebar"] {
                 display: flex !important;
-                transform: none !important;
                 min-width: 244px !important;
                 max-width: 244px !important;
-                visibility: visible !important;
-                opacity: 1 !important;
                 background: linear-gradient(180deg, rgba(26, 31, 46, 0.98) 0%, rgba(15, 17, 23, 0.98) 100%);
                 border-right: 1px solid rgba(45, 53, 80, 0.9);
-            }
-
-            [data-testid="collapsedControl"] {
-                display: none !important;
             }
 
             /* Hide Streamlit auto-generated pages navigation list.
@@ -562,6 +559,21 @@ def inject_css() -> None:
         """,
         unsafe_allow_html=True,
     )
+
+    if hide_sidebar:
+        st.markdown(
+            """
+            <style>
+                section[data-testid="stSidebar"] {
+                    display: none !important;
+                }
+                [data-testid="collapsedControl"] {
+                    display: none !important;
+                }
+            </style>
+            """,
+            unsafe_allow_html=True,
+        )
 
 
 
