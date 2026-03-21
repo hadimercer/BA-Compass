@@ -19,7 +19,7 @@ def render(current_user: dict) -> None:
         div[data-testid="stColumn"]:first-child div[data-testid="stButton"] button,
     section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
         div[data-testid="column"]:first-child div[data-testid="stButton"] button {
-        height:56px; margin-top:-56px; background:transparent !important;
+        height:72px; margin-top:calc(-72px - 1rem); background:transparent !important;
         border:none !important; color:transparent !important; border-radius:10px !important;
         box-shadow:none !important;
     }
@@ -34,7 +34,7 @@ def render(current_user: dict) -> None:
         div[data-testid="stColumn"]:last-child button,
     section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
         div[data-testid="column"]:last-child button {
-        height:56px; margin-top:-56px; background:transparent !important;
+        height:72px; margin-top:calc(-72px - 1rem); background:transparent !important;
         border:none !important; box-shadow:none !important; border-radius:10px !important;
         color:rgba(139,156,189,0.55) !important; font-size:1rem !important;
         letter-spacing:0.05em !important;
@@ -46,7 +46,7 @@ def render(current_user: dict) -> None:
         background:rgba(74,159,212,0.06) !important;
         color:rgba(139,156,189,0.9) !important; cursor:pointer;
     }
-    /* Restore inter-row spacing (margin moved off row HTML onto columns block) */
+    /* Inter-row spacing */
     section[data-testid="stMain"] div[data-testid="stHorizontalBlock"] {
         margin-bottom: 0.35rem;
     }
@@ -237,7 +237,7 @@ def render(current_user: dict) -> None:
             <div style="display:flex;align-items:center;padding:0.65rem 1rem;border-radius:10px;
                 border-left:{left_border};border-top:1px solid rgba(45,53,80,0.6);
                 border-right:1px solid rgba(45,53,80,0.6);border-bottom:1px solid rgba(45,53,80,0.6);
-                background:{row_bg};margin-bottom:0;height:56px;">
+                background:{row_bg};margin-bottom:0;height:72px;">
               <span style="font-size:0.7rem;color:#8B9CBD;min-width:1.4rem;margin-right:0.6rem;">{seq}</span>
               <span style="width:10px;height:10px;border-radius:50%;background:{dot_color};
                            flex-shrink:0;margin-right:0.75rem;display:inline-block;"></span>
