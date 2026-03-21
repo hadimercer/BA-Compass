@@ -67,10 +67,15 @@ def inject_css(hide_sidebar: bool = False) -> None:
 
             section[data-testid="stSidebar"] {
                 display: flex !important;
+                transform: none !important;
                 min-width: 244px !important;
                 max-width: 244px !important;
                 background: linear-gradient(180deg, rgba(26, 31, 46, 0.98) 0%, rgba(15, 17, 23, 0.98) 100%);
                 border-right: 1px solid rgba(45, 53, 80, 0.9);
+            }
+
+            [data-testid="collapsedControl"] {
+                display: none !important;
             }
 
             /* Hide Streamlit auto-generated pages navigation list.
