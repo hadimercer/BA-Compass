@@ -46,6 +46,10 @@ def render(current_user: dict) -> None:
         background:rgba(74,159,212,0.06) !important;
         color:rgba(139,156,189,0.9) !important; cursor:pointer;
     }
+    /* Restore inter-row spacing (margin moved off row HTML onto columns block) */
+    section[data-testid="stMain"] div[data-testid="stHorizontalBlock"] {
+        margin-bottom: 0.35rem;
+    }
     </style>""", unsafe_allow_html=True)
 
     # ── Helpers ───────────────────────────────────────────────────────────────
@@ -219,20 +223,21 @@ def render(current_user: dict) -> None:
             row_bg = "rgba(16,185,129,0.05)" if status == "complete" else "rgba(30,37,56,0.6)"
             left_border = "3px solid #10B981" if status == "complete" else "1px solid rgba(45,53,80,0.6)"
 
-            artifact_html = ""
+            artifact_sub = ""
             if status == "complete":
                 art = artifact_by_module.get(module_id)
                 if art:
-                    artifact_html = (
-                        f"<span style='font-size:0.75rem;color:#8B9CBD;margin-right:0.75rem;'>"
-                        f"{art['module_name']} v{art['version']}</span>"
+                    artifact_sub = (
+                        f"<div style='font-size:0.72rem;color:#6EE7B7;margin-top:0.1rem;'>"
+                        f"Artifact v{art['version']}: {art['module_name']}"
+                        f"</div>"
                     )
 
             st.markdown(f"""
             <div style="display:flex;align-items:center;padding:0.65rem 1rem;border-radius:10px;
                 border-left:{left_border};border-top:1px solid rgba(45,53,80,0.6);
                 border-right:1px solid rgba(45,53,80,0.6);border-bottom:1px solid rgba(45,53,80,0.6);
-                background:{row_bg};margin-bottom:0.35rem;height:56px;">
+                background:{row_bg};margin-bottom:0;height:56px;">
               <span style="font-size:0.7rem;color:#8B9CBD;min-width:1.4rem;margin-right:0.6rem;">{seq}</span>
               <span style="width:10px;height:10px;border-radius:50%;background:{dot_color};
                            flex-shrink:0;margin-right:0.75rem;display:inline-block;"></span>
@@ -240,8 +245,8 @@ def render(current_user: dict) -> None:
                 <div style="font-weight:600;font-size:0.9rem;color:#F0F4F8;white-space:nowrap;
                             overflow:hidden;text-overflow:ellipsis;">{name}</div>
                 <div style="font-size:0.72rem;color:#8B9CBD;">{item['knowledge_area']}</div>
+                {artifact_sub}
               </div>
-              <div style="display:flex;align-items:center;flex-shrink:0;">{artifact_html}</div>
             </div>""", unsafe_allow_html=True)
 
             col_enter, col_menu = st.columns([11, 1])
