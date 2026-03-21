@@ -14,14 +14,37 @@ def render(current_user: dict) -> None:
 
     # ── Transparent row-button overlay CSS ───────────────────────────────────
     st.markdown("""<style>
+    /* Fix 1 — row entry overlay (first column, both selector variants) */
+    section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
+        div[data-testid="stColumn"]:first-child div[data-testid="stButton"] button,
     section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
         div[data-testid="column"]:first-child div[data-testid="stButton"] button {
         height:56px; margin-top:-56px; background:transparent !important;
         border:none !important; color:transparent !important; border-radius:10px !important;
+        box-shadow:none !important;
     }
+    section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
+        div[data-testid="stColumn"]:first-child div[data-testid="stButton"] button:hover,
     section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
         div[data-testid="column"]:first-child div[data-testid="stButton"] button:hover {
         background:rgba(74,159,212,0.06) !important; cursor:pointer;
+    }
+    /* Fix 2 — ··· popover trigger (last column, no chrome) */
+    section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
+        div[data-testid="stColumn"]:last-child button,
+    section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
+        div[data-testid="column"]:last-child button {
+        height:56px; margin-top:-56px; background:transparent !important;
+        border:none !important; box-shadow:none !important; border-radius:10px !important;
+        color:rgba(139,156,189,0.55) !important; font-size:1rem !important;
+        letter-spacing:0.05em !important;
+    }
+    section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
+        div[data-testid="stColumn"]:last-child button:hover,
+    section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
+        div[data-testid="column"]:last-child button:hover {
+        background:rgba(74,159,212,0.06) !important;
+        color:rgba(139,156,189,0.9) !important; cursor:pointer;
     }
     </style>""", unsafe_allow_html=True)
 
@@ -221,7 +244,7 @@ def render(current_user: dict) -> None:
               <div style="display:flex;align-items:center;flex-shrink:0;">{artifact_html}</div>
             </div>""", unsafe_allow_html=True)
 
-            col_enter, col_menu = st.columns([8, 1])
+            col_enter, col_menu = st.columns([11, 1])
             with col_enter:
                 if st.button(" ", key=f"enter_{item_id}", use_container_width=True):
                     st.session_state["active_module_id"] = module_id
@@ -229,7 +252,7 @@ def render(current_user: dict) -> None:
                     st.session_state["page"] = "module"
                     st.rerun()
             with col_menu:
-                with st.popover("···", use_container_width=True):
+                with st.popover("···"):
                     if status in ("not_started", "in_progress"):
                         if st.button("Mark Complete", key=f"mc_{item_id}", use_container_width=True):
                             _update_status(item_id, "complete")

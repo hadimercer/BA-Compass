@@ -145,9 +145,24 @@ def render(current_user: dict) -> None:
 
     # ── Page layout ───────────────────────────────────────────────────────────
 
+    # CSS reset — counter roadmap transparent-button bleed into this page
+    st.markdown("""<style>
+    section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
+        div[data-testid="stColumn"]:first-child div[data-testid="stButton"] button,
+    section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
+        div[data-testid="column"]:first-child div[data-testid="stButton"] button {
+        height:auto !important; margin-top:0 !important;
+        background:rgba(255,255,255,0.05) !important;
+        border:1px solid rgba(250,250,250,0.2) !important;
+        color:rgb(250,250,250) !important;
+        border-radius:0.5rem !important; box-shadow:none !important;
+    }
+    </style>""", unsafe_allow_html=True)
+
     # Slim header
     col_back, col_title = st.columns([1, 7])
     with col_back:
+        st.markdown("<div style='height:0.9rem'></div>", unsafe_allow_html=True)
         if st.button("← Roadmap", use_container_width=True):
             st.session_state["page"] = "roadmap"
             st.rerun()
@@ -159,6 +174,19 @@ def render(current_user: dict) -> None:
           <div style="font-size:1.3rem;font-weight:700;color:#F0F4F8;line-height:1.2;">{module['name']}</div>
           <div style="font-size:0.82rem;color:#8B9CBD;">{(module.get('description',''))[:120]}</div>
         </div>""", unsafe_allow_html=True)
+
+    # ── Artifact dialog (Fix 4) ───────────────────────────────────────────────
+
+    if existing_artifact:
+        _art_content = existing_artifact.get("content", {})
+        _art_text = _art_content.get("text", "") if isinstance(_art_content, dict) else str(_art_content)
+        _art_ver = existing_artifact.get("version", 1)
+
+        @st.dialog(f"{module['name']} — v{_art_ver}")
+        def _show_artifact_dialog():
+            st.markdown(_art_text)
+            if st.button("Close", use_container_width=True):
+                st.rerun()
 
     # Collapsible context + artifact panel
     has_artifact = existing_artifact is not None
@@ -179,19 +207,32 @@ def render(current_user: dict) -> None:
             </div>""", unsafe_allow_html=True)
         with col_art:
             if has_artifact:
-                content = existing_artifact.get("content", {})
-                artifact_text = content.get("text", "") if isinstance(content, dict) else str(content)
-                ver = existing_artifact.get("version", 1)
-                # Bug 4 — strip markdown for clean preview
-                clean_preview = re.sub(r'[*#`_>]', '', artifact_text)
+                # CSS for transparent overlay button on the artifact box
+                st.markdown("""<style>
+                div[data-testid="stExpander"] div[data-testid="stHorizontalBlock"]
+                    div[data-testid="stColumn"]:last-child div[data-testid="stButton"] button,
+                div[data-testid="stExpander"] div[data-testid="stHorizontalBlock"]
+                    div[data-testid="column"]:last-child div[data-testid="stButton"] button {
+                    height:78px !important; margin-top:-78px !important;
+                    background:transparent !important; border:none !important;
+                    box-shadow:none !important; color:transparent !important;
+                    border-radius:12px !important; cursor:pointer !important;
+                }
+                </style>""", unsafe_allow_html=True)
                 st.markdown(f"""
                 <div style="background:rgba(16,185,129,0.10);border:1px solid rgba(16,185,129,0.3);
-                     border-radius:12px;padding:0.8rem 1rem;">
+                     border-radius:12px;padding:0.75rem 1rem;height:78px;
+                     display:flex;flex-direction:column;justify-content:center;">
                   <div style="font-size:0.7rem;color:#6EE7B7;text-transform:uppercase;
-                               letter-spacing:0.06em;margin-bottom:0.35rem;">Saved Artifact v{ver}</div>
-                  <div style="font-size:0.8rem;color:#F0F4F8;line-height:1.5;
-                               max-height:100px;overflow:hidden;">{clean_preview[:250]}…</div>
+                               letter-spacing:0.06em;margin-bottom:0.2rem;">
+                    {module['name']} · v{_art_ver}</div>
+                  <div style="font-size:0.85rem;color:#F0F4F8;font-weight:600;line-height:1.3;">
+                    {project.get('engagement_type', '—')}</div>
+                  <div style="font-size:0.72rem;color:#6EE7B7;margin-top:0.2rem;opacity:0.7;">
+                    Click to view full artifact ↗</div>
                 </div>""", unsafe_allow_html=True)
+                if st.button(" ", key="view_artifact_btn", use_container_width=True):
+                    _show_artifact_dialog()
             else:
                 st.markdown("""
                 <div style="background:rgba(30,37,56,0.5);border:1px dashed rgba(45,53,80,0.7);
@@ -205,8 +246,8 @@ def render(current_user: dict) -> None:
     for msg in messages:
         _render_message(msg["role"], msg["content"])
 
-    # Draft area — shown when draft exists
-    if st.session_state[draft_key]:
+    # Draft area — shown only when draft exists AND no artifact has been saved yet
+    if st.session_state[draft_key] and existing_artifact is None:
         st.markdown(
             "<div style='margin-top:0.75rem;font-size:0.75rem;color:#4A9FD4;"
             "letter-spacing:0.06em;text-transform:uppercase;margin-bottom:0.3rem;'>"
@@ -247,11 +288,15 @@ def render(current_user: dict) -> None:
             height=100,
             label_visibility="collapsed",
         )
-        form_col1, form_col2 = st.columns([3, 1])
-        with form_col1:
+        if existing_artifact is None:
+            form_col1, form_col2 = st.columns([3, 1])
+            with form_col1:
+                send = st.form_submit_button("Send", use_container_width=True)
+            with form_col2:
+                gen_draft = st.form_submit_button("Generate Draft", use_container_width=True)
+        else:
             send = st.form_submit_button("Send", use_container_width=True)
-        with form_col2:
-            gen_draft = st.form_submit_button("Generate Draft", use_container_width=True)
+            gen_draft = False
 
     # ── Handle send ───────────────────────────────────────────────────────────
     if send and user_input.strip():
