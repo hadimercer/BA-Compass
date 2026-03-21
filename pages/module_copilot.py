@@ -145,19 +145,27 @@ def render(current_user: dict) -> None:
 
     # ── Page layout ───────────────────────────────────────────────────────────
 
-    # CSS reset — counter roadmap gap-collapse and transparent-button bleed
+    # CSS reset — undo roadmap's absolute-positioning overlay and restore normal button style
     st.markdown("""<style>
     section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
         div[data-testid="stColumn"]:first-child div[data-testid="stVerticalBlock"],
     section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
         div[data-testid="column"]:first-child div[data-testid="stVerticalBlock"] {
-        gap: 1rem !important;
+        position: static !important; gap: 1rem !important;
+    }
+    section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
+        div[data-testid="stColumn"]:first-child
+        div[data-testid="stVerticalBlock"] > div:has(> div[data-testid="stButton"]),
+    section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
+        div[data-testid="column"]:first-child
+        div[data-testid="stVerticalBlock"] > div:has(> div[data-testid="stButton"]) {
+        position: static !important; height: auto !important;
     }
     section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
         div[data-testid="stColumn"]:first-child div[data-testid="stButton"] button,
     section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
         div[data-testid="column"]:first-child div[data-testid="stButton"] button {
-        height:auto !important; margin-top:0 !important;
+        height:auto !important; width:auto !important; margin-top:0 !important;
         background:rgba(255,255,255,0.05) !important;
         border:1px solid rgba(250,250,250,0.2) !important;
         color:rgb(250,250,250) !important;

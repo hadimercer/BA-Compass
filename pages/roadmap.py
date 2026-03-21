@@ -12,13 +12,36 @@ def render(current_user: dict) -> None:
 
     # ── Transparent row-button overlay CSS ───────────────────────────────────
     st.markdown("""<style>
-    /* Row entry overlay — -108px = row height (72px) + observed column-internal gap (36px) */
+    /* Row entry overlay — absolute positioning anchored to stVerticalBlock.
+       We target the element-container that wraps stButton (not stButton itself)
+       because element-container already has position:relative by default,
+       which would make stButton position relative to it rather than stVerticalBlock. */
+
+    /* 1. stVerticalBlock in first column is the positioning context */
+    section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
+        div[data-testid="stColumn"]:first-child div[data-testid="stVerticalBlock"],
+    section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
+        div[data-testid="column"]:first-child div[data-testid="stVerticalBlock"] {
+        position: relative !important;
+    }
+    /* 2. Pin the element-container that wraps stButton to top:0 of stVerticalBlock */
+    section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
+        div[data-testid="stColumn"]:first-child
+        div[data-testid="stVerticalBlock"] > div:has(> div[data-testid="stButton"]),
+    section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
+        div[data-testid="column"]:first-child
+        div[data-testid="stVerticalBlock"] > div:has(> div[data-testid="stButton"]) {
+        position: absolute !important; top:0 !important; left:0 !important;
+        right:0 !important; height:72px !important; z-index:5 !important;
+    }
+    /* 3. Button fills the absolutely-positioned element-container */
     section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
         div[data-testid="stColumn"]:first-child div[data-testid="stButton"] button,
     section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
         div[data-testid="column"]:first-child div[data-testid="stButton"] button {
-        height:72px !important; margin-top:-108px !important; background:transparent !important;
-        border:none !important; color:transparent !important; border-radius:10px !important;
+        height:72px !important; width:100% !important; margin-top:0 !important;
+        background:transparent !important; border:none !important;
+        color:transparent !important; border-radius:10px !important;
         box-shadow:none !important;
     }
     section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
@@ -27,7 +50,7 @@ def render(current_user: dict) -> None:
         div[data-testid="column"]:first-child div[data-testid="stButton"] button:hover {
         background:rgba(74,159,212,0.06) !important; cursor:pointer;
     }
-    /* ··· popover — col_menu starts at same Y as the row card, no offset needed */
+    /* ··· popover — last column, unchanged */
     section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
         div[data-testid="stColumn"]:last-child button,
     section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
