@@ -34,6 +34,14 @@ Before generating any draft, perform a completeness check against the required c
 
 ENH-14 — NO INLINE DRAFTS:
 Never produce a full artifact draft inline in the conversation. When you have gathered sufficient information to draft, respond only with: 'I have everything needed to produce a complete [module name] artifact. Click Generate Draft above to generate the formal document.' Do not reproduce the artifact content in the chat under any circumstances. The Generate Draft button is the only path to artifact generation. If the user asks you to 'write it out', 'show me the draft', or 'generate it here', decline politely and redirect: 'The draft will be formatted and saved properly when you click Generate Draft above — that ensures it is versioned and traceable in your project.'
+
+PTV-01 — PROPOSE-THEN-VALIDATE (MANDATORY):
+You have full access to prior project artifacts in your context. Whenever prior artifacts contain information relevant to the current module, you MUST propose before you ask. The pattern is: 'Based on the [artifact name], [proposed content]. Is that right, or does anything need to change?' Never ask an open question when you can derive a reasonable starting point from prior artifacts. Examples of what this means in practice:
+- Wrong: 'What are the main pain points in the current process?'
+- Right: 'From the Current State Assessment, the main pain points appear to be [X, Y, Z from the artifact]. Are those the right pain points to carry forward, or are there others not captured there?'
+- Wrong: 'Who are the key stakeholders for this module?'
+- Right: 'The Stakeholder Register identifies [Group A, Group B, Group C] as the key groups for this engagement. For this module specifically, I would expect [Group A and B] to be most relevant — does that match, or should I include others?'
+Apply this principle on every question where prior artifacts contain applicable content.
 """
 
 SYSTEM_DRAFT_GENERATION = """You are an expert Business Analyst generating a structured artifact draft.
@@ -78,6 +86,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "What happens when stakeholder availability is limited",
             "Governance escalation path",
         ],
+        "opening_approach": (
+            "Propose a BA approach framework appropriate for this engagement type and scale tier. "
+            "Reference the engagement type and scale dimensions to suggest the methodology, "
+            "documentation formality, and governance structure. Ask the user to confirm or adjust "
+            "the proposed approach rather than starting from a blank slate."
+        ),
     },
     "Stakeholder Engagement Planning": {
         "required_sections": [
@@ -107,6 +121,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Different engagement intensities per stakeholder tier",
             "What triggers an unplanned communication",
         ],
+        "opening_approach": (
+            "Using the Stakeholder Register as the source, propose an engagement plan for each "
+            "stakeholder group — including suggested meeting cadence, communication format, and BA "
+            "touchpoint frequency differentiated by influence-interest quadrant. Ask the user to "
+            "validate or adjust the proposed plan."
+        ),
     },
     "BA Governance Setup": {
         "required_sections": [
@@ -136,6 +156,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Practical change request mechanism",
             "Conflict resolution process",
         ],
+        "opening_approach": (
+            "Propose a governance framework based on the engagement type and scale tier. "
+            "Suggest change control gates, review checkpoints, sign-off authorities, and escalation "
+            "paths appropriate for this type and scale. Ask the user to validate the proposed "
+            "structure against their organisation's norms."
+        ),
     },
     "Information Management Planning": {
         "required_sections": [
@@ -165,6 +191,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Post-engagement retention and handoff process",
             "Version numbering conventions",
         ],
+        "opening_approach": (
+            "Propose an artifact storage and management structure based on the engagement type "
+            "and scale tier. Suggest naming conventions, version control approach, and access "
+            "control categories appropriate to this engagement. Ask the user to confirm or adjust "
+            "the proposed structure against their organisation's tooling and standards."
+        ),
     },
     "Performance Metrics Definition": {
         "required_sections": [
@@ -194,6 +226,13 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Baseline values",
             "Metric ownership",
         ],
+        "opening_approach": (
+            "Propose an initial BA performance metrics register based on the engagement type "
+            "and scale tier. Suggest metrics appropriate for this type of engagement — e.g. "
+            "requirements rework rate, stakeholder satisfaction, on-time delivery. Ask the user "
+            "to confirm the proposed metrics, provide baselines where known, and identify who "
+            "will track each."
+        ),
     },
     # ── Elicitation & Collaboration ──────────────────────────────────────────
     "Elicitation Planning": {
@@ -224,6 +263,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Preparation and logistics detail",
             "Elicitation risks",
         ],
+        "opening_approach": (
+            "Using the Stakeholder Register as the source, propose an elicitation plan that "
+            "assigns a technique to each stakeholder group with rationale. For example, interviews "
+            "for senior stakeholders, workshops for cross-functional alignment. Ask the user to "
+            "validate the proposed technique choices and provide scheduling and logistics details."
+        ),
     },
     "Stakeholder Interviews": {
         "required_sections": [
@@ -255,11 +300,13 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Output synthesis approach",
         ],
         "opening_approach": (
-            "Structure the conversation around interview guide design per stakeholder group. "
-            "For each group ask: what is the objective of this interview, what are five to six "
-            "specific questions you would ask, and are there any sensitive areas to navigate carefully. "
-            "After covering all primary stakeholder groups, proactively check for missing groups "
-            "by referencing the Stakeholder Register artifact if it exists."
+            "Using the Stakeholder Register as the source, propose a draft interview guide "
+            "framework. Identify the key stakeholder groups from the register and propose 3–5 "
+            "targeted interview questions per group based on their documented interests, influence "
+            "levels, and engagement approach. Ask the user to validate the proposed guide, adjust "
+            "questions that do not fit the real context, and confirm which stakeholders are "
+            "actually available for interview. Never ask the user to generate questions from scratch "
+            "when the Stakeholder Register provides the context to propose them."
         ),
     },
     "Workshops & Focus Groups": {
@@ -292,6 +339,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Conflict management approach",
             "Pre-work requirements",
         ],
+        "opening_approach": (
+            "Propose a workshop agenda structure based on the engagement type and prior artifacts "
+            "(Problem Statement, Stakeholder Register, Current State Assessment if available). "
+            "Suggest the workshop objectives, facilitation structure, and key questions to surface. "
+            "Ask the user to validate the proposed agenda and confirm the target participants."
+        ),
     },
     "Observation & Job Shadowing": {
         "required_sections": [
@@ -321,6 +374,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Specific observation focus areas",
             "Data capture template design",
         ],
+        "opening_approach": (
+            "Using the Current State Assessment or Problem Statement artifacts as context, propose "
+            "an observation plan — identifying which roles or process steps most need direct "
+            "observation based on the documented pain points and complexity. Ask the user to "
+            "confirm the proposed observation targets and provide access and logistics details."
+        ),
     },
     "Survey & Questionnaire Design": {
         "required_sections": [
@@ -350,6 +409,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Chase plan for low response",
             "Qualitative analysis approach",
         ],
+        "opening_approach": (
+            "Using the Stakeholder Register and any prior elicitation artifacts, propose an initial "
+            "survey design — identifying which stakeholder groups should be surveyed and what "
+            "dimensions to measure. Suggest question categories based on the engagement objectives "
+            "and ask the user to validate the proposed scope and audience."
+        ),
     },
     "Document Analysis": {
         "required_sections": [
@@ -379,6 +444,13 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Documentation gaps",
             "Contradictions between sources",
         ],
+        "opening_approach": (
+            "Propose a document inventory based on the engagement type and stated business problem. "
+            "Suggest the categories of documents that should be reviewed — e.g. current process "
+            "documentation, policy documents, system specifications, data reports — then ask the "
+            "user to identify which are available and add any specific documents not in the "
+            "proposed inventory."
+        ),
     },
     "Benchmarking & Market Analysis": {
         "required_sections": [
@@ -409,6 +481,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Solution implications from benchmark gaps",
             "Context differences that qualify the benchmark",
         ],
+        "opening_approach": (
+            "Propose a benchmarking framework based on the engagement type and business problem. "
+            "Suggest the dimensions to benchmark — internal process performance, competitor "
+            "capabilities, or industry standards — based on prior artifacts. Ask the user to "
+            "validate the proposed benchmark dimensions and confirm the comparator set."
+        ),
     },
     "Brainstorming Facilitation": {
         "required_sections": [
@@ -438,6 +516,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Dominant participant management",
             "Link between outputs and the original problem",
         ],
+        "opening_approach": (
+            "Propose a brainstorming session design based on the engagement type and the specific "
+            "problem or decision the session must address. Reference prior artifacts (Problem "
+            "Statement, Gap Analysis) to frame the session objective. Ask the user to confirm "
+            "the proposed objective, participant group, and facilitation technique."
+        ),
     },
     "Elicitation Results Documentation": {
         "required_sections": [
@@ -467,6 +551,14 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Outstanding questions register",
             "Opinion vs fact differentiation",
         ],
+        "opening_approach": (
+            "Open by synthesising findings from the Stakeholder Interviews, Workshops & Focus "
+            "Groups, and Document Analysis artifacts already captured. Propose a consolidated "
+            "elicitation findings summary organised by theme — e.g. process pain points, "
+            "stakeholder concerns, data quality issues, technology gaps. Ask the user to validate "
+            "the proposed synthesis before proceeding. Never ask the user to list their findings "
+            "from scratch when prior elicitation artifacts contain the source material."
+        ),
     },
     # ── Requirements Life Cycle Management ────────────────────────────────────
     "Requirements Traceability Setup": {
@@ -497,6 +589,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Maintenance responsibility and trigger",
             "Tool decision with rationale",
         ],
+        "opening_approach": (
+            "Using the requirements artifacts already captured, propose a traceability framework "
+            "structure — defining the trace links from business objectives through BRD through FRD "
+            "through acceptance criteria. Present the proposed chain and ask the user to confirm "
+            "the levels before the matrix is populated."
+        ),
     },
     "Requirements Prioritization": {
         "required_sections": [
@@ -527,6 +625,13 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Conflict resolution between competing stakeholder priorities",
             "Prioritisation method rationale",
         ],
+        "opening_approach": (
+            "Using the Business Requirements Documentation and Functional Requirements artifacts, "
+            "propose an initial MoSCoW prioritisation for all identified requirements. Present the "
+            "proposed priority assignments with rationale based on business need and stakeholder "
+            "impact, then ask the user to challenge or adjust where their stakeholder knowledge "
+            "differs from the BA's assessment."
+        ),
     },
     "Requirements Change Management": {
         "required_sections": [
@@ -556,6 +661,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Change communication process",
             "Emergency change procedure",
         ],
+        "opening_approach": (
+            "Propose a change control process based on the engagement type, scale tier, and "
+            "any governance artifacts already captured. Suggest the change request mechanism, "
+            "impact assessment steps, and approval authority for requirements changes. Ask the "
+            "user to validate the proposed process and adjust for their organisation's norms."
+        ),
     },
     "Requirements Baselining": {
         "required_sections": [
@@ -586,6 +697,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Role-specific sign-off accountability",
             "Out-of-baseline requirements handling",
         ],
+        "opening_approach": (
+            "Review all requirements artifacts to date and propose a baseline requirements register "
+            "— listing each requirement, its current version, and its approval status. Identify "
+            "any requirements not yet version-controlled or signed off, and ask the user to confirm "
+            "which version of each artefact constitutes the formal baseline."
+        ),
     },
     "Requirements Sign-off & Approval": {
         "required_sections": [
@@ -615,6 +732,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Approver scope per stakeholder",
             "Escalation path for missed sign-off",
         ],
+        "opening_approach": (
+            "Using the Stakeholder Register and all requirements artifacts, propose the sign-off "
+            "record — listing each approver, their scope of authority, and the artefacts they must "
+            "sign off. Ask the user to confirm the proposed approval structure, timeline, and any "
+            "escalation path for requirements that are disputed."
+        ),
     },
     "Traceability Matrix": {
         "required_sections": [
@@ -644,6 +767,13 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Gap analysis",
             "Maintenance ownership and process",
         ],
+        "opening_approach": (
+            "Using all requirements artifacts captured to date, propose the initial traceability "
+            "matrix entries. Map each requirement to its source business objective and downstream "
+            "acceptance criterion based on the artifact content. Ask the user to review the proposed "
+            "linkages and identify any orphan requirements — requirements with no objective or "
+            "acceptance criterion trace."
+        ),
     },
     # ── Strategy Analysis ──────────────────────────────────────────────────────
     "Current State Assessment": {
@@ -677,6 +807,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Undocumented workarounds",
             "End-user perspective distinct from process owner",
         ],
+        "opening_approach": (
+            "Using the Problem Statement artifact as context, propose the dimensions to assess: "
+            "people, process, technology, and data layers. For any dimension referenced in prior "
+            "artifacts, propose an initial assessment finding. Ask the user to validate the proposed "
+            "structure and fill in what the BA could not derive from prior context."
+        ),
     },
     "Problem Statement Definition": {
         "required_sections": [
@@ -708,6 +844,13 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Per-stakeholder concern differentiation",
             "Measurable targets in the desired future state",
         ],
+        "opening_approach": (
+            "If prior artifacts exist, extract the business problem as it has been described and "
+            "propose a draft problem statement from that context. If this is the first module, ask: "
+            "'What business problem or opportunity has prompted this engagement, and who is most "
+            "directly affected by it?' Follow up by proposing a structured statement — problem, "
+            "impact, affected parties, trigger — and asking the user to validate."
+        ),
     },
     "Root Cause Analysis": {
         "required_sections": [
@@ -776,6 +919,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Strategic alignment",
             "Measurable success conditions",
         ],
+        "opening_approach": (
+            "If a Problem Statement artifact exists, propose a draft business need statement derived "
+            "from it — including the strategic alignment, affected business functions, and measurable "
+            "impact. Ask the user to validate the proposed need statement and provide any "
+            "quantification not captured in the Problem Statement."
+        ),
     },
     "Future State Design": {
         "required_sections": [
@@ -812,6 +961,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Per-group training requirements",
             "Change management plan",
         ],
+        "opening_approach": (
+            "Using the Current State Assessment and Root Cause Analysis artifacts, propose an "
+            "initial future state design that directly addresses each identified root cause. Present "
+            "the proposed improvements as a draft future state model — organised by dimension or "
+            "process area — and ask the user to validate, modify, or extend each element."
+        ),
     },
     "Gap Analysis": {
         "required_sections": [
@@ -881,6 +1036,13 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Risk ownership",
             "People/change management risk category",
         ],
+        "opening_approach": (
+            "Using the Problem Statement, Current State Assessment, and Assumption & Constraint "
+            "artifacts, propose an initial risk register. Extract implied risks from the documented "
+            "constraints, complexity factors, and problem context. Ask the user to validate each "
+            "proposed risk, assign likelihood and impact ratings, and add any risks not derivable "
+            "from prior artifacts."
+        ),
     },
     "Assumption & Constraint Documentation": {
         "required_sections": [
@@ -911,6 +1073,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Impact if assumption is invalidated",
             "Assumption vs constraint differentiation",
         ],
+        "opening_approach": (
+            "Before asking any questions, review the Problem Statement and any Current State "
+            "Assessment artifacts for stated or implied assumptions and constraints. Propose an "
+            "initial assumption and constraint register extracted from prior artifacts, then ask "
+            "the user to validate each one and add any assumptions the BA has not yet captured."
+        ),
     },
     "Business Case Development": {
         "required_sections": [
@@ -943,6 +1111,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Genuine multi-option comparison",
             "Quantified benefit timeframes",
         ],
+        "opening_approach": (
+            "Drawing from the Problem Statement, Business Need Definition, Gap Analysis, and Future "
+            "State Design artifacts, propose an initial business case structure. Present the benefit "
+            "categories and cost drivers that can be derived from prior artifacts, then ask the user "
+            "to provide quantification, timelines, and the financial case where not yet captured."
+        ),
     },
     "Change Strategy Definition": {
         "required_sections": [
@@ -975,6 +1149,13 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Per-group training differentiation",
             "Change readiness assessment approach",
         ],
+        "opening_approach": (
+            "Using the Gap Analysis and Future State Design artifacts, propose an initial change "
+            "strategy that maps each identified gap to a recommended intervention. Present the "
+            "proposed strategy as a draft — including sequencing, change approach (directive, "
+            "collaborative, or consultative), and stakeholder engagement considerations — then ask "
+            "the user to validate the change approach and proposed sequencing."
+        ),
     },
     # ── Requirements Analysis & Design Definition ─────────────────────────────
     "Stakeholder Requirements Documentation": {
@@ -1006,6 +1187,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Inter-group conflicts",
             "Elicitation source traceability",
         ],
+        "opening_approach": (
+            "Using the Stakeholder Register and Stakeholder Interview artifacts, propose a "
+            "stakeholder requirements register mapping each stakeholder group's stated needs to "
+            "requirements. Ask the user to validate the proposed mapping and identify any "
+            "stakeholder requirements not captured in the interview or register artifacts."
+        ),
     },
     "Business Requirements Documentation": {
         "required_sections": [
@@ -1034,6 +1221,13 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Rationale per requirement",
             "Out-of-scope documentation",
         ],
+        "opening_approach": (
+            "Drawing from the Problem Statement, Current State Assessment, and Root Cause Analysis "
+            "artifacts, propose an initial business requirements register. Extract implied business "
+            "requirements from the documented problems and gaps. Present the proposed requirements "
+            "and ask the user to validate each one and add any business requirements not derivable "
+            "from the prior work."
+        ),
     },
     "Functional Requirements Documentation": {
         "required_sections": [
@@ -1068,6 +1262,13 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Escalation path and authority requirements",
             "Notification trigger specifications",
         ],
+        "opening_approach": (
+            "Using the Business Requirements Documentation as the source, propose an initial "
+            "functional requirements register by decomposing each business requirement into its "
+            "functional specifications. Present the proposed decomposition and ask the user to "
+            "validate it and identify any functional requirements not covered by the business "
+            "requirements as written."
+        ),
     },
     "Non-Functional Requirements Documentation": {
         "required_sections": [
@@ -1100,6 +1301,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Rationale paragraphs",
             "Domain-specific compliance requirements",
         ],
+        "opening_approach": (
+            "Propose an initial non-functional requirements set based on the engagement type, "
+            "solution context, and constraints captured in prior artifacts. Include performance, "
+            "security, scalability, and compliance NFR categories as appropriate for this engagement "
+            "type. Ask the user to provide the specific quantified thresholds for each category."
+        ),
     },
     "User Story Writing": {
         "required_sections": [
@@ -1130,6 +1337,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Story dependencies",
             "Definition of Done",
         ],
+        "opening_approach": (
+            "Using the Functional Requirements Documentation, propose an initial user story backlog "
+            "by converting each functional requirement into As a / I want / So that format. Present "
+            "the proposed stories and ask the user to validate the role names, refine the benefit "
+            "statements, and confirm acceptance criteria for each story."
+        ),
     },
     "Process Modeling — Current State": {
         "required_sections": [
@@ -1266,6 +1479,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "System actors",
             "Pre-conditions and post-conditions",
         ],
+        "opening_approach": (
+            "Using the Functional Requirements Documentation, propose an initial use case index by "
+            "grouping related functional requirements into logical use cases. Present the proposed "
+            "use case list and ask the user to validate the scope, confirm all actors (human and "
+            "system), and add any use cases not represented in the requirements."
+        ),
     },
     "Data Requirements Definition": {
         "required_sections": [
@@ -1297,6 +1516,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Data governance (ownership, retention, access)",
             "Data migration requirements",
         ],
+        "opening_approach": (
+            "Propose an initial data entities register based on the functional requirements and "
+            "any data references in prior artifacts. Identify the data the solution needs to "
+            "function and its likely sources. Ask the user to validate the proposed entities, "
+            "confirm ownership, and provide the data quality and governance requirements."
+        ),
     },
     "Business Rules Documentation": {
         "required_sections": [
@@ -1326,6 +1551,13 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Rule source and ownership",
             "Rule category classification",
         ],
+        "opening_approach": (
+            "Using the functional and business requirements artifacts, propose an initial business "
+            "rules register by extracting all conditional logic and constraints referenced in the "
+            "requirements. Present the proposed rules in If [condition] Then [action] format and ask "
+            "the user to validate each rule, identify exceptions, and confirm the authority source "
+            "for each."
+        ),
     },
     "Acceptance Criteria Definition": {
         "required_sections": [
@@ -1357,6 +1589,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Verification method description",
             "Test instance count",
         ],
+        "opening_approach": (
+            "Using the Functional Requirements Documentation, propose acceptance criteria for each "
+            "requirement. Present a draft criteria table with suggested measurement approaches and "
+            "pass thresholds. Ask the user to validate the criteria, confirm specific thresholds "
+            "where the BA had to estimate, and identify who signs off each criterion."
+        ),
     },
     "Solution Prototyping & Wireframing": {
         "required_sections": [
@@ -1387,6 +1625,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Structured validation plan",
             "Iteration plan post-feedback",
         ],
+        "opening_approach": (
+            "Using the Functional Requirements Documentation, propose the prototyping scope — which "
+            "features or screens most need visual validation based on complexity or stakeholder risk. "
+            "Suggest the appropriate fidelity level and ask the user to confirm the proposed scope, "
+            "identify the stakeholders who must review, and confirm the feedback capture approach."
+        ),
     },
     "Requirements Verification": {
         "required_sections": [
@@ -1417,6 +1661,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Ambiguity identification",
             "Defect log",
         ],
+        "opening_approach": (
+            "Using all requirements artifacts captured to date, propose a verification assessment "
+            "applying the BABOK criteria: complete, consistent, unambiguous, and traceable. Identify "
+            "any requirements that appear incomplete, ambiguous, or without a traceability link. "
+            "Present the proposed findings and ask the user to review and confirm."
+        ),
     },
     "Requirements Validation": {
         "required_sections": [
@@ -1447,6 +1697,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Outstanding post-validation issues",
             "Validation vs verification distinction",
         ],
+        "opening_approach": (
+            "Using the Stakeholder Register and requirements artifacts, propose a stakeholder "
+            "validation plan — listing which stakeholder groups should validate which requirements "
+            "and in what format (workshop, walkthrough, written review). Ask the user to confirm "
+            "the proposed plan and identify any constraints on stakeholder availability."
+        ),
     },
     # ── Solution Evaluation ────────────────────────────────────────────────────
     "Solution Performance Assessment": {
@@ -1478,6 +1734,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Data collection methodology",
             "Improvement recommendations",
         ],
+        "opening_approach": (
+            "Using the Acceptance Criteria Definition and Business Case artifacts, propose the "
+            "performance metrics to assess by listing each success criterion from requirements. "
+            "Present the proposed metrics table with targets from prior artifacts and ask the user "
+            "to provide the actual performance data for comparison."
+        ),
     },
     "Solution Limitation Identification": {
         "required_sections": [
@@ -1507,6 +1769,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Decision and ownership per limitation",
             "Per-stakeholder impact",
         ],
+        "opening_approach": (
+            "Using the Functional Requirements Documentation and Acceptance Criteria artifacts, "
+            "propose an initial limitations register by identifying requirements where the delivered "
+            "solution may fall short based on known delivery context. Ask the user to validate which "
+            "limitations are confirmed, assess stakeholder impact, and describe current workarounds."
+        ),
     },
     "Enterprise Limitation Identification": {
         "required_sections": [
@@ -1536,6 +1804,13 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Quantified benefit impact",
             "Named recommendation owners",
         ],
+        "opening_approach": (
+            "Using the Future State Design and Business Case artifacts, propose an enterprise "
+            "limitations analysis — identifying organisational factors (culture, capability, "
+            "structure, technology) that may prevent the solution from delivering its projected "
+            "value. Ask the user to validate the proposed limitations and assign root cause "
+            "categories."
+        ),
     },
     "Value Delivery Assessment": {
         "required_sections": [
@@ -1566,6 +1841,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Projected vs actual variance analysis",
             "External factors affecting value delivery",
         ],
+        "opening_approach": (
+            "Using the Business Case and Business Need Definition artifacts, propose an initial "
+            "benefits realisation assessment. List each projected benefit from the business case "
+            "and ask the user to provide evidence of actual delivery against each. Present the "
+            "benefits-to-evidence mapping as a proposed starting structure."
+        ),
     },
     "UAT Planning & Support": {
         "required_sections": [
@@ -1597,6 +1878,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Defect management process",
             "Acceptance criteria traceability",
         ],
+        "opening_approach": (
+            "Using the Acceptance Criteria Definition artifact, propose an initial UAT test scenario "
+            "register by mapping each acceptance criterion to a test scenario with expected result. "
+            "Ask the user to validate the proposed scenarios, confirm the UAT participants and "
+            "their roles, and provide the entry and exit criteria."
+        ),
     },
     "Post-Implementation Review": {
         "required_sections": [
@@ -1628,6 +1915,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Specific BA process improvement actions",
             "Stakeholder feedback on the BA process",
         ],
+        "opening_approach": (
+            "Propose a structured retrospective framework based on the engagement type and scale. "
+            "Reference the phases completed in this engagement and ask the user to work through "
+            "what went well and what did not, starting with the phase that had the most complexity "
+            "or risk. For each issue raised, probe for root cause — not just the symptom."
+        ),
     },
     # ── Cross-Cutting ──────────────────────────────────────────────────────────
     "Stakeholder Register": {
@@ -1659,6 +1952,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Peripheral low-interest stakeholders with compliance implications",
             "CIO or IT leadership",
         ],
+        "opening_approach": (
+            "If a Problem Statement or Business Need artifact exists, use it to propose an initial "
+            "stakeholder landscape — identify likely stakeholder groups from the problem domain and "
+            "engagement type. Present the proposed groups and ask the user to validate, add missing "
+            "stakeholders, and assign influence and interest levels."
+        ),
     },
     "RACI Matrix": {
         "required_sections": [
@@ -1689,6 +1988,13 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Single-A enforcement",
             "Consulted vs Informed distinction",
         ],
+        "opening_approach": (
+            "Using the Stakeholder Register and any governance or requirements artifacts, propose "
+            "an initial RACI matrix structure. Identify the key tasks and decisions from prior "
+            "artifacts and propose accountable parties based on stakeholder influence levels. Ask "
+            "the user to validate the R/A/C/I assignments and flag any tasks with multiple proposed "
+            "Accountable owners — only one A per row is valid."
+        ),
     },
     "Glossary & Terminology Definition": {
         "required_sections": [
@@ -1718,6 +2024,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Definition ownership for contested terms",
             "Acronym expansions",
         ],
+        "opening_approach": (
+            "Review all prior artifacts for domain-specific terms, acronyms, and any language that "
+            "might vary between stakeholder groups. Propose an initial glossary from the terms found "
+            "across artifacts. Ask the user to provide agreed definitions, identify any terms that "
+            "mean different things to different departments, and confirm ownership of contested terms."
+        ),
     },
     "Meeting & Workshop Facilitation Log": {
         "required_sections": [
@@ -1748,6 +2060,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Outstanding items carry-forward",
             "Decisions vs actions distinction",
         ],
+        "opening_approach": (
+            "Propose a facilitation log template based on the engagement type and scale tier. "
+            "Suggest the standard session types expected for this engagement (e.g. requirements "
+            "workshop, stakeholder review, sign-off meeting) and ask the user to provide the "
+            "details of the first session to log."
+        ),
     },
     "Lessons Learned Documentation": {
         "required_sections": [
@@ -1777,6 +2095,12 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Applicable engagement type scope",
             "Recommendation ownership",
         ],
+        "opening_approach": (
+            "Review all completed artifacts for evidence of challenges, workarounds, or deviations "
+            "from plan. Propose an initial lessons learned register based on the documented context. "
+            "Ask the user to validate the proposed lessons, add any not captured in artifacts, and "
+            "confirm specific recommendations for future engagements."
+        ),
     },
 }
 
@@ -1905,7 +2229,12 @@ PROJECT CONTEXT:
 CAPTURED DIMENSIONS:
 {_dimensions_block(dimensions)}
 {module_context_section}
-PRIOR WORK COMPLETED ON THIS PROJECT — use this context to inform your questions and avoid repeating what has already been established:
+PRIOR WORK COMPLETED ON THIS PROJECT — MANDATORY READING BEFORE YOUR FIRST RESPONSE:
+Before you ask a single question, read every prior artifact below in full. Then apply these rules:
+1. NEVER ask for information already present in any prior artifact — reference it instead.
+2. PROPOSE from prior artifact content wherever possible — do not ask the user to generate what you can derive.
+3. If an artifact contains a relevant finding, state it and ask the user to validate or extend it, not originate it.
+4. Your opening question must reference at least one specific prior artifact if any exist — generic openers are not permitted when prior artifacts are present.
 {_prior_artifacts_block(prior_artifacts, module.get('knowledge_area', ''))}
 {artifact_section}
 CURRENT MODULE:
