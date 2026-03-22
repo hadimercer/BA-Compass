@@ -8,8 +8,9 @@ import streamlit as st
 
 from components.ai import call_openai, truncate_conversation
 from components.db import (
-    get_completed_artifacts_summary,
+    get_all_project_artifacts,
     get_conversation_history,
+    get_last_active_project,
     get_latest_artifact,
     run_query,
     save_artifact,
@@ -22,8 +23,14 @@ from prompts.copilot import (
 
 
 def _fix_list_spacing(text: str) -> str:
-    """Collapse double newlines between numbered list items."""
-    return re.sub(r'\n\n(\d+\.)', r'\n\1', text)
+    """Collapse double newlines within numbered list blocks and fix split number-text."""
+    # 1. Join number and its text when they appear on separate lines: "1.\n text" → "1. text"
+    text = re.sub(r'(\d+\.)\n(\s*\S)', r'\1 \2', text)
+    # 2. Remove blank lines between consecutive numbered items (e.g. \n\n2.)
+    text = re.sub(r'\n\n(\d+\.)', r'\n\1', text)
+    # 3. Remove blank lines between a numbered item and its indented continuation
+    text = re.sub(r'(\d+\.[^\n]+)\n\n(\s{2,}\S)', r'\1\n\2', text)
+    return text
 
 
 def render(current_user: dict) -> None:
@@ -62,6 +69,13 @@ def render(current_user: dict) -> None:
         )
 
     def _render_message(role: str, content: str) -> None:
+        if role == "system":
+            st.markdown(
+                f'<div style="text-align:center;font-size:0.78rem;color:rgba(110,231,183,0.75);'
+                f'margin:0.4rem 0;padding:0.25rem 0.5rem;">{content}</div>',
+                unsafe_allow_html=True,
+            )
+            return
         css_class = "chat-bubble-user" if role == "user" else "chat-bubble-ai"
         st.markdown(
             f'<div class="{css_class}"><div>{content}</div></div>',
@@ -71,6 +85,14 @@ def render(current_user: dict) -> None:
     # ── Resolve context ───────────────────────────────────────────────────────
 
     project_id = st.session_state.get("active_project_id")
+
+    # BUG-06: rehydrate from DB if session state was cleared by a refresh
+    if not project_id:
+        recovered = get_last_active_project(current_user["user_id"])
+        if recovered:
+            project_id = recovered
+            st.session_state["active_project_id"] = project_id
+
     module_id = st.session_state.get("active_module_id")
     roadmap_item_id = st.session_state.get("active_roadmap_item_id")
 
@@ -92,8 +114,25 @@ def render(current_user: dict) -> None:
         return
 
     dimensions = _load_dimensions(project_id)
-    prior_artifacts = get_completed_artifacts_summary(project_id, module_id)
+    prior_artifacts = get_all_project_artifacts(project_id, module_id)  # BUG-01
     existing_artifact = get_latest_artifact(project_id, module_id)
+
+    # ── Session state keys ────────────────────────────────────────────────────
+
+    session_key = f"copilot_{project_id}_{module_id}"
+    draft_key = f"draft_{project_id}_{module_id}"
+    draft_generated_key = f"draft_generated_{project_id}_{module_id}"  # BUG-05
+    is_revising_key = f"is_revising_{project_id}_{module_id}"           # BUG-04
+
+    # ── BUG-04: Consume one-shot revise flag set by roadmap Reopen & Revise ──
+
+    revise_mode = st.session_state.pop(f"revise_mode_{module_id}", False)
+    if revise_mode:
+        # Force conversation and draft to reload from DB / existing artifact
+        st.session_state.pop(session_key, None)
+        st.session_state.pop(draft_key, None)
+        st.session_state[is_revising_key] = True
+        st.session_state[draft_generated_key] = True  # BUG-05: show buttons immediately
 
     # ── Mark roadmap item in-progress on entry ────────────────────────────────
 
@@ -107,19 +146,25 @@ def render(current_user: dict) -> None:
         if rows and rows[0]["status"] == "not_started":
             _set_roadmap_status(roadmap_item_id, "in_progress")
 
-    # ── Session state for this module session ─────────────────────────────────
+    # ── Resolve current artifact text for revise mode ─────────────────────────
 
-    session_key = f"copilot_{project_id}_{module_id}"
-    draft_key = f"draft_{project_id}_{module_id}"
+    _current_artifact_text: str | None = None
+    if st.session_state.get(is_revising_key) and existing_artifact:
+        _art = existing_artifact.get("content", {})
+        _current_artifact_text = _art.get("text", "") if isinstance(_art, dict) else str(_art)
+
+    # ── Conversation history ──────────────────────────────────────────────────
 
     if session_key not in st.session_state:
         db_history = get_conversation_history(project_id, module_id)
         loaded = [{"role": r["role"], "content": r["content"]} for r in db_history]
 
-        # Bug 1 — Auto-inject opening question if conversation is new
         if not loaded:
             with st.spinner("Starting module..."):
-                sys_prompt = build_copilot_system(module, project, dimensions, prior_artifacts)
+                sys_prompt = build_copilot_system(
+                    module, project, dimensions, prior_artifacts,
+                    current_artifact_text=_current_artifact_text,
+                )
                 try:
                     first_q = call_openai(
                         [{"role": "system", "content": sys_prompt},
@@ -189,7 +234,7 @@ def render(current_user: dict) -> None:
           <div style="font-size:0.82rem;color:#94A3B8;">{(module.get('description',''))[:120]}</div>
         </div>""", unsafe_allow_html=True)
 
-    # ── Artifact dialog (Fix 4) ───────────────────────────────────────────────
+    # ── Artifact dialog ───────────────────────────────────────────────────────
 
     if existing_artifact:
         _art_content = existing_artifact.get("content", {})
@@ -261,8 +306,8 @@ def render(current_user: dict) -> None:
     for msg in messages:
         _render_message(msg["role"], msg["content"])
 
-    # Draft area — shown only when draft exists AND no artifact has been saved yet
-    if st.session_state[draft_key] and existing_artifact is None:
+    # ── Draft area — BUG-05: shown whenever a draft exists (not gated on existing_artifact) ──
+    if st.session_state[draft_key]:
         st.markdown(
             "<div style='margin-top:0.75rem;font-size:0.75rem;color:#60A5FA;"
             "letter-spacing:0.06em;text-transform:uppercase;margin-bottom:0.3rem;'>"
@@ -283,10 +328,18 @@ def render(current_user: dict) -> None:
                     result = save_artifact(project_id, module_id, module["name"], edited_draft)
                     if roadmap_item_id:
                         _set_roadmap_status(roadmap_item_id, "complete")
+                    # BUG-04: clear revise mode after successful save
+                    st.session_state.pop(is_revising_key, None)
+                    st.session_state.pop(draft_generated_key, None)  # BUG-05: reset flag
                 st.session_state[draft_key] = edited_draft
                 ver = result.get("version", "?")
-                # Bug 3 — toast instead of st.success
-                st.toast(f"Artifact saved — {module['name']} v{ver}")
+                # BUG-07: toast with icon and ✓ prefix
+                st.toast(f"✓ Artifact saved — {module['name']} v{ver}", icon="✓")
+                # BUG-08: persist system confirmation message in chat
+                system_msg = f"✓ {module['name']} v{ver} saved successfully."
+                save_message(project_id, module_id, "system", system_msg)
+                messages.append({"role": "system", "content": system_msg})
+                st.session_state[session_key] = messages
                 st.rerun()
         with mark_col:
             if st.button("Clear Draft", use_container_width=True):
@@ -303,15 +356,12 @@ def render(current_user: dict) -> None:
             height=100,
             label_visibility="collapsed",
         )
-        if existing_artifact is None:
-            form_col1, form_col2 = st.columns([3, 1])
-            with form_col1:
-                send = st.form_submit_button("Send", use_container_width=True)
-            with form_col2:
-                gen_draft = st.form_submit_button("Generate Draft", use_container_width=True)
-        else:
+        # BUG-05: Generate Draft always visible — no longer gated on existing_artifact
+        form_col1, form_col2 = st.columns([3, 1])
+        with form_col1:
             send = st.form_submit_button("Send", use_container_width=True)
-            gen_draft = False
+        with form_col2:
+            gen_draft = st.form_submit_button("Generate Draft", use_container_width=True)
 
     # ── Handle send ───────────────────────────────────────────────────────────
     if send and user_input.strip():
@@ -319,7 +369,10 @@ def render(current_user: dict) -> None:
         save_message(project_id, module_id, "user", user_text)
         messages.append({"role": "user", "content": user_text})
 
-        system_prompt = build_copilot_system(module, project, dimensions, prior_artifacts)
+        system_prompt = build_copilot_system(
+            module, project, dimensions, prior_artifacts,
+            current_artifact_text=_current_artifact_text,
+        )
         ai_messages = truncate_conversation(
             [{"role": m["role"], "content": m["content"]} for m in messages],
             system_prompt,
@@ -333,7 +386,6 @@ def render(current_user: dict) -> None:
                 st.error(str(exc))
                 return
 
-        # Bug 2 — fix list spacing in AI response
         response = _fix_list_spacing(response)
         save_message(project_id, module_id, "assistant", response)
         messages.append({"role": "assistant", "content": response})
@@ -372,7 +424,7 @@ def render(current_user: dict) -> None:
                     st.error(str(exc))
                     return
 
-            # Bug 2 — fix list spacing in draft
             draft_text = _fix_list_spacing(draft_text)
             st.session_state[draft_key] = draft_text
+            st.session_state[draft_generated_key] = True  # BUG-05: flag draft as generated
             st.rerun()

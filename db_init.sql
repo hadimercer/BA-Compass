@@ -97,3 +97,7 @@ CREATE OR REPLACE TRIGGER trg_roadmap_items_updated_at
 CREATE OR REPLACE TRIGGER trg_artifacts_updated_at
     BEFORE UPDATE ON artifacts
     FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+-- Add last_active_project_id column if it does not already exist (safe for re-runs)
+ALTER TABLE users
+    ADD COLUMN IF NOT EXISTS last_active_project_id UUID REFERENCES projects(project_id);

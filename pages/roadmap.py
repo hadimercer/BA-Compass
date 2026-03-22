@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import streamlit as st
 
-from components.db import run_query
+from components.db import get_last_active_project, run_query
 from components.ui import render_page_header
 
 
@@ -131,6 +131,13 @@ def render(current_user: dict) -> None:
         qp = st.query_params.get("project_id")
         if qp:
             project_id = str(qp)
+            st.session_state["active_project_id"] = project_id
+
+    # BUG-06: rehydrate from DB if session state was cleared by a refresh
+    if not project_id:
+        recovered = get_last_active_project(current_user["user_id"])
+        if recovered:
+            project_id = recovered
             st.session_state["active_project_id"] = project_id
 
     if not project_id:
@@ -289,6 +296,10 @@ def render(current_user: dict) -> None:
                 elif status == "complete":
                     if st.button("Reopen & Revise", key=f"rr_{item_id}", use_container_width=True):
                         _update_status(item_id, "in_progress")
+                        st.session_state["active_module_id"] = module_id
+                        st.session_state["active_roadmap_item_id"] = item_id
+                        st.session_state[f"revise_mode_{module_id}"] = True
+                        st.session_state["page"] = "module"
                         st.rerun()
                     if st.button("Mark Skipped", key=f"ms_{item_id}", use_container_width=True):
                         _update_status(item_id, "skipped")

@@ -36,6 +36,21 @@ Severity guidelines:
 - high: Would likely cause stakeholder confusion, rework, or project risk if unaddressed
 - medium: Reduces quality and professionalism but does not block delivery
 - low: Nice-to-have improvement, minor polish
+
+Evidence requirement for "incomplete" findings:
+When flagging any artifact as incomplete, truncated, or missing content, you must quote
+the specific passage from the artifact that supports your finding. Do not flag an artifact
+as incomplete unless you can identify and quote the exact location where content is missing
+or ends abruptly. If you cannot quote specific evidence, do not include the finding.
+
+Cross-artifact consistency check:
+Perform a cross-artifact consistency check on all numerical targets, dates, metrics, and
+named figures. For each metric that appears in more than one artifact, verify the value
+is stated consistently. Flag any case where the same metric is stated differently across
+artifacts as gap_type "inconsistent" and module_reference "Cross-artifact".
+Examples to check: duration targets (days, weeks, hours), handoff counts, satisfaction
+score targets, timeline dates, budget figures, headcount constraints.
+Quote both passages when flagging — the consistent value and the conflicting value.
 """
 
 
