@@ -86,6 +86,32 @@ def render(current_user: dict) -> None:
             unsafe_allow_html=True,
         )
 
+    def _is_draft_ready(msgs: list[dict]) -> bool:
+        """Return True when conditions are met for draft generation.
+
+        True when:
+        - A draft was already generated this session (draft_generated_key set)
+        - An artifact was previously saved (existing_artifact is not None)
+        - An assistant message contains both the readiness phrase AND 'Generate Draft'
+        """
+        if st.session_state.get(draft_generated_key):
+            return True
+        if existing_artifact is not None:
+            return True
+        for msg in msgs:
+            if msg.get("role") != "assistant":
+                continue
+            content = msg.get("content", "")
+            if (
+                (
+                    "I have everything needed to produce" in content
+                    or "I have sufficient information to produce" in content
+                )
+                and "Generate Draft" in content
+            ):
+                return True
+        return False
+
     # ── Resolve context ───────────────────────────────────────────────────────
 
     project_id = st.session_state.get("active_project_id")
@@ -225,6 +251,9 @@ def render(current_user: dict) -> None:
         border:1px solid rgba(255,255,255,0.14) !important;
         color:#F1F5F9 !important;
         border-radius:0.5rem !important; box-shadow:none !important;
+    }
+    section[data-testid="stMain"] > div {
+        padding-bottom: 140px !important;
     }
     </style>""", unsafe_allow_html=True)
 
@@ -400,25 +429,23 @@ def render(current_user: dict) -> None:
                 st.session_state[draft_key] = ""
                 st.rerun()
 
-    # Input form
+    # Input area — st.chat_input() is Streamlit's native pinned bottom widget
     st.markdown("<div style='height:0.5rem;'></div>", unsafe_allow_html=True)
 
-    with st.form(f"copilot_form_{module_id}", clear_on_submit=True):
-        user_input = st.text_area(
-            "Message",
-            placeholder="Answer the question above, or add context...",
-            height=100,
-            label_visibility="collapsed",
-        )
-        # BUG-05: Generate Draft always visible — no longer gated on existing_artifact
-        form_col1, form_col2 = st.columns([3, 1])
-        with form_col1:
-            send = st.form_submit_button("Send", use_container_width=True)
-        with form_col2:
-            gen_draft = st.form_submit_button("Generate Draft", use_container_width=True)
+    draft_ready = _is_draft_ready(messages)
+    gen_draft = st.button(
+        "Generate Draft",
+        disabled=not draft_ready,
+        use_container_width=True,
+        key=f"gen_draft_{module_id}",
+    )
+    if not draft_ready:
+        st.caption("Complete the conversation above — Generate Draft unlocks when the co-pilot confirms it has enough information.")
+
+    user_input = st.chat_input("Answer the question above, or add context...")
 
     # ── Handle send ───────────────────────────────────────────────────────────
-    if send and user_input.strip():
+    if user_input:
         user_text = user_input.strip()
         save_message(project_id, module_id, "user", user_text)
         messages.append({"role": "user", "content": user_text})
@@ -462,11 +489,9 @@ def render(current_user: dict) -> None:
 
     # ── Handle generate draft ─────────────────────────────────────────────────
     if gen_draft:
-        if user_input.strip():
-            user_text = user_input.strip()
-            save_message(project_id, module_id, "user", user_text)
-            messages.append({"role": "user", "content": user_text})
-            st.session_state[session_key] = messages
+        if not draft_ready:
+            st.warning("Continue the conversation until the co-pilot confirms it has enough information to generate the draft.")
+            st.stop()
 
         if len(messages) < 2:
             st.warning("Have a short conversation first so I have enough context to draft from.")
