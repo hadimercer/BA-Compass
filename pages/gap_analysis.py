@@ -5,7 +5,7 @@ from __future__ import annotations
 import streamlit as st
 
 from components.ai import call_openai
-from components.db import run_query
+from components.db import get_last_active_project, run_query
 from components.ui import render_page_header
 from prompts.gap_analysis import build_gap_analysis_messages, parse_gap_response
 
@@ -66,6 +66,12 @@ def render(current_user: dict) -> None:
     # ── Resolve project ───────────────────────────────────────────────────────
 
     project_id = st.session_state.get("active_project_id")
+    # BUG-06: rehydrate from DB if session state was cleared by a refresh
+    if not project_id:
+        recovered = get_last_active_project(current_user["user_id"])
+        if recovered:
+            project_id = recovered
+            st.session_state["active_project_id"] = project_id
     if not project_id:
         st.error("No project selected. Return to the dashboard.")
         if st.button("Go to Dashboard"):

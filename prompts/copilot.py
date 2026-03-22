@@ -27,6 +27,9 @@ Rules:
 - Do not include meta-commentary about what you did — just produce the artifact.
 """
 
+_APPROX_CHARS_PER_TOKEN = 4
+_MAX_ARTIFACT_CHARS = 6000 * _APPROX_CHARS_PER_TOKEN  # ≈ 24 000 chars
+
 
 def _dimensions_block(dimensions: list[dict]) -> str:
     if not dimensions:
@@ -37,12 +40,51 @@ def _dimensions_block(dimensions: list[dict]) -> str:
     return "\n".join(lines)
 
 
-def _prior_artifacts_block(artifacts: list[dict]) -> str:
+def _prior_artifacts_block(
+    artifacts: list[dict],
+    current_module_knowledge_area: str = "",
+) -> str:
+    """Inject prior artifact text with token-aware truncation.
+
+    If total chars ≤ _MAX_ARTIFACT_CHARS: include all artifacts in full.
+    Otherwise: preserve full text for the 3 most recently saved artifacts and the 1
+    artifact most thematically related (matching knowledge_area of the current module).
+    All others are truncated to a 300-char excerpt labelled '[key findings only]'.
+
+    Expects artifacts ordered oldest-first (as returned by get_all_project_artifacts).
+    """
     if not artifacts:
         return "None yet."
+
+    total_chars = sum(len(a["text"]) for a in artifacts)
+    if total_chars <= _MAX_ARTIFACT_CHARS:
+        lines = []
+        for a in artifacts:
+            lines.append(f"\n### {a['module_name']} (v{a['version']})\n{a['text']}")
+        return "\n".join(lines)
+
+    # Protected set: 3 most recent (tail of sorted-oldest-first list)
+    most_recent_indices = set(range(max(0, len(artifacts) - 3), len(artifacts)))
+
+    # Most thematically related: first knowledge_area match; fallback to most recent
+    thematic_index: int | None = None
+    for i, a in enumerate(artifacts):
+        if a.get("knowledge_area", "") == current_module_knowledge_area:
+            thematic_index = i
+            break
+    if thematic_index is None and artifacts:
+        thematic_index = len(artifacts) - 1
+    protected = most_recent_indices | {thematic_index}
+
     lines = []
-    for a in artifacts:
-        lines.append(f"\n### {a['module_name']}\n{a['text'][:600]}")
+    for i, a in enumerate(artifacts):
+        if i in protected:
+            lines.append(f"\n### {a['module_name']} (v{a['version']})\n{a['text']}")
+        else:
+            excerpt = a["text"][:300].rstrip() + "…" if len(a["text"]) > 300 else a["text"]
+            lines.append(
+                f"\n### {a['module_name']} (v{a['version']}) [key findings only]\n{excerpt}"
+            )
     return "\n".join(lines)
 
 
@@ -51,8 +93,20 @@ def build_copilot_system(
     project: dict,
     dimensions: list[dict],
     prior_artifacts: list[dict],
+    current_artifact_text: str | None = None,
 ) -> str:
-    """Build the full system prompt for a co-pilot session."""
+    """Build the full system prompt for a co-pilot session.
+
+    current_artifact_text: when set (Reopen & Revise mode), injects the existing saved
+    artifact under a dedicated section so the co-pilot uses it as the revision baseline.
+    """
+    artifact_section = ""
+    if current_artifact_text:
+        artifact_section = f"""
+
+CURRENT SAVED VERSION OF THIS ARTIFACT — the user wants to revise and improve it, use this as the baseline:
+{current_artifact_text}
+"""
     return (
         SYSTEM_COPILOT_BASE
         + f"""
@@ -65,9 +119,9 @@ PROJECT CONTEXT:
 CAPTURED DIMENSIONS:
 {_dimensions_block(dimensions)}
 
-PRIOR WORK (summaries of completed artifacts):
-{_prior_artifacts_block(prior_artifacts)}
-
+PRIOR WORK COMPLETED ON THIS PROJECT — use this context to inform your questions and avoid repeating what has already been established:
+{_prior_artifacts_block(prior_artifacts, module.get('knowledge_area', ''))}
+{artifact_section}
 CURRENT MODULE:
 - Name: {module.get('name')}
 - BABOK Knowledge Area: {module.get('knowledge_area')}

@@ -150,6 +150,43 @@ def get_completed_artifacts_summary(project_id: str, exclude_module_id: str) -> 
     return result
 
 
+def get_all_project_artifacts(project_id: str, exclude_module_id: str) -> list[dict]:
+    """Return full text of all saved artifacts for a project (excluding the current module).
+
+    Includes created_at and knowledge_area so the caller can apply token-aware truncation.
+    Results are ordered oldest-first so the caller can easily identify the most-recent-N.
+    """
+    rows = run_query(
+        """
+        SELECT DISTINCT ON (a.module_id)
+            m.name AS module_name,
+            m.knowledge_area,
+            a.content,
+            a.version,
+            a.created_at
+        FROM artifacts a
+        JOIN modules m ON m.module_id = a.module_id
+        WHERE a.project_id = %s AND a.module_id::text != %s
+        ORDER BY a.module_id, a.version DESC
+        """,
+        (project_id, exclude_module_id),
+        fetch=True,
+    )
+    result = []
+    for r in rows:
+        content = r["content"]
+        text = content.get("text", "") if isinstance(content, dict) else str(content)
+        result.append({
+            "module_name": r["module_name"],
+            "knowledge_area": r["knowledge_area"],
+            "version": r["version"],
+            "created_at": r["created_at"],
+            "text": text,
+        })
+    result.sort(key=lambda x: x["created_at"] or "")
+    return result
+
+
 def set_last_active_project(user_id: str, project_id: str) -> None:
     """Persist the last active project ID to the user record."""
     run_query(
