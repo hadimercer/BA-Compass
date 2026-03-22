@@ -3,20 +3,32 @@ All 24 roadmap templates for BA Compass: 8 engagement types × 3 scale tiers.
 Source: F2_Product_Definition_v1.0.docx, Section 8.
 Each template is an ordered list of module names that MUST exactly match
 the 'name' field in modules.py.
+
+ENH-07 Sequencing Principles (applied to all templates):
+  1. Assumptions & Constraints early — document knowns before eliciting unknowns
+  2. Elicitation before analysis — conduct interviews/workshops before RCA/gap
+  3. Current state before future state — understand before redesigning
+  4. Requirements before acceptance criteria, sign-off last
 """
 
 TEMPLATES = [
     # ─── Process Improvement ─────────────────────────────────────────────────
+    # Sequencing rationale:
+    #   Elicitation (Stakeholder Interviews) before Current State Assessment so
+    #   the BA understands context before documenting the current process.
+    #   Root Cause Analysis comes after understanding current state.
+    #   Future State Design follows analysis. Requirements documented after design.
+    #   Acceptance Criteria defined last, before any sign-off.
     {
         "engagement_type": "Process Improvement",
         "scale_tier": "Request",
         "module_sequence": [
             "Problem Statement Definition",
-            "Current State Assessment",
             "Stakeholder Interviews",
+            "Current State Assessment",
             "Root Cause Analysis",
-            "Functional Requirements Documentation",
             "Future State Design",
+            "Functional Requirements Documentation",
             "Acceptance Criteria Definition",
         ],
     },
@@ -25,18 +37,18 @@ TEMPLATES = [
         "scale_tier": "Engagement",
         "module_sequence": [
             "Problem Statement Definition",
+            "Assumption & Constraint Documentation",
             "Stakeholder Register",
             "Stakeholder Engagement Planning",
+            "Stakeholder Interviews",
             "Current State Assessment",
             "Process Modeling — Current State",
-            "Stakeholder Interviews",
             "Root Cause Analysis",
+            "Future State Design",
+            "Process Modeling — Future State",
             "Gap Analysis",
             "Business Requirements Documentation",
             "Functional Requirements Documentation",
-            "Future State Design",
-            "Process Modeling — Future State",
-            "Assumption & Constraint Documentation",
             "Acceptance Criteria Definition",
             "Requirements Sign-off & Approval",
         ],
@@ -51,6 +63,7 @@ TEMPLATES = [
             "BA Governance Setup",
             "Problem Statement Definition",
             "Business Need Definition",
+            "Assumption & Constraint Documentation",
             "Current State Assessment",
             "Process Modeling — Current State",
             "Stakeholder Interviews",
@@ -59,7 +72,6 @@ TEMPLATES = [
             "Elicitation Results Documentation",
             "Root Cause Analysis",
             "Risk Assessment",
-            "Assumption & Constraint Documentation",
             "Business Requirements Documentation",
             "Functional Requirements Documentation",
             "Non-Functional Requirements Documentation",
@@ -81,6 +93,12 @@ TEMPLATES = [
     },
 
     # ─── New System / Technology Implementation ───────────────────────────────
+    # Sequencing rationale:
+    #   Elicitation (Stakeholder Interviews) before Current State Assessment.
+    #   Assumptions & Constraints documented after stakeholder engagement so
+    #   they reflect what the interviews confirmed.
+    #   Functional and Non-Functional requirements before use cases/user stories.
+    #   UAT Planning last — it requires complete requirements.
     {
         "engagement_type": "New System / Technology Implementation",
         "scale_tier": "Request",
@@ -129,7 +147,7 @@ TEMPLATES = [
             "Information Management Planning",
             "Problem Statement Definition",
             "Business Need Definition",
-            "Business Case Development",
+            "Assumption & Constraint Documentation",
             "Current State Assessment",
             "Process Modeling — Current State",
             "Stakeholder Interviews",
@@ -139,7 +157,6 @@ TEMPLATES = [
             "Elicitation Results Documentation",
             "Root Cause Analysis",
             "Risk Assessment",
-            "Assumption & Constraint Documentation",
             "Business Requirements Documentation",
             "Functional Requirements Documentation",
             "Non-Functional Requirements Documentation",
@@ -165,6 +182,11 @@ TEMPLATES = [
     },
 
     # ─── Data & Reporting ─────────────────────────────────────────────────────
+    # Sequencing rationale:
+    #   Elicitation before data requirements definition — understand business
+    #   context before specifying data needs.
+    #   Current State Assessment before future design.
+    #   Prototyping (wireframing) after requirements, before acceptance criteria.
     {
         "engagement_type": "Data & Reporting",
         "scale_tier": "Request",
@@ -185,13 +207,14 @@ TEMPLATES = [
             "Stakeholder Interviews",
             "Document Analysis",
             "Current State Assessment",
+            "Assumption & Constraint Documentation",
             "Data Requirements Definition",
             "Business Requirements Documentation",
             "Functional Requirements Documentation",
             "Non-Functional Requirements Documentation",
             "Business Rules Documentation",
-            "Acceptance Criteria Definition",
             "Solution Prototyping & Wireframing",
+            "Acceptance Criteria Definition",
             "Requirements Sign-off & Approval",
             "UAT Planning & Support",
         ],
@@ -206,7 +229,7 @@ TEMPLATES = [
             "BA Governance Setup",
             "Problem Statement Definition",
             "Business Need Definition",
-            "Business Case Development",
+            "Assumption & Constraint Documentation",
             "Current State Assessment",
             "Stakeholder Interviews",
             "Workshops & Focus Groups",
@@ -215,7 +238,6 @@ TEMPLATES = [
             "Elicitation Results Documentation",
             "Root Cause Analysis",
             "Risk Assessment",
-            "Assumption & Constraint Documentation",
             "Data Requirements Definition",
             "Business Requirements Documentation",
             "Functional Requirements Documentation",
@@ -241,6 +263,12 @@ TEMPLATES = [
     },
 
     # ─── Regulatory & Compliance ──────────────────────────────────────────────
+    # Sequencing rationale:
+    #   Document Analysis before Current State Assessment — regulatory context
+    #   must be established before assessing current state against it.
+    #   Assumptions & Constraints early — compliance constraints are known upfront.
+    #   Risk Assessment before requirements — regulatory risks shape requirements.
+    #   Future State Design after gap is understood.
     {
         "engagement_type": "Regulatory & Compliance",
         "scale_tier": "Request",
@@ -261,10 +289,11 @@ TEMPLATES = [
             "Stakeholder Register",
             "Stakeholder Engagement Planning",
             "Document Analysis",
-            "Current State Assessment",
-            "Gap Analysis",
-            "Risk Assessment",
             "Assumption & Constraint Documentation",
+            "Current State Assessment",
+            "Stakeholder Interviews",
+            "Risk Assessment",
+            "Gap Analysis",
             "Business Requirements Documentation",
             "Functional Requirements Documentation",
             "Business Rules Documentation",
@@ -285,7 +314,7 @@ TEMPLATES = [
             "Information Management Planning",
             "Problem Statement Definition",
             "Business Need Definition",
-            "Business Case Development",
+            "Assumption & Constraint Documentation",
             "Document Analysis",
             "Current State Assessment",
             "Stakeholder Interviews",
@@ -293,15 +322,15 @@ TEMPLATES = [
             "Elicitation Results Documentation",
             "Root Cause Analysis",
             "Risk Assessment",
-            "Assumption & Constraint Documentation",
+            "Gap Analysis",
             "Business Rules Documentation",
             "Business Requirements Documentation",
             "Functional Requirements Documentation",
             "Non-Functional Requirements Documentation",
-            "Gap Analysis",
             "Future State Design",
             "Process Modeling — Future State",
             "Change Strategy Definition",
+            "Business Case Development",
             "Requirements Verification",
             "Requirements Validation",
             "Requirements Prioritization",
@@ -318,6 +347,11 @@ TEMPLATES = [
     },
 
     # ─── Organizational Change ────────────────────────────────────────────────
+    # Sequencing rationale:
+    #   Stakeholder elicitation early — org change is highly stakeholder-driven.
+    #   Assumptions & Constraints after initial stakeholder engagement.
+    #   Current State before Root Cause Analysis and Gap.
+    #   Change Strategy and RACI after understanding current state and requirements.
     {
         "engagement_type": "Organizational Change",
         "scale_tier": "Request",
@@ -339,11 +373,11 @@ TEMPLATES = [
             "Stakeholder Register",
             "Stakeholder Engagement Planning",
             "Stakeholder Interviews",
+            "Assumption & Constraint Documentation",
             "Current State Assessment",
             "Root Cause Analysis",
-            "Gap Analysis",
             "Risk Assessment",
-            "Assumption & Constraint Documentation",
+            "Gap Analysis",
             "Business Requirements Documentation",
             "Future State Design",
             "Change Strategy Definition",
@@ -363,7 +397,7 @@ TEMPLATES = [
             "Information Management Planning",
             "Problem Statement Definition",
             "Business Need Definition",
-            "Business Case Development",
+            "Assumption & Constraint Documentation",
             "Current State Assessment",
             "Process Modeling — Current State",
             "Stakeholder Interviews",
@@ -372,7 +406,6 @@ TEMPLATES = [
             "Elicitation Results Documentation",
             "Root Cause Analysis",
             "Risk Assessment",
-            "Assumption & Constraint Documentation",
             "Business Requirements Documentation",
             "Functional Requirements Documentation",
             "Gap Analysis",
@@ -390,16 +423,21 @@ TEMPLATES = [
     },
 
     # ─── New Product / Service Development ───────────────────────────────────
+    # Sequencing rationale:
+    #   Problem Statement and Business Need before stakeholder engagement.
+    #   Elicitation Planning before conducting elicitation.
+    #   User Stories after business/functional requirements are established.
+    #   Prototyping after requirements, before acceptance criteria.
     {
         "engagement_type": "New Product / Service Development",
         "scale_tier": "Request",
         "module_sequence": [
             "Problem Statement Definition",
-            "Stakeholder Interviews",
             "Business Need Definition",
+            "Stakeholder Interviews",
+            "Functional Requirements Documentation",
             "User Story Writing",
             "Acceptance Criteria Definition",
-            "Functional Requirements Documentation",
         ],
     },
     {
@@ -410,17 +448,17 @@ TEMPLATES = [
             "Business Need Definition",
             "Stakeholder Register",
             "Stakeholder Engagement Planning",
-            "Stakeholder Interviews",
             "Elicitation Planning",
+            "Stakeholder Interviews",
             "Document Analysis",
             "Current State Assessment",
             "Business Requirements Documentation",
             "Functional Requirements Documentation",
             "Non-Functional Requirements Documentation",
-            "User Story Writing",
-            "Acceptance Criteria Definition",
-            "Solution Prototyping & Wireframing",
             "Business Rules Documentation",
+            "User Story Writing",
+            "Solution Prototyping & Wireframing",
+            "Acceptance Criteria Definition",
             "Requirements Prioritization",
             "Requirements Sign-off & Approval",
             "UAT Planning & Support",
@@ -437,17 +475,16 @@ TEMPLATES = [
             "Information Management Planning",
             "Problem Statement Definition",
             "Business Need Definition",
-            "Business Case Development",
+            "Assumption & Constraint Documentation",
             "Benchmarking & Market Analysis",
             "Current State Assessment",
+            "Elicitation Planning",
             "Stakeholder Interviews",
             "Workshops & Focus Groups",
             "Survey & Questionnaire Design",
-            "Elicitation Planning",
             "Elicitation Results Documentation",
             "Root Cause Analysis",
             "Risk Assessment",
-            "Assumption & Constraint Documentation",
             "Business Requirements Documentation",
             "Functional Requirements Documentation",
             "Non-Functional Requirements Documentation",
@@ -455,8 +492,8 @@ TEMPLATES = [
             "Business Rules Documentation",
             "User Story Writing",
             "Use Case Development",
-            "Acceptance Criteria Definition",
             "Solution Prototyping & Wireframing",
+            "Acceptance Criteria Definition",
             "Requirements Verification",
             "Requirements Validation",
             "Requirements Prioritization",
@@ -474,16 +511,22 @@ TEMPLATES = [
     },
 
     # ─── Vendor Selection & Procurement ──────────────────────────────────────
+    # Sequencing rationale:
+    #   Stakeholder Interviews before Benchmarking — understand internal needs
+    #   before researching the market.
+    #   Assumptions & Constraints early — procurement constraints are upfront.
+    #   Risk Assessment informs requirements prioritization.
+    #   Sign-off last.
     {
         "engagement_type": "Vendor Selection & Procurement",
         "scale_tier": "Request",
         "module_sequence": [
             "Problem Statement Definition",
-            "Stakeholder Interviews",
             "Business Need Definition",
+            "Assumption & Constraint Documentation",
+            "Stakeholder Interviews",
             "Functional Requirements Documentation",
             "Non-Functional Requirements Documentation",
-            "Assumption & Constraint Documentation",
         ],
     },
     {
@@ -494,12 +537,12 @@ TEMPLATES = [
             "Business Need Definition",
             "Stakeholder Register",
             "Stakeholder Interviews",
+            "Assumption & Constraint Documentation",
             "Document Analysis",
             "Benchmarking & Market Analysis",
             "Functional Requirements Documentation",
             "Non-Functional Requirements Documentation",
             "Business Rules Documentation",
-            "Assumption & Constraint Documentation",
             "Risk Assessment",
             "Requirements Prioritization",
             "Requirements Sign-off & Approval",
@@ -515,7 +558,7 @@ TEMPLATES = [
             "BA Governance Setup",
             "Problem Statement Definition",
             "Business Need Definition",
-            "Business Case Development",
+            "Assumption & Constraint Documentation",
             "Current State Assessment",
             "Stakeholder Interviews",
             "Workshops & Focus Groups",
@@ -523,7 +566,6 @@ TEMPLATES = [
             "Benchmarking & Market Analysis",
             "Elicitation Results Documentation",
             "Risk Assessment",
-            "Assumption & Constraint Documentation",
             "Business Requirements Documentation",
             "Functional Requirements Documentation",
             "Non-Functional Requirements Documentation",
@@ -540,15 +582,22 @@ TEMPLATES = [
     },
 
     # ─── Strategic Initiative ─────────────────────────────────────────────────
+    # Sequencing rationale:
+    #   Document Analysis and Stakeholder Interviews before Current State Assessment
+    #   — gather external/internal context before synthesising the current state.
+    #   Assumptions & Constraints after initial elicitation.
+    #   Root Cause Analysis and Risk Assessment before defining future state.
+    #   Gap Analysis bridges current/future state analysis.
+    #   Business Case Development after understanding gaps and future state.
     {
         "engagement_type": "Strategic Initiative",
         "scale_tier": "Request",
         "module_sequence": [
             "Problem Statement Definition",
             "Business Need Definition",
+            "Assumption & Constraint Documentation",
             "Stakeholder Interviews",
             "Document Analysis",
-            "Assumption & Constraint Documentation",
             "Business Case Development",
         ],
     },
@@ -564,14 +613,14 @@ TEMPLATES = [
             "Workshops & Focus Groups",
             "Document Analysis",
             "Benchmarking & Market Analysis",
+            "Assumption & Constraint Documentation",
             "Current State Assessment",
             "Root Cause Analysis",
             "Risk Assessment",
-            "Assumption & Constraint Documentation",
             "Gap Analysis",
             "Future State Design",
-            "Business Case Development",
             "Change Strategy Definition",
+            "Business Case Development",
             "Requirements Sign-off & Approval",
         ],
     },
@@ -587,7 +636,7 @@ TEMPLATES = [
             "Performance Metrics Definition",
             "Problem Statement Definition",
             "Business Need Definition",
-            "Business Case Development",
+            "Assumption & Constraint Documentation",
             "Current State Assessment",
             "Process Modeling — Current State",
             "Stakeholder Interviews",
@@ -597,13 +646,13 @@ TEMPLATES = [
             "Elicitation Results Documentation",
             "Root Cause Analysis",
             "Risk Assessment",
-            "Assumption & Constraint Documentation",
             "Gap Analysis",
             "Future State Design",
             "Process Modeling — Future State",
             "Change Strategy Definition",
             "Business Requirements Documentation",
             "Functional Requirements Documentation",
+            "Business Case Development",
             "Requirements Prioritization",
             "Requirements Traceability Setup",
             "Traceability Matrix",

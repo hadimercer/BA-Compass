@@ -101,3 +101,7 @@ CREATE OR REPLACE TRIGGER trg_artifacts_updated_at
 -- Add last_active_project_id column if it does not already exist (safe for re-runs)
 ALTER TABLE users
     ADD COLUMN IF NOT EXISTS last_active_project_id UUID REFERENCES projects(project_id);
+
+-- ENH-05: opening question pre-generated per module based on prior artifacts
+ALTER TABLE project_roadmap_items
+    ADD COLUMN IF NOT EXISTS opening_question TEXT;

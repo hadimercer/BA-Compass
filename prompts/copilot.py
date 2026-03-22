@@ -31,6 +31,9 @@ Every question you ask must include at least two concrete examples relevant to t
 
 ENH-04 — COMPLETENESS CHECK BEFORE DRAFT:
 Before generating any draft, perform a completeness check against the required content areas for this module as specified in your MODULE BACKGROUND CONTEXT below. If any required content area has not been covered in the conversation, do not proceed to draft. Instead respond: 'Before I draft — I notice we have not covered [specific missing area]. This is important for a complete [module name] because [reason]. [Ask a specific question to gather the missing information].' Only proceed to draft when all required content areas have been addressed. When all areas are covered, respond: 'I have everything needed to produce a complete [module name]. Click Generate Draft to generate the formal artifact, or let me know if you want to add anything first.'
+
+ENH-14 — NO INLINE DRAFTS:
+Never produce a full artifact draft inline in the conversation. When you have gathered sufficient information to draft, respond only with: 'I have everything needed to produce a complete [module name] artifact. Click Generate Draft above to generate the formal document.' Do not reproduce the artifact content in the chat under any circumstances. The Generate Draft button is the only path to artifact generation. If the user asks you to 'write it out', 'show me the draft', or 'generate it here', decline politely and redirect: 'The draft will be formatted and saved properly when you click Generate Draft above — that ensures it is versioned and traceable in your project.'
 """
 
 SYSTEM_DRAFT_GENERATION = """You are an expert Business Analyst generating a structured artifact draft.
@@ -1139,15 +1142,26 @@ MODULE_CONTEXT: dict[str, dict] = {
         ],
         "must_gather_before_draft": [
             "All roles or teams that have their own swimlane",
+            "How many swimlanes / roles are involved?",
             "Steps performed by each lane in sequence",
             "All handoff points — where work moves from one lane to another",
             "Decision points and their branching logic",
+            "Are there any decision points or escalation paths in the process?",
             "System or tool used in each step",
+            "Approximate total process duration and handoff count",
+            "Process owner (who is accountable for the end-to-end process)",
         ],
         "artifact_format": (
-            "Swimlane diagram narrative (text-based): structured by lane with Step ID, "
-            "Step Description, Inputs, Outputs, Handoffs, Systems, and Pain Points. "
-            "One section per swimlane."
+            "REQUIRED STRUCTURED FORMAT — always use this regardless of how the user provides input:\n"
+            "(1) Process Overview — total duration, total handoff count, process owner.\n"
+            "(2) One section per swimlane — numbered steps, each step including: action performed, "
+            "system or tool used (if applicable), and output or handoff produced.\n"
+            "(3) Handoff Register — every handoff listed explicitly: from-lane, to-lane, trigger, "
+            "and any delay or dependency.\n"
+            "(4) Decision Points — every branch or escalation point in the process.\n"
+            "(5) Critical Dependencies — pre-conditions and blockers for the process.\n"
+            "Convert narrative user input into this structure. Never produce a narrative description "
+            "as the artifact output for this module."
         ),
         "junior_misses": [
             "Handoffs — where work passes between lanes is where most delays occur",
@@ -1179,15 +1193,28 @@ MODULE_CONTEXT: dict[str, dict] = {
         ],
         "must_gather_before_draft": [
             "Future state swimlane structure — which roles/teams are involved",
+            "How many swimlanes / roles are involved in the future state?",
             "Steps per lane in the redesigned process",
             "Automation points — steps that will be automated",
             "How handoffs are reduced or improved vs current state",
+            "Are there any decision points or escalation paths in the future process?",
             "Systems involved in each future state step",
+            "Approximate total future process duration and handoff count",
+            "Process owner for the future state",
         ],
         "artifact_format": (
-            "Swimlane diagram narrative structured by lane: Step ID, Description, "
-            "Automation flag (Manual/Automated/Semi-automated), System, Handoffs. "
-            "Change Summary section comparing current vs future state by lane."
+            "REQUIRED STRUCTURED FORMAT — always use this regardless of how the user provides input:\n"
+            "(1) Process Overview — total duration, total handoff count, process owner.\n"
+            "(2) One section per swimlane — numbered steps, each step including: action performed, "
+            "automation flag (Manual / Automated / Semi-automated), system or tool used (if applicable), "
+            "and output or handoff produced.\n"
+            "(3) Handoff Register — every handoff listed explicitly: from-lane, to-lane, trigger, "
+            "and any delay or dependency.\n"
+            "(4) Decision Points — every branch or escalation point in the future process.\n"
+            "(5) Critical Dependencies — pre-conditions and blockers for the future state.\n"
+            "Include a Change Summary section after the swimlane sections comparing current vs future "
+            "state by lane (what changed and why). Convert narrative user input into this structure. "
+            "Never produce a narrative description as the artifact output for this module."
         ),
         "junior_misses": [
             "Explicitly marking automation points — which steps are automated vs manual",
@@ -1925,3 +1952,52 @@ def opening_message(module_name: str) -> str:
         "I'll ask you a few questions to gather what I need, then help you produce a draft artifact. "
         "Let's start — tell me about this engagement in your own words, or answer my first question below."
     )
+
+
+def build_opening_question_prompt(
+    module: dict,
+    project: dict,
+    prior_artifacts: list[dict],
+) -> str:
+    """Build a one-shot prompt to generate a context-aware opening question.
+
+    Used by the background regeneration job (ENH-05). The generated question is stored
+    in project_roadmap_items.opening_question and used when the user enters the module.
+    """
+    module_name = module.get("name", "")
+    _ctx = MODULE_CONTEXT.get(module_name, {})
+    must_gather = _ctx.get("must_gather_before_draft", [])
+    must_gather_str = "\n".join(f"  - {q}" for q in must_gather) if must_gather else "  - (see module description)"
+
+    artifact_summary = ""
+    if prior_artifacts:
+        lines = []
+        for a in prior_artifacts[:6]:  # limit context length
+            excerpt = a.get("text", "")[:300].replace("\n", " ")
+            lines.append(f"  [{a['module_name']}]: {excerpt}")
+        artifact_summary = "\n".join(lines)
+    else:
+        artifact_summary = "  None yet."
+
+    return f"""You are generating a single context-aware opening question for a BA co-pilot session.
+
+The BA is working on a {project.get('engagement_type', 'business analysis')} engagement
+(scale: {project.get('scale_tier', 'not specified')}) for project: {project.get('name', 'Unknown')}.
+
+The next module they will complete is: {module_name}
+Module description: {module.get('description', '')}
+
+Prior artifacts already completed on this project:
+{artifact_summary}
+
+Key things to gather for {module_name}:
+{must_gather_str}
+
+Your task: Generate ONE specific, context-aware opening question that:
+- References the engagement type and project context
+- Builds on what has already been captured in prior artifacts
+- Targets the most important unknown for {module_name}
+- Includes 2 concrete examples relevant to a {project.get('engagement_type', 'business analysis')} context
+- Is conversational but precise
+
+Output only the question text — no preamble, no explanation, no label. Just the question."""

@@ -15,6 +15,36 @@ Respond ONLY with valid JSON in this exact structure:
 {
   "overall_assessment": "2-3 sentence summary of the engagement's completeness and quality.",
   "completeness_score": <integer 0-100>,
+  "score_breakdown": {
+    "base_score": 100,
+    "deductions": [
+      {
+        "category": "Missing modules",
+        "instances": <int>,
+        "points_per_instance": 5,
+        "total_deducted": <int>
+      },
+      {
+        "category": "Incomplete artifact findings",
+        "instances": <int>,
+        "points_per_instance": 3,
+        "total_deducted": <int>
+      },
+      {
+        "category": "Inconsistency findings",
+        "instances": <int>,
+        "points_per_instance": 4,
+        "total_deducted": <int>
+      },
+      {
+        "category": "Recommended enhancements",
+        "instances": <int>,
+        "points_per_instance": 1,
+        "total_deducted": <int>
+      }
+    ],
+    "final_score": <int>
+  },
   "findings": [
     {
       "severity": "high" | "medium" | "low",
@@ -25,6 +55,15 @@ Respond ONLY with valid JSON in this exact structure:
     }
   ]
 }
+
+Scoring rules for score_breakdown:
+- Start at base_score = 100
+- Deduct 5 points per missing module (gap_type = "missing")
+- Deduct 3 points per incomplete artifact finding (gap_type = "incomplete")
+- Deduct 4 points per inconsistency finding (gap_type = "inconsistent")
+- Deduct 1 point per recommended enhancement (gap_type = "recommended")
+- final_score must equal base_score minus sum of all total_deducted values, minimum 0
+- completeness_score must equal final_score
 
 Gap type definitions:
 - missing: An expected artifact or section is entirely absent

@@ -126,6 +126,189 @@ def save_artifact(project_id: str, module_id: str, artifact_type: str, content_t
     return dict(result[0]) if result else {}
 
 
+def get_opening_question(project_id: str, module_id: str) -> str | None:
+    """Return the pre-generated context-aware opening question for a module, or None."""
+    rows = run_query(
+        """
+        SELECT opening_question
+        FROM project_roadmap_items
+        WHERE project_id = %s AND module_id = %s
+        LIMIT 1
+        """,
+        (project_id, module_id),
+        fetch=True,
+    )
+    if rows and rows[0].get("opening_question"):
+        return str(rows[0]["opening_question"])
+    return None
+
+
+def set_opening_question(project_id: str, module_id: str, question: str) -> None:
+    """Persist the pre-generated opening question for a roadmap item."""
+    run_query(
+        """
+        UPDATE project_roadmap_items
+        SET opening_question = %s
+        WHERE project_id = %s AND module_id = %s
+        """,
+        (question, project_id, module_id),
+        fetch=False,
+    )
+
+
+def get_incomplete_roadmap_modules(project_id: str) -> list[dict]:
+    """Return module_id and module data for all not_started/in_progress roadmap items."""
+    rows = run_query(
+        """
+        SELECT pri.module_id, m.name, m.knowledge_area, m.description,
+               m.typical_inputs, m.typical_outputs
+        FROM project_roadmap_items pri
+        JOIN modules m ON m.module_id = pri.module_id
+        WHERE pri.project_id = %s AND pri.status IN ('not_started', 'in_progress')
+        ORDER BY pri.sequence_order
+        """,
+        (project_id,),
+        fetch=True,
+    )
+    return [dict(r) for r in rows]
+
+
+def trigger_opening_question_regen(project_id: str, db_url: str) -> None:
+    """Background function: regenerate opening questions for all incomplete modules.
+
+    Receives db_url as a plain string so this function can be called from a daemon
+    thread without requiring a Streamlit session context.
+    Imports are local to avoid loading AI dependencies at module import time.
+    """
+    import logging
+
+    try:
+        from components.ai import call_openai
+        from prompts.copilot import build_opening_question_prompt
+
+        # Build a minimal connection using the passed URL directly
+        import psycopg2
+        from psycopg2.extras import RealDictCursor
+
+        def _run(sql: str, params: tuple, fetch: bool = False):
+            conn = psycopg2.connect(db_url, cursor_factory=RealDictCursor, connect_timeout=15)
+            try:
+                with conn.cursor() as cur:
+                    cur.execute(sql, params)
+                    result = cur.fetchall() if fetch and cur.description else []
+                if not fetch or sql.lstrip().split(None, 1)[0].upper() != "SELECT":
+                    conn.commit()
+                return result
+            finally:
+                conn.close()
+
+        # Get all saved artifacts for context
+        artifact_rows = _run(
+            """
+            SELECT DISTINCT ON (a.module_id)
+                m.name AS module_name, m.knowledge_area, a.content, a.version
+            FROM artifacts a
+            JOIN modules m ON m.module_id = a.module_id
+            WHERE a.project_id = %s
+            ORDER BY a.module_id, a.version DESC
+            """,
+            (project_id,),
+            fetch=True,
+        )
+        prior_artifacts = []
+        for r in artifact_rows:
+            content = r["content"]
+            text = content.get("text", "") if isinstance(content, dict) else str(content)
+            prior_artifacts.append({
+                "module_name": r["module_name"],
+                "knowledge_area": r["knowledge_area"],
+                "version": r["version"],
+                "text": text,
+            })
+
+        if not prior_artifacts:
+            return  # Nothing to build context from
+
+        # Get project record
+        proj_rows = _run(
+            "SELECT project_id, name, engagement_type, scale_tier FROM projects WHERE project_id = %s LIMIT 1",
+            (project_id,),
+            fetch=True,
+        )
+        if not proj_rows:
+            return
+        project = dict(proj_rows[0])
+
+        # Get all incomplete modules
+        incomplete_rows = _run(
+            """
+            SELECT pri.module_id, m.name, m.knowledge_area, m.description,
+                   m.typical_inputs, m.typical_outputs
+            FROM project_roadmap_items pri
+            JOIN modules m ON m.module_id = pri.module_id
+            WHERE pri.project_id = %s AND pri.status IN ('not_started', 'in_progress')
+            ORDER BY pri.sequence_order
+            """,
+            (project_id,),
+            fetch=True,
+        )
+
+        for row in incomplete_rows:
+            module = dict(row)
+            try:
+                prompt = build_opening_question_prompt(module, project, prior_artifacts)
+                question = call_openai(
+                    [{"role": "system", "content": prompt},
+                     {"role": "user", "content": "Generate the opening question now."}],
+                    temperature=0.4,
+                )
+                if question:
+                    _run(
+                        "UPDATE project_roadmap_items SET opening_question = %s WHERE project_id = %s AND module_id = %s",
+                        (question.strip(), project_id, str(module["module_id"])),
+                    )
+            except Exception:
+                logging.getLogger(__name__).exception(
+                    "Failed to generate opening question for module %s", module.get("name")
+                )
+                continue
+
+    except Exception:
+        logging.getLogger(__name__).exception(
+            "Opening question regen failed for project %s", project_id
+        )
+
+
+def get_artifact_versions(project_id: str, module_id: str) -> list[dict]:
+    """Return all saved versions for a project+module, newest first."""
+    rows = run_query(
+        """
+        SELECT artifact_id, version, created_at
+        FROM artifacts
+        WHERE project_id = %s AND module_id = %s
+        ORDER BY version DESC
+        """,
+        (project_id, module_id),
+        fetch=True,
+    )
+    return [dict(r) for r in rows]
+
+
+def get_artifact_by_id(artifact_id: str) -> dict | None:
+    """Return a specific artifact row by primary key."""
+    rows = run_query(
+        """
+        SELECT artifact_id, content, version, artifact_type
+        FROM artifacts
+        WHERE artifact_id = %s
+        LIMIT 1
+        """,
+        (artifact_id,),
+        fetch=True,
+    )
+    return dict(rows[0]) if rows else None
+
+
 def get_completed_artifacts_summary(project_id: str, exclude_module_id: str) -> list[dict]:
     """Return name + content text for all complete-status modules with saved artifacts."""
     rows = run_query(

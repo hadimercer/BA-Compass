@@ -9,12 +9,16 @@ import streamlit as st
 from components.ai import call_openai, truncate_conversation
 from components.db import (
     get_all_project_artifacts,
+    get_artifact_by_id,
+    get_artifact_versions,
     get_conversation_history,
     get_last_active_project,
     get_latest_artifact,
+    get_opening_question,
     run_query,
     save_artifact,
     save_message,
+    trigger_opening_question_regen,
 )
 from prompts.copilot import (
     build_copilot_system,
@@ -160,22 +164,28 @@ def render(current_user: dict) -> None:
         loaded = [{"role": r["role"], "content": r["content"]} for r in db_history]
 
         if not loaded:
-            with st.spinner("Starting module..."):
-                sys_prompt = build_copilot_system(
-                    module, project, dimensions, prior_artifacts,
-                    current_artifact_text=_current_artifact_text,
-                )
-                try:
-                    first_q = call_openai(
-                        [{"role": "system", "content": sys_prompt},
-                         {"role": "user", "content": f"Start the {module['name']} module. Ask your opening question now. Be concise."}],
-                        temperature=0.3,
+            # ENH-05: use pre-generated context-aware opening question if available
+            stored_question = get_opening_question(project_id, module_id)
+            if stored_question:
+                save_message(project_id, module_id, "assistant", stored_question)
+                loaded = [{"role": "assistant", "content": stored_question}]
+            else:
+                with st.spinner("Starting module..."):
+                    sys_prompt = build_copilot_system(
+                        module, project, dimensions, prior_artifacts,
+                        current_artifact_text=_current_artifact_text,
                     )
-                    first_q = _fix_list_spacing(first_q)
-                    save_message(project_id, module_id, "assistant", first_q)
-                    loaded = [{"role": "assistant", "content": first_q}]
-                except RuntimeError:
-                    loaded = []
+                    try:
+                        first_q = call_openai(
+                            [{"role": "system", "content": sys_prompt},
+                             {"role": "user", "content": f"Start the {module['name']} module. Ask your opening question now. Be concise."}],
+                            temperature=0.3,
+                        )
+                        first_q = _fix_list_spacing(first_q)
+                        save_message(project_id, module_id, "assistant", first_q)
+                        loaded = [{"role": "assistant", "content": first_q}]
+                    except RuntimeError:
+                        loaded = []
 
         st.session_state[session_key] = loaded
 
@@ -240,11 +250,42 @@ def render(current_user: dict) -> None:
         _art_content = existing_artifact.get("content", {})
         _art_text = _art_content.get("text", "") if isinstance(_art_content, dict) else str(_art_content)
         _art_ver = existing_artifact.get("version", 1)
+        _all_versions = get_artifact_versions(project_id, module_id)
+        _dialog_title = (
+            f"{module['name']} — {len(_all_versions)} version{'s' if len(_all_versions) != 1 else ''}"
+            if len(_all_versions) > 1
+            else f"{module['name']} — v{_art_ver}"
+        )
 
-        @st.dialog(f"{module['name']} — v{_art_ver}")
+        @st.dialog(_dialog_title, width="large")
         def _show_artifact_dialog():
-            st.markdown(_art_text)
-            if st.button("Close", use_container_width=True):
+            st.markdown("""<style>
+            div[data-testid="stDialog"] div[data-testid="stButton"] button {
+                width: 120px !important;
+                float: right !important;
+            }
+            </style>""", unsafe_allow_html=True)
+            # ENH-06: version selector when multiple versions exist
+            if len(_all_versions) > 1:
+                ver_labels = [f"v{v['version']}" for v in _all_versions]
+                selected_label = st.selectbox(
+                    "Version",
+                    options=ver_labels,
+                    index=0,
+                    key="artifact_version_selector",
+                )
+                selected_idx = ver_labels.index(selected_label)
+                selected_row = _all_versions[selected_idx]
+                art_row = get_artifact_by_id(str(selected_row["artifact_id"]))
+                if art_row:
+                    content = art_row.get("content", {})
+                    display_text = content.get("text", "") if isinstance(content, dict) else str(content)
+                else:
+                    display_text = _art_text
+            else:
+                display_text = _art_text
+            st.markdown(display_text)
+            if st.button("Close"):
                 st.rerun()
 
     # Collapsible context + artifact panel
@@ -340,6 +381,14 @@ def render(current_user: dict) -> None:
                 save_message(project_id, module_id, "system", system_msg)
                 messages.append({"role": "system", "content": system_msg})
                 st.session_state[session_key] = messages
+                # ENH-05: trigger background opening question regeneration for remaining modules
+                import threading
+                _db_url = st.secrets["neon_db_url"]
+                threading.Thread(
+                    target=trigger_opening_question_regen,
+                    args=(project_id, _db_url),
+                    daemon=True,
+                ).start()
                 st.rerun()
         with mark_col:
             if st.button("Clear Draft", use_container_width=True):
@@ -385,6 +434,20 @@ def render(current_user: dict) -> None:
             except RuntimeError as exc:
                 st.error(str(exc))
                 return
+
+        # ENH-14: suppress inline drafts — if AI produces long prose before Generate Draft
+        # has been clicked, truncate at a natural break and redirect to the button
+        if not st.session_state.get(draft_generated_key) and len(response.split()) > 300:
+            paragraphs = response.split("\n\n")
+            truncated = []
+            word_count = 0
+            for para in paragraphs:
+                word_count += len(para.split())
+                truncated.append(para)
+                if word_count >= 200:
+                    break
+            response = "\n\n".join(truncated)
+            response += "\n\n*[Click Generate Draft above to produce the full formatted artifact]*"
 
         response = _fix_list_spacing(response)
         save_message(project_id, module_id, "assistant", response)

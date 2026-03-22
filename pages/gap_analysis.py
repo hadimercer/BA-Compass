@@ -149,6 +149,12 @@ def render(current_user: dict) -> None:
                         st.error(str(exc))
                         return
                 st.session_state[gap_key] = result
+                # ENH-13: store findings keyed by module name for traceability matrix
+                findings_by_module: dict[str, list] = {}
+                for f in result.get("findings", []):
+                    module_ref = f.get("module_reference", "")
+                    findings_by_module.setdefault(module_ref, []).append(f)
+                st.session_state[f"gap_findings_{project_id}"] = findings_by_module
                 st.rerun()
 
             result = st.session_state.get(gap_key)
@@ -179,6 +185,50 @@ def render(current_user: dict) -> None:
                     """,
                     unsafe_allow_html=True,
                 )
+
+                # ENH-12: score breakdown table
+                breakdown = result.get("score_breakdown")
+                if breakdown:
+                    deductions = breakdown.get("deductions", [])
+                    has_deductions = any(d.get("total_deducted", 0) > 0 for d in deductions)
+                    if has_deductions:
+                        rows_html = ""
+                        for d in deductions:
+                            if d.get("total_deducted", 0) > 0:
+                                rows_html += (
+                                    f"<tr>"
+                                    f"<td style='padding:0.2rem 0.5rem;color:#94A3B8;'>{d['category']}</td>"
+                                    f"<td style='padding:0.2rem 0.5rem;color:#F1F5F9;text-align:center;'>"
+                                    f"{d['instances']} × {d['points_per_instance']}pts</td>"
+                                    f"<td style='padding:0.2rem 0.5rem;color:#EF4444;text-align:right;'>"
+                                    f"−{d['total_deducted']}</td>"
+                                    f"</tr>"
+                                )
+                        final = breakdown.get("final_score", score)
+                        st.markdown(
+                            f"""
+                            <div style="background:rgba(17,24,39,0.75);border:1px solid rgba(255,255,255,0.09);
+                                        border-radius:10px;padding:0.8rem 1rem;margin-bottom:1rem;">
+                                <div style="font-size:0.7rem;color:#60A5FA;letter-spacing:0.07em;
+                                             text-transform:uppercase;margin-bottom:0.5rem;">Score Breakdown</div>
+                                <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
+                                    <tr>
+                                        <td style='padding:0.2rem 0.5rem;color:#94A3B8;'>Base score</td>
+                                        <td></td>
+                                        <td style='padding:0.2rem 0.5rem;color:#F1F5F9;text-align:right;'>100</td>
+                                    </tr>
+                                    {rows_html}
+                                    <tr style="border-top:1px solid rgba(255,255,255,0.12);">
+                                        <td style='padding:0.3rem 0.5rem;color:#F1F5F9;font-weight:600;'>Final score</td>
+                                        <td></td>
+                                        <td style='padding:0.3rem 0.5rem;font-weight:700;text-align:right;
+                                                    color:{score_color};'>{final}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            """,
+                            unsafe_allow_html=True,
+                        )
 
                 if not findings:
                     st.success("No significant gaps found. Your engagement package looks complete.")
@@ -311,6 +361,19 @@ def render(current_user: dict) -> None:
                         else "<span style='color:#94A3B8;'>—</span>"
                     )
 
+                    # ENH-13: gap analysis indicator icon
+                    gap_findings = st.session_state.get(f"gap_findings_{project_id}", {})
+                    module_findings = gap_findings.get(item["module_name"], [])
+                    if module_findings:
+                        severities = [f.get("severity", "low") for f in module_findings]
+                        if "high" in severities:
+                            gap_icon = "🔴"
+                        elif "medium" in severities:
+                            gap_icon = "🟡"
+                        else:
+                            gap_icon = "🔵"
+                        artifact_cell += f" &nbsp;{gap_icon}"
+
                     st.markdown(
                         f"""
                         <div style="display:flex;align-items:center;gap:0.75rem;
@@ -327,6 +390,11 @@ def render(current_user: dict) -> None:
                         """,
                         unsafe_allow_html=True,
                     )
+                    if module_findings:
+                        with st.expander(f"{gap_icon} {len(module_findings)} finding{'s' if len(module_findings) != 1 else ''}", expanded=False):
+                            for f in module_findings:
+                                gap_type_label = f.get("gap_type", "").title()
+                                st.markdown(f"**{gap_type_label}:** {f.get('finding', '')}")
 
             # Coverage summary
             with_artifact = sum(1 for r in roadmap_items if str(r["module_id"]) in artifact_by_module)
