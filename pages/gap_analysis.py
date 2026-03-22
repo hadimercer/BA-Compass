@@ -106,20 +106,20 @@ def render(current_user: dict) -> None:
         st.markdown(
             f"""
             <div style="display:flex;gap:1rem;margin-bottom:1.2rem;flex-wrap:wrap;">
-              <div style="background:rgba(30,37,56,0.9);border:1px solid rgba(45,53,80,0.9);
+              <div style="background:rgba(25,33,54,0.90);border:1px solid rgba(255,255,255,0.14);
                           border-radius:12px;padding:0.7rem 1.1rem;flex:1;min-width:120px;text-align:center;">
-                <div style="font-size:1.5rem;font-weight:700;color:#F0F4F8;">{len(roadmap_items)}</div>
-                <div style="font-size:0.75rem;color:#8B9CBD;">Modules in roadmap</div>
+                <div style="font-size:1.5rem;font-weight:700;color:#F1F5F9;">{len(roadmap_items)}</div>
+                <div style="font-size:0.75rem;color:#94A3B8;">Modules in roadmap</div>
               </div>
-              <div style="background:rgba(30,37,56,0.9);border:1px solid rgba(45,53,80,0.9);
+              <div style="background:rgba(25,33,54,0.90);border:1px solid rgba(255,255,255,0.14);
                           border-radius:12px;padding:0.7rem 1.1rem;flex:1;min-width:120px;text-align:center;">
                 <div style="font-size:1.5rem;font-weight:700;color:#A7F3D0;">{complete_count}</div>
-                <div style="font-size:0.75rem;color:#8B9CBD;">Modules complete</div>
+                <div style="font-size:0.75rem;color:#94A3B8;">Modules complete</div>
               </div>
-              <div style="background:rgba(30,37,56,0.9);border:1px solid rgba(45,53,80,0.9);
+              <div style="background:rgba(25,33,54,0.90);border:1px solid rgba(255,255,255,0.14);
                           border-radius:12px;padding:0.7rem 1.1rem;flex:1;min-width:120px;text-align:center;">
                 <div style="font-size:1.5rem;font-weight:700;color:#B9DEFF;">{artifact_count}</div>
-                <div style="font-size:0.75rem;color:#8B9CBD;">Artifacts saved</div>
+                <div style="font-size:0.75rem;color:#94A3B8;">Artifacts saved</div>
               </div>
             </div>
             """,
@@ -153,20 +153,20 @@ def render(current_user: dict) -> None:
                 assessment = result.get("overall_assessment", "")
 
                 # Overall assessment card
-                score_color = "#10B981" if score >= 70 else "#F59E0B" if score >= 40 else "#EF4444"
+                score_color = "#22C55E" if score >= 70 else "#F59E0B" if score >= 40 else "#EF4444"
                 st.markdown(
                     f"""
-                    <div style="background:rgba(26,31,46,0.95);border:1px solid rgba(45,53,80,0.9);
-                                border-radius:16px;padding:1.2rem 1.4rem;margin-bottom:1.2rem;">
+                    <div style="background:rgba(17,24,39,0.92);border:1px solid rgba(255,255,255,0.14);
+                                border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.2rem;">
                         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;">
                             <div style="flex:1;">
-                                <div style="font-size:0.72rem;color:#4A9FD4;letter-spacing:0.07em;
+                                <div style="font-size:0.72rem;color:#60A5FA;letter-spacing:0.07em;
                                              text-transform:uppercase;margin-bottom:0.5rem;">Overall Assessment</div>
-                                <div style="font-size:0.92rem;color:#F0F4F8;line-height:1.65;">{assessment}</div>
+                                <div style="font-size:0.92rem;color:#F1F5F9;line-height:1.65;">{assessment}</div>
                             </div>
                             <div style="text-align:center;min-width:72px;">
                                 <div style="font-size:2rem;font-weight:700;color:{score_color};">{score}</div>
-                                <div style="font-size:0.7rem;color:#8B9CBD;">/ 100</div>
+                                <div style="font-size:0.7rem;color:#94A3B8;">/ 100</div>
                             </div>
                         </div>
                     </div>
@@ -182,7 +182,7 @@ def render(current_user: dict) -> None:
                     severity_cfg = {
                         "high":   {"label": "High Priority",   "color": "#EF4444", "bg": "rgba(239,68,68,0.08)",   "border": "rgba(239,68,68,0.3)"},
                         "medium": {"label": "Medium Priority",  "color": "#F59E0B", "bg": "rgba(245,158,11,0.08)",  "border": "rgba(245,158,11,0.3)"},
-                        "low":    {"label": "Low Priority",     "color": "#8B9CBD", "bg": "rgba(139,156,189,0.08)", "border": "rgba(139,156,189,0.25)"},
+                        "low":    {"label": "Low Priority",     "color": "#94A3B8", "bg": "rgba(100,116,139,0.08)", "border": "rgba(100,116,139,0.25)"},
                     }
                     gap_type_labels = {
                         "missing": "Missing",
@@ -221,16 +221,16 @@ def render(current_user: dict) -> None:
                                         <span style="font-size:0.82rem;font-weight:600;color:{cfg['color']};">
                                             {module_ref}
                                         </span>
-                                        <span style="font-size:0.7rem;color:#8B9CBD;
-                                                      background:rgba(139,156,189,0.12);
-                                                      border:1px solid rgba(139,156,189,0.2);
+                                        <span style="font-size:0.7rem;color:#94A3B8;
+                                                      background:rgba(100,116,139,0.12);
+                                                      border:1px solid rgba(100,116,139,0.20);
                                                       border-radius:999px;padding:0.1rem 0.5rem;">
                                             {gap_type}
                                         </span>
                                     </div>
-                                    <div style="font-size:0.88rem;color:#F0F4F8;
+                                    <div style="font-size:0.88rem;color:#F1F5F9;
                                                  margin-bottom:0.45rem;line-height:1.55;">{finding}</div>
-                                    <div style="font-size:0.82rem;color:#8B9CBD;line-height:1.5;">
+                                    <div style="font-size:0.82rem;color:#94A3B8;line-height:1.5;">
                                         <strong style="color:rgba(240,244,248,0.7);">Recommendation:</strong> {recommendation}
                                     </div>
                                 </div>
@@ -271,9 +271,9 @@ def render(current_user: dict) -> None:
                 "skipped": "—",
             }
             status_color = {
-                "not_started": "#8B9CBD",
-                "in_progress": "#4A9FD4",
-                "complete": "#10B981",
+                "not_started": "#94A3B8",
+                "in_progress": "#60A5FA",
+                "complete": "#22C55E",
                 "skipped": "#F59E0B",
             }
 
@@ -297,22 +297,22 @@ def render(current_user: dict) -> None:
                     status = item["status"]
                     artifact = artifact_by_module.get(mid)
                     icon = status_icon.get(status, "○")
-                    color = status_color.get(status, "#8B9CBD")
+                    color = status_color.get(status, "#94A3B8")
 
                     artifact_cell = (
-                        f"<span style='color:#A7F3D0;'>v{artifact['version']} saved</span>"
+                        f"<span style='color:#86EFAC;'>v{artifact['version']} saved</span>"
                         if artifact
-                        else "<span style='color:#8B9CBD;'>—</span>"
+                        else "<span style='color:#94A3B8;'>—</span>"
                     )
 
                     st.markdown(
                         f"""
                         <div style="display:flex;align-items:center;gap:0.75rem;
                                     padding:0.5rem 0.6rem;border-radius:10px;
-                                    margin-bottom:0.25rem;background:rgba(30,37,56,0.6);
-                                    border:1px solid rgba(45,53,80,0.6);">
+                                    margin-bottom:0.25rem;background:rgba(25,33,54,0.55);
+                                    border:1px solid rgba(255,255,255,0.08);">
                             <span style="font-size:1rem;color:{color};min-width:1.1rem;">{icon}</span>
-                            <span style="flex:1;font-size:0.88rem;color:#F0F4F8;">{item['module_name']}</span>
+                            <span style="flex:1;font-size:0.88rem;color:#F1F5F9;">{item['module_name']}</span>
                             <span style="font-size:0.8rem;">{artifact_cell}</span>
                             <span style="font-size:0.75rem;color:{color};min-width:80px;text-align:right;">
                                 {status.replace('_',' ').title()}
@@ -327,9 +327,9 @@ def render(current_user: dict) -> None:
             total = len(roadmap_items)
             st.markdown(
                 f"""
-                <div style="margin-top:1rem;padding:0.75rem 1rem;background:rgba(26,31,46,0.9);
-                            border:1px solid rgba(45,53,80,0.8);border-radius:12px;
-                            font-size:0.85rem;color:#8B9CBD;">
+                <div style="margin-top:1rem;padding:0.75rem 1rem;background:rgba(17,24,39,0.85);
+                            border:1px solid rgba(255,255,255,0.10);border-radius:10px;
+                            font-size:0.85rem;color:#94A3B8;">
                     {with_artifact} of {total} modules have saved artifacts
                     &nbsp;·&nbsp;
                     {sum(1 for r in roadmap_items if r['status']=='complete')} complete
@@ -349,7 +349,7 @@ def render(current_user: dict) -> None:
                     unsafe_allow_html=True,
                 )
                 st.markdown(
-                    "<div style='font-size:0.82rem;color:#8B9CBD;margin-bottom:0.6rem;'>"
+                    "<div style='font-size:0.82rem;color:#94A3B8;margin-bottom:0.6rem;'>"
                     "These artifacts were saved for modules no longer in the roadmap.</div>",
                     unsafe_allow_html=True,
                 )

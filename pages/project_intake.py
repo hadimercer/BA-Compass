@@ -90,11 +90,11 @@ def render(current_user: dict) -> None:
     if project.get("engagement_type") and project.get("scale_tier"):
         st.markdown(
             f"""
-            <div style="background:rgba(16,185,129,0.10);border:1px solid rgba(16,185,129,0.30);
-                        border-radius:16px;padding:1.2rem 1.4rem;margin-bottom:1.2rem;">
-                <div style="font-size:0.78rem;color:#6EE7B7;letter-spacing:0.06em;
+            <div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.25);
+                        border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.2rem;">
+                <div style="font-size:0.78rem;color:#86EFAC;letter-spacing:0.06em;
                             text-transform:uppercase;margin-bottom:0.4rem;">Classification Confirmed</div>
-                <div style="font-size:1.15rem;font-weight:700;color:#F0F4F8;">
+                <div style="font-size:1.15rem;font-weight:700;color:#F1F5F9;">
                     {project['engagement_type']} &nbsp;·&nbsp; {project['scale_tier']}
                 </div>
             </div>
@@ -132,9 +132,9 @@ def render(current_user: dict) -> None:
             st.markdown(
                 f"""
                 <div style="display:flex;justify-content:flex-end;margin-bottom:0.75rem;">
-                  <div style="background:rgba(46,117,182,0.22);border:1px solid rgba(74,159,212,0.3);
+                  <div style="background:rgba(59,130,246,0.20);border:1px solid rgba(96,165,250,0.28);
                               border-radius:14px 14px 4px 14px;padding:0.7rem 1rem;
-                              max-width:78%;color:#F0F4F8;font-size:0.93rem;line-height:1.55;">
+                              max-width:78%;color:#F1F5F9;font-size:0.93rem;line-height:1.55;">
                     {msg['content']}
                   </div>
                 </div>
@@ -145,9 +145,9 @@ def render(current_user: dict) -> None:
             st.markdown(
                 f"""
                 <div style="display:flex;justify-content:flex-start;margin-bottom:0.75rem;">
-                  <div style="background:rgba(30,37,56,0.88);border:1px solid rgba(45,53,80,0.9);
+                  <div style="background:rgba(25,33,54,0.95);border:1px solid rgba(255,255,255,0.14);
                               border-radius:14px 14px 14px 4px;padding:0.7rem 1rem;
-                              max-width:78%;color:#F0F4F8;font-size:0.93rem;line-height:1.55;">
+                              max-width:78%;color:#F1F5F9;font-size:0.93rem;line-height:1.55;">
                     {msg['content']}
                   </div>
                 </div>
@@ -166,15 +166,15 @@ def render(current_user: dict) -> None:
 
         st.markdown(
             f"""
-            <div style="background:rgba(26,31,46,0.95);border:1px solid rgba(74,159,212,0.35);
-                        border-radius:18px;padding:1.4rem 1.5rem;margin:1rem 0 1.2rem;">
-                <div style="font-size:0.75rem;color:#4A9FD4;letter-spacing:0.07em;
+            <div style="background:rgba(17,24,39,0.92);border:1px solid rgba(96,165,250,0.30);
+                        border-radius:12px;padding:1.4rem 1.5rem;margin:1rem 0 1.2rem;">
+                <div style="font-size:0.75rem;color:#60A5FA;letter-spacing:0.07em;
                             text-transform:uppercase;margin-bottom:0.7rem;">Classification Recommendation</div>
-                <div style="font-size:1.3rem;font-weight:700;color:#F0F4F8;margin-bottom:0.35rem;">
+                <div style="font-size:1.3rem;font-weight:700;color:#F1F5F9;margin-bottom:0.35rem;">
                     {eng}
                 </div>
-                <div style="font-size:0.95rem;color:#8B9CBD;margin-bottom:0.9rem;">
-                    Scale: <strong style="color:#F0F4F8;">{tier}</strong>
+                <div style="font-size:0.95rem;color:#94A3B8;margin-bottom:0.9rem;">
+                    Scale: <strong style="color:#F1F5F9;">{tier}</strong>
                 </div>
                 <div style="font-size:0.88rem;color:rgba(240,244,248,0.78);line-height:1.6;">
                     {explanation}

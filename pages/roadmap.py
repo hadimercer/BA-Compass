@@ -48,7 +48,7 @@ def render(current_user: dict) -> None:
         div[data-testid="stColumn"]:first-child div[data-testid="stButton"] button:hover,
     section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
         div[data-testid="column"]:first-child div[data-testid="stButton"] button:hover {
-        background:rgba(74,159,212,0.06) !important; cursor:pointer;
+        background:rgba(59,130,246,0.08) !important; cursor:pointer;
     }
     /* ··· popover — last column, unchanged */
     section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
@@ -57,15 +57,15 @@ def render(current_user: dict) -> None:
         div[data-testid="column"]:last-child button {
         height:72px !important; margin-top:0 !important; background:transparent !important;
         border:none !important; box-shadow:none !important; border-radius:10px !important;
-        color:rgba(139,156,189,0.55) !important; font-size:1rem !important;
+        color:rgba(148,163,184,0.55) !important; font-size:1rem !important;
         letter-spacing:0.05em !important;
     }
     section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
         div[data-testid="stColumn"]:last-child button:hover,
     section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
         div[data-testid="column"]:last-child button:hover {
-        background:rgba(74,159,212,0.06) !important;
-        color:rgba(139,156,189,0.9) !important; cursor:pointer;
+        background:rgba(59,130,246,0.08) !important;
+        color:rgba(148,163,184,0.9) !important; cursor:pointer;
     }
     /* Inter-row spacing */
     section[data-testid="stMain"] div[data-testid="stHorizontalBlock"] {
@@ -222,21 +222,34 @@ def render(current_user: dict) -> None:
         seq = item["sequence_order"]
 
         dot_color = {
-            "not_started": "#6B7280",
-            "in_progress": "#4A9FD4",
-            "complete": "#10B981",
-            "skipped": "rgba(139,156,189,0.35)",
-        }.get(status, "#6B7280")
+            "not_started": "#64748B",
+            "in_progress": "#60A5FA",
+            "complete":    "#22C55E",
+            "skipped":     "rgba(100,116,139,0.30)",
+        }.get(status, "#64748B")
 
-        row_bg = "rgba(16,185,129,0.05)" if status == "complete" else "rgba(30,37,56,0.6)"
-        left_border = "3px solid #10B981" if status == "complete" else "1px solid rgba(45,53,80,0.6)"
+        row_bg = {
+            "complete":    "rgba(34,197,94,0.06)",
+            "in_progress": "rgba(59,130,246,0.05)",
+            "skipped":     "rgba(100,116,139,0.04)",
+            "not_started": "rgba(25,33,54,0.55)",
+        }.get(status, "rgba(25,33,54,0.55)")
+
+        left_border = {
+            "complete":    "3px solid #22C55E",
+            "in_progress": "3px solid #3B82F6",
+            "skipped":     "3px solid rgba(100,116,139,0.40)",
+            "not_started": "1px solid rgba(255,255,255,0.08)",
+        }.get(status, "1px solid rgba(255,255,255,0.08)")
+
+        skipped_opacity = "opacity:0.78;" if status == "skipped" else ""
 
         artifact_sub = ""
         if status == "complete":
             art = artifact_by_module.get(module_id)
             if art:
                 artifact_sub = (
-                    f"<div style='font-size:0.72rem;color:#6EE7B7;margin-top:0.1rem;'>"
+                    f"<div style='font-size:0.72rem;color:#86EFAC;margin-top:0.1rem;'>"
                     f"Artifact v{art['version']}: {art['module_name']}"
                     f"</div>"
                 )
@@ -246,16 +259,16 @@ def render(current_user: dict) -> None:
             # Card rendered first, button second — button overlays card via margin-top:-72px
             st.markdown(f"""
             <div style="display:flex;align-items:center;padding:0.65rem 1rem;border-radius:10px;
-                border-left:{left_border};border-top:1px solid rgba(45,53,80,0.6);
-                border-right:1px solid rgba(45,53,80,0.6);border-bottom:1px solid rgba(45,53,80,0.6);
-                background:{row_bg};height:72px;pointer-events:none;">
-              <span style="font-size:0.7rem;color:#8B9CBD;min-width:1.4rem;margin-right:0.6rem;">{seq}</span>
+                border-left:{left_border};border-top:1px solid rgba(255,255,255,0.08);
+                border-right:1px solid rgba(255,255,255,0.08);border-bottom:1px solid rgba(255,255,255,0.08);
+                background:{row_bg};height:72px;pointer-events:none;{skipped_opacity}">
+              <span style="font-size:0.7rem;color:#94A3B8;min-width:1.4rem;margin-right:0.6rem;">{seq}</span>
               <span style="width:10px;height:10px;border-radius:50%;background:{dot_color};
                            flex-shrink:0;margin-right:0.75rem;display:inline-block;"></span>
               <div style="flex:1;min-width:0;">
-                <div style="font-weight:600;font-size:0.9rem;color:#F0F4F8;white-space:nowrap;
+                <div style="font-weight:600;font-size:0.9rem;color:#F1F5F9;white-space:nowrap;
                             overflow:hidden;text-overflow:ellipsis;">{name}</div>
-                <div style="font-size:0.72rem;color:#8B9CBD;">{item['knowledge_area']}</div>
+                <div style="font-size:0.72rem;color:#94A3B8;">{item['knowledge_area']}</div>
                 {artifact_sub}
               </div>
             </div>""", unsafe_allow_html=True)

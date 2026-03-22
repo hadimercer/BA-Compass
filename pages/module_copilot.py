@@ -166,9 +166,9 @@ def render(current_user: dict) -> None:
     section[data-testid="stMain"] div[data-testid="stHorizontalBlock"]
         div[data-testid="column"]:first-child div[data-testid="stButton"] button {
         height:auto !important; width:auto !important; margin-top:0 !important;
-        background:rgba(255,255,255,0.05) !important;
-        border:1px solid rgba(250,250,250,0.2) !important;
-        color:rgb(250,250,250) !important;
+        background:rgba(255,255,255,0.04) !important;
+        border:1px solid rgba(255,255,255,0.14) !important;
+        color:#F1F5F9 !important;
         border-radius:0.5rem !important; box-shadow:none !important;
     }
     </style>""", unsafe_allow_html=True)
@@ -183,10 +183,10 @@ def render(current_user: dict) -> None:
     with col_title:
         st.markdown(f"""
         <div style="padding:0.4rem 0 0.2rem;">
-          <span style="font-size:0.7rem;color:#4A9FD4;letter-spacing:0.07em;
+          <span style="font-size:0.7rem;color:#60A5FA;letter-spacing:0.07em;
                        text-transform:uppercase;">{module['knowledge_area']}</span>
-          <div style="font-size:1.3rem;font-weight:700;color:#F0F4F8;line-height:1.2;">{module['name']}</div>
-          <div style="font-size:0.82rem;color:#8B9CBD;">{(module.get('description',''))[:120]}</div>
+          <div style="font-size:1.3rem;font-weight:700;color:#F1F5F9;line-height:1.2;">{module['name']}</div>
+          <div style="font-size:0.82rem;color:#94A3B8;">{(module.get('description',''))[:120]}</div>
         </div>""", unsafe_allow_html=True)
 
     # ── Artifact dialog (Fix 4) ───────────────────────────────────────────────
@@ -208,11 +208,11 @@ def render(current_user: dict) -> None:
         col_ctx, col_art = st.columns(2)
         with col_ctx:
             st.markdown(f"""
-            <div style="background:rgba(20,28,48,0.9);border:1px solid rgba(45,53,80,0.7);
-                 border-radius:12px;padding:0.8rem 1rem;">
-              <div style="font-size:0.7rem;color:#8B9CBD;text-transform:uppercase;
+            <div style="background:rgba(9,13,22,0.95);border:1px solid rgba(255,255,255,0.10);
+                 border-radius:10px;padding:0.8rem 1rem;">
+              <div style="font-size:0.7rem;color:#94A3B8;text-transform:uppercase;
                            letter-spacing:0.06em;margin-bottom:0.5rem;">Project Context</div>
-              <div style="font-size:0.85rem;color:#F0F4F8;line-height:1.65;">
+              <div style="font-size:0.85rem;color:#F1F5F9;line-height:1.65;">
                 <strong>{project.get('engagement_type','—')}</strong><br>
                 {project.get('scale_tier','—')} scale<br>
                 {len(dimensions)} dimension{'s' if len(dimensions)!=1 else ''} captured<br>
@@ -230,28 +230,29 @@ def render(current_user: dict) -> None:
                     height:78px !important; margin-top:-78px !important;
                     background:transparent !important; border:none !important;
                     box-shadow:none !important; color:transparent !important;
-                    border-radius:12px !important; cursor:pointer !important;
+                    border-radius:10px !important; cursor:pointer !important;
                 }
                 </style>""", unsafe_allow_html=True)
                 st.markdown(f"""
-                <div style="background:rgba(16,185,129,0.10);border:1px solid rgba(16,185,129,0.3);
-                     border-radius:12px;padding:0.75rem 1rem;height:78px;
-                     display:flex;flex-direction:column;justify-content:center;">
-                  <div style="font-size:0.7rem;color:#6EE7B7;text-transform:uppercase;
+                <div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.25);
+                     border-radius:10px;padding:0.75rem 1rem;height:78px;
+                     display:flex;flex-direction:column;justify-content:center;
+                     box-shadow:0 0 12px rgba(34,197,94,0.06);">
+                  <div style="font-size:0.7rem;color:#86EFAC;text-transform:uppercase;
                                letter-spacing:0.06em;margin-bottom:0.2rem;">
                     {module['name']} · v{_art_ver}</div>
-                  <div style="font-size:0.85rem;color:#F0F4F8;font-weight:600;line-height:1.3;">
+                  <div style="font-size:0.85rem;color:#F1F5F9;font-weight:600;line-height:1.3;">
                     {project.get('engagement_type', '—')}</div>
-                  <div style="font-size:0.72rem;color:#6EE7B7;margin-top:0.2rem;opacity:0.7;">
+                  <div style="font-size:0.72rem;color:#86EFAC;margin-top:0.2rem;opacity:0.7;">
                     Click to view full artifact ↗</div>
                 </div>""", unsafe_allow_html=True)
                 if st.button(" ", key="view_artifact_btn", use_container_width=True):
                     _show_artifact_dialog()
             else:
                 st.markdown("""
-                <div style="background:rgba(30,37,56,0.5);border:1px dashed rgba(45,53,80,0.7);
-                     border-radius:12px;padding:0.8rem 1rem;text-align:center;">
-                  <div style="font-size:0.82rem;color:#8B9CBD;">No saved artifacts yet</div>
+                <div style="background:rgba(17,24,39,0.50);border:1px dashed rgba(255,255,255,0.10);
+                     border-radius:10px;padding:0.8rem 1rem;text-align:center;">
+                  <div style="font-size:0.82rem;color:#94A3B8;">No saved artifacts yet</div>
                 </div>""", unsafe_allow_html=True)
 
     st.markdown("<div style='height:0.5rem;'></div>", unsafe_allow_html=True)
@@ -263,7 +264,7 @@ def render(current_user: dict) -> None:
     # Draft area — shown only when draft exists AND no artifact has been saved yet
     if st.session_state[draft_key] and existing_artifact is None:
         st.markdown(
-            "<div style='margin-top:0.75rem;font-size:0.75rem;color:#4A9FD4;"
+            "<div style='margin-top:0.75rem;font-size:0.75rem;color:#60A5FA;"
             "letter-spacing:0.06em;text-transform:uppercase;margin-bottom:0.3rem;'>"
             "Draft Artifact</div>",
             unsafe_allow_html=True,

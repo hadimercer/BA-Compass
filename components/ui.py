@@ -17,23 +17,29 @@ def inject_css(hide_sidebar: bool = False) -> None:
         """
         <style>
             :root {
-                --bg: #0F1117;
-                --surface: #1A1F2E;
-                --card: #1E2538;
-                --border: #2D3550;
-                --accent: #2E75B6;
-                --accent-lt: #4A9FD4;
-                --text: #F0F4F8;
-                --text-secondary: #8B9CBD;
-                --success: #10B981;
+                --bg: #090D16;
+                --surface: #111827;
+                --card: #192136;
+                --border: rgba(255,255,255,0.08);
+                --accent: #3B82F6;
+                --accent-lt: #60A5FA;
+                --text: #F1F5F9;
+                --text-secondary: #94A3B8;
+                --success: #22C55E;
                 --warning: #F59E0B;
                 --danger: #EF4444;
+                --border-strong: rgba(255,255,255,0.14);
+                --text-tertiary: #64748B;
+                --accent-dim: rgba(59,130,246,0.12);
+                --success-dim: rgba(34,197,94,0.10);
+                --success-border: rgba(34,197,94,0.25);
             }
 
             .stApp {
                 background:
-                    radial-gradient(circle at top left, rgba(74, 159, 212, 0.18), transparent 34%),
-                    linear-gradient(180deg, #0C1019 0%, var(--bg) 55%, #0D1421 100%);
+                    radial-gradient(circle at top left, rgba(59,130,246,0.14), transparent 32%),
+                    radial-gradient(circle at top right, rgba(59,130,246,0.06), transparent 40%),
+                    linear-gradient(180deg, #07090F 0%, var(--bg) 60%, #06090F 100%);
                 color: var(--text);
             }
 
@@ -70,8 +76,8 @@ def inject_css(hide_sidebar: bool = False) -> None:
                 transform: none !important;
                 min-width: 244px !important;
                 max-width: 244px !important;
-                background: linear-gradient(180deg, rgba(26, 31, 46, 0.98) 0%, rgba(15, 17, 23, 0.98) 100%);
-                border-right: 1px solid rgba(45, 53, 80, 0.9);
+                background: linear-gradient(180deg, #0A0F1C 0%, #070A14 100%);
+                border-right: 1px solid var(--border-strong);
             }
 
             [data-testid="collapsedControl"] {
@@ -89,10 +95,10 @@ def inject_css(hide_sidebar: bool = False) -> None:
 
             div[data-testid="stForm"],
             div[data-testid="stExpander"] {
-                border: 1px solid rgba(45, 53, 80, 0.9);
-                background: rgba(30, 37, 56, 0.82);
-                border-radius: 18px;
-                box-shadow: 0 22px 48px rgba(0, 0, 0, 0.22);
+                border: 1px solid var(--border-strong);
+                background: rgba(25,33,54,0.85);
+                border-radius: 14px;
+                box-shadow: 0 16px 40px rgba(0,0,0,0.28);
             }
 
             div[data-testid="stForm"] {
@@ -107,9 +113,9 @@ def inject_css(hide_sidebar: bool = False) -> None:
 
             div[data-testid="stTextInput"] input,
             div[data-testid="stTextArea"] textarea {
-                background: rgba(15, 17, 23, 0.72);
+                background: rgba(9,13,22,0.80);
                 color: var(--text);
-                border: 1px solid var(--border);
+                border: 1px solid var(--border-strong);
                 border-radius: 12px;
             }
 
@@ -123,17 +129,18 @@ def inject_css(hide_sidebar: bool = False) -> None:
             div[data-testid="stFormSubmitButton"] > button {
                 width: 100%;
                 border-radius: 12px;
-                border: 1px solid rgba(74, 159, 212, 0.55);
+                border: 1px solid rgba(96,165,250,0.45);
                 background: linear-gradient(135deg, var(--accent) 0%, var(--accent-lt) 100%);
                 color: white;
                 font-weight: 600;
                 padding: 0.7rem 1rem;
-                box-shadow: 0 14px 30px rgba(46, 117, 182, 0.25);
+                box-shadow: 0 8px 20px rgba(59,130,246,0.20);
+                transition: filter 0.15s ease, border-color 0.15s ease;
             }
 
             div.stButton > button:hover,
             div[data-testid="stFormSubmitButton"] > button:hover {
-                border-color: rgba(74, 159, 212, 0.85);
+                border-color: rgba(96,165,250,0.75);
                 filter: brightness(1.04);
             }
 
@@ -143,9 +150,9 @@ def inject_css(hide_sidebar: bool = False) -> None:
             }
 
             .auth-card {
-                background: linear-gradient(180deg, rgba(30, 37, 56, 0.95) 0%, rgba(22, 29, 43, 0.92) 100%);
-                border: 1px solid rgba(74, 159, 212, 0.22);
-                border-radius: 24px;
+                background: rgba(17,24,39,0.92);
+                border: 1px solid var(--border-strong);
+                border-radius: 14px;
                 padding: 2rem;
                 box-shadow: 0 26px 60px rgba(0, 0, 0, 0.35);
             }
@@ -158,8 +165,8 @@ def inject_css(hide_sidebar: bool = False) -> None:
                 letter-spacing: 0.08em;
                 text-transform: uppercase;
                 color: var(--accent-lt);
-                background: rgba(46, 117, 182, 0.16);
-                border: 1px solid rgba(74, 159, 212, 0.2);
+                background: var(--accent-dim);
+                border: 1px solid rgba(96,165,250,0.18);
                 margin-bottom: 1rem;
             }
 
@@ -177,16 +184,17 @@ def inject_css(hide_sidebar: bool = False) -> None:
             }
 
             .page-header {
-                background: linear-gradient(135deg, rgba(30, 37, 56, 0.9) 0%, rgba(26, 31, 46, 0.78) 100%);
-                border: 1px solid rgba(45, 53, 80, 0.95);
-                border-radius: 22px;
+                background: rgba(17,24,39,0.85);
+                border: 1px solid var(--border-strong);
+                border-left: 3px solid var(--accent);
+                border-radius: 10px;
                 padding: 1.4rem 1.5rem;
                 margin-bottom: 1.25rem;
-                box-shadow: 0 18px 38px rgba(0, 0, 0, 0.18);
+                box-shadow: 0 4px 24px rgba(0,0,0,0.28);
             }
 
             .page-title {
-                font-size: 1.9rem;
+                font-size: 1.65rem;
                 font-weight: 700;
                 color: var(--text);
                 margin-bottom: 0.2rem;
@@ -198,7 +206,7 @@ def inject_css(hide_sidebar: bool = False) -> None:
 
             .sidebar-kicker {
                 color: var(--accent-lt);
-                font-size: 0.72rem;
+                font-size: 0.68rem;
                 letter-spacing: 0.08em;
                 text-transform: uppercase;
                 margin-bottom: 0.4rem;
@@ -206,23 +214,24 @@ def inject_css(hide_sidebar: bool = False) -> None:
 
             .sidebar-title {
                 color: var(--text);
-                font-size: 1.2rem;
+                font-size: 1.25rem;
                 font-weight: 700;
             }
 
             .sidebar-link {
                 padding: 0.72rem 0.85rem;
                 border: 1px solid transparent;
-                border-radius: 14px;
+                border-radius: 8px;
                 margin-bottom: 0.5rem;
                 color: var(--text-secondary);
-                background: rgba(255, 255, 255, 0.02);
+                background: transparent;
             }
 
             .sidebar-link.active {
                 color: var(--text);
-                background: rgba(46, 117, 182, 0.16);
-                border-color: rgba(74, 159, 212, 0.35);
+                background: rgba(59,130,246,0.12);
+                border-color: transparent;
+                border-left: 3px solid var(--accent);
             }
 
             .sidebar-link.disabled {
@@ -231,9 +240,9 @@ def inject_css(hide_sidebar: bool = False) -> None:
 
             .dashboard-card {
                 height: 240px;
-                background: linear-gradient(180deg, rgba(30, 37, 56, 0.92) 0%, rgba(22, 29, 43, 0.92) 100%);
-                border: 1px solid rgba(45, 53, 80, 0.95);
-                border-radius: 20px;
+                background: rgba(25,33,54,0.88);
+                border: 1px solid var(--border-strong);
+                border-radius: 12px;
                 padding: 1.15rem;
                 box-shadow: 0 18px 36px rgba(0, 0, 0, 0.18);
                 margin-bottom: 1rem;
@@ -264,15 +273,15 @@ def inject_css(hide_sidebar: bool = False) -> None:
 
             .status-badge.active,
             .status-badge.complete {
-                background: rgba(16, 185, 129, 0.14);
-                color: #A7F3D0;
-                border-color: rgba(16, 185, 129, 0.35);
+                background: var(--success-dim);
+                color: #86EFAC;
+                border-color: var(--success-border);
             }
 
             .status-badge.in-progress {
-                background: rgba(46, 117, 182, 0.14);
-                color: #B9DEFF;
-                border-color: rgba(74, 159, 212, 0.32);
+                background: var(--accent-dim);
+                color: #93C5FD;
+                border-color: rgba(96,165,250,0.30);
             }
 
             .status-badge.skipped,
@@ -284,17 +293,17 @@ def inject_css(hide_sidebar: bool = False) -> None:
 
             .status-badge.not-started,
             .status-badge.default {
-                background: rgba(139, 156, 189, 0.16);
+                background: rgba(100,116,139,0.16);
                 color: var(--text-secondary);
-                border-color: rgba(139, 156, 189, 0.25);
+                border-color: rgba(100,116,139,0.25);
             }
 
             .empty-state {
                 text-align: center;
                 padding: 3.25rem 1.5rem;
-                background: linear-gradient(180deg, rgba(30, 37, 56, 0.86) 0%, rgba(20, 26, 39, 0.9) 100%);
-                border: 1px dashed rgba(74, 159, 212, 0.28);
-                border-radius: 24px;
+                background: rgba(17,24,39,0.70);
+                border: 1px dashed rgba(96,165,250,0.22);
+                border-radius: 16px;
                 margin: 1rem 0 1.25rem;
             }
 
@@ -321,15 +330,15 @@ def inject_css(hide_sidebar: bool = False) -> None:
                 text-transform: uppercase;
                 color: var(--accent-lt);
                 padding: 0.55rem 0 0.45rem;
-                border-bottom: 1px solid rgba(45, 53, 80, 0.7);
+                border-bottom: 1px solid var(--border);
                 margin-bottom: 0.75rem;
                 margin-top: 0.5rem;
             }
 
             .module-card {
-                background: linear-gradient(180deg, rgba(30,37,56,0.92) 0%, rgba(22,29,43,0.92) 100%);
-                border: 1px solid rgba(45,53,80,0.95);
-                border-radius: 16px;
+                background: rgba(25,33,54,0.85);
+                border: 1px solid var(--border-strong);
+                border-radius: 12px;
                 padding: 1rem 1.1rem 0.85rem;
                 margin-bottom: 0.55rem;
                 height: 148px;
@@ -337,7 +346,7 @@ def inject_css(hide_sidebar: bool = False) -> None:
             }
 
             .module-card:hover {
-                border-color: rgba(74,159,212,0.3);
+                border-color: rgba(96,165,250,0.30);
             }
 
             .module-card-name {
@@ -367,23 +376,24 @@ def inject_css(hide_sidebar: bool = False) -> None:
                 margin-bottom: 0.45rem;
             }
 
-            .m-badge-not-started  { background:rgba(139,156,189,0.16); color:#8B9CBD; border:1px solid rgba(139,156,189,0.25); }
-            .m-badge-in-progress  { background:rgba(46,117,182,0.18);  color:#B9DEFF; border:1px solid rgba(74,159,212,0.32); }
-            .m-badge-complete     { background:rgba(16,185,129,0.14);  color:#A7F3D0; border:1px solid rgba(16,185,129,0.35); }
+            .m-badge-not-started  { background:rgba(100,116,139,0.16); color:#94A3B8; border:1px solid rgba(100,116,139,0.25); }
+            .m-badge-in-progress  { background:rgba(59,130,246,0.14);  color:#93C5FD; border:1px solid rgba(96,165,250,0.30); }
+            .m-badge-complete     { background:var(--success-dim);     color:#86EFAC; border:1px solid var(--success-border); }
             .m-badge-skipped      { background:rgba(245,158,11,0.14);  color:#FCD34D; border:1px solid rgba(245,158,11,0.3);  }
 
             .progress-track {
-                background: rgba(255,255,255,0.08);
+                background: rgba(255,255,255,0.10);
                 border-radius: 999px;
-                height: 7px;
+                height: 8px;
                 margin: 0.5rem 0 0.25rem;
             }
 
             .progress-fill {
                 background: linear-gradient(90deg, var(--accent) 0%, var(--accent-lt) 100%);
                 border-radius: 999px;
-                height: 7px;
+                height: 8px;
                 transition: width 0.4s ease;
+                box-shadow: 0 0 6px rgba(59,130,246,0.40);
             }
 
             .project-meta-row {
@@ -397,7 +407,7 @@ def inject_css(hide_sidebar: bool = False) -> None:
                 font-size: 0.78rem;
                 color: var(--text-secondary);
                 background: rgba(255,255,255,0.05);
-                border: 1px solid rgba(45,53,80,0.8);
+                border: 1px solid var(--border);
                 border-radius: 999px;
                 padding: 0.2rem 0.65rem;
             }
@@ -409,15 +419,15 @@ def inject_css(hide_sidebar: bool = False) -> None:
                 color: var(--text-secondary) !important;
                 font-weight: 400 !important;
                 padding: 0.72rem 0.85rem !important;
-                border-radius: 14px !important;
+                border-radius: 8px !important;
                 text-align: left !important;
                 justify-content: flex-start !important;
                 margin-bottom: 0.3rem;
             }
 
             section[data-testid="stSidebar"] div.stButton > button:hover {
-                background: rgba(255, 255, 255, 0.04) !important;
-                border-color: rgba(74, 159, 212, 0.25) !important;
+                background: rgba(59,130,246,0.08) !important;
+                border-color: rgba(96,165,250,0.20) !important;
                 color: var(--text) !important;
             }
 
@@ -428,8 +438,8 @@ def inject_css(hide_sidebar: bool = False) -> None:
             }
 
             div[data-testid="stSelectbox"] > div > div {
-                background: rgba(15, 17, 23, 0.72) !important;
-                border: 1px solid var(--border) !important;
+                background: rgba(9,13,22,0.80) !important;
+                border: 1px solid var(--border-strong) !important;
                 border-radius: 12px !important;
                 color: var(--text) !important;
             }
@@ -456,8 +466,8 @@ def inject_css(hide_sidebar: bool = False) -> None:
             }
 
             button[data-baseweb="tab"][aria-selected="true"] {
-                background: rgba(46, 117, 182, 0.22) !important;
-                border: 1px solid rgba(74, 159, 212, 0.4) !important;
+                background: rgba(59,130,246,0.18) !important;
+                border: 1px solid rgba(96,165,250,0.35) !important;
                 border-bottom: none !important;
                 color: var(--text) !important;
             }
@@ -481,25 +491,26 @@ def inject_css(hide_sidebar: bool = False) -> None:
             div[data-testid="stDownloadButton"] > button {
                 width: 100%;
                 border-radius: 12px;
-                border: 1px solid rgba(74, 159, 212, 0.55);
+                border: 1px solid rgba(96,165,250,0.45);
                 background: linear-gradient(135deg, var(--accent) 0%, var(--accent-lt) 100%);
                 color: white;
                 font-weight: 600;
                 padding: 0.7rem 1rem;
-                box-shadow: 0 14px 30px rgba(46, 117, 182, 0.25);
+                box-shadow: 0 8px 20px rgba(59,130,246,0.20);
+                transition: filter 0.15s ease, border-color 0.15s ease;
             }
 
             div[data-testid="stDownloadButton"] > button:hover {
-                border-color: rgba(74, 159, 212, 0.85);
+                border-color: rgba(96,165,250,0.75);
                 filter: brightness(1.04);
             }
 
             /* ── Metric ────────────────────────────────────────────────────── */
 
             div[data-testid="stMetric"] {
-                background: rgba(30, 37, 56, 0.82);
-                border: 1px solid rgba(45, 53, 80, 0.9);
-                border-radius: 14px;
+                background: rgba(25,33,54,0.90);
+                border: 1px solid var(--border-strong);
+                border-radius: 10px;
                 padding: 0.8rem 1rem;
             }
 
@@ -525,15 +536,16 @@ def inject_css(hide_sidebar: bool = False) -> None:
             }
 
             .chat-bubble-user > div {
-                background: rgba(46, 117, 182, 0.22);
-                border: 1px solid rgba(74, 159, 212, 0.3);
+                background: rgba(59,130,246,0.20);
+                border: 1px solid rgba(96,165,250,0.28);
                 border-radius: 14px 14px 4px 14px;
                 padding: 0.75rem 1rem;
                 max-width: 82%;
-                color: #F0F4F8;
+                color: var(--text);
                 font-size: 0.92rem;
                 line-height: 1.6;
                 white-space: pre-wrap;
+                font-family: inherit;
             }
 
             .chat-bubble-ai {
@@ -543,15 +555,16 @@ def inject_css(hide_sidebar: bool = False) -> None:
             }
 
             .chat-bubble-ai > div {
-                background: rgba(30, 37, 56, 0.9);
-                border: 1px solid rgba(45, 53, 80, 0.9);
+                background: rgba(25,33,54,0.95);
+                border: 1px solid var(--border-strong);
                 border-radius: 14px 14px 14px 4px;
                 padding: 0.75rem 1rem;
                 max-width: 82%;
-                color: #F0F4F8;
+                color: var(--text);
                 font-size: 0.92rem;
                 line-height: 1.6;
                 white-space: pre-wrap;
+                font-family: inherit;
             }
 
             /* ── Info / success / error / warning overrides ────────────────── */
@@ -612,11 +625,14 @@ def render_sidebar(current_page: str) -> None:
         if pid:
             pname = st.session_state.get("active_project_name", "Active Project")
             st.markdown(
-                f"<div style='font-size:0.72rem;color:#4A9FD4;padding:0.3rem 0.7rem 0;"
-                f"letter-spacing:0.05em;text-transform:uppercase;'>Current Project</div>"
-                f"<div style='font-size:0.82rem;color:#F0F4F8;padding:0.1rem 0.7rem 0.65rem;"
+                f"<div style='background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);"
+                f"border-radius:8px;padding:0.45rem 0.7rem 0.5rem;margin-bottom:0.65rem;'>"
+                f"<div style='font-size:0.68rem;color:#60A5FA;"
+                f"letter-spacing:0.05em;text-transform:uppercase;margin-bottom:0.2rem;'>Current Project</div>"
+                f"<div style='font-size:0.82rem;color:#F1F5F9;"
                 f"font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"
-                f"max-width:200px;'>{pname}</div>",
+                f"max-width:200px;'>{pname}</div>"
+                f"</div>",
                 unsafe_allow_html=True,
             )
 

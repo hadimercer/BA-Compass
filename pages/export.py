@@ -72,12 +72,12 @@ def render(current_user: dict) -> None:
     st.markdown(
         f"""
         <div style="padding:1.1rem 0 0.5rem;">
-            <span style="font-size:0.72rem;color:#4A9FD4;letter-spacing:0.07em;
+            <span style="font-size:0.72rem;color:#60A5FA;letter-spacing:0.07em;
                          text-transform:uppercase;">Export</span>
-            <div style="font-size:1.55rem;font-weight:700;color:#F0F4F8;line-height:1.25;">
+            <div style="font-size:1.55rem;font-weight:700;color:#F1F5F9;line-height:1.25;">
                 {project['name']}
             </div>
-            <div style="font-size:0.85rem;color:#8B9CBD;margin-top:0.2rem;">
+            <div style="font-size:0.85rem;color:#94A3B8;margin-top:0.2rem;">
                 {project['engagement_type']} · {project['scale_tier']} scale ·
                 {len(artifacts)} artifact{'s' if len(artifacts) != 1 else ''} saved
             </div>
@@ -103,7 +103,7 @@ def render(current_user: dict) -> None:
 
     with tab_individual:
         st.markdown(
-            "<p style='color:#8B9CBD;font-size:0.88rem;margin:0.5rem 0 1rem;'>"
+            "<p style='color:#94A3B8;font-size:0.88rem;margin:0.5rem 0 1rem;'>"
             "Select a completed artifact to preview and download as Markdown."
             "</p>",
             unsafe_allow_html=True,
@@ -130,9 +130,9 @@ def render(current_user: dict) -> None:
         with st.expander("Preview", expanded=True):
             st.markdown(
                 f"""
-                <div style="background:rgba(30,37,56,0.9);border:1px solid rgba(45,53,80,0.9);
-                            border-radius:12px;padding:1.2rem 1.4rem;
-                            font-size:0.82rem;color:#F0F4F8;line-height:1.65;
+                <div style="background:rgba(25,33,54,0.95);border:1px solid rgba(255,255,255,0.14);
+                            border-radius:10px;padding:1.2rem 1.4rem;
+                            font-size:0.82rem;color:#F1F5F9;line-height:1.65;
                             white-space:pre-wrap;max-height:360px;overflow-y:auto;">
 {md_text[:2000]}{'...' if len(md_text) > 2000 else ''}
                 </div>
@@ -155,7 +155,7 @@ def render(current_user: dict) -> None:
 
     with tab_package:
         st.markdown(
-            "<p style='color:#8B9CBD;font-size:0.88rem;margin:0.5rem 0 1rem;'>"
+            "<p style='color:#94A3B8;font-size:0.88rem;margin:0.5rem 0 1rem;'>"
             "Download all saved artifacts as a single Markdown document with a cover page and table of contents."
             "</p>",
             unsafe_allow_html=True,
@@ -172,10 +172,10 @@ def render(current_user: dict) -> None:
             with col:
                 st.markdown(
                     f"""
-                    <div style="background:rgba(30,37,56,0.9);border:1px solid rgba(45,53,80,0.9);
-                                border-radius:12px;padding:0.9rem 1rem;text-align:center;">
-                        <div style="font-size:1.6rem;font-weight:700;color:#4A9FD4;">{value}</div>
-                        <div style="font-size:0.75rem;color:#8B9CBD;margin-top:0.2rem;">{label}</div>
+                    <div style="background:rgba(25,33,54,0.90);border:1px solid rgba(255,255,255,0.14);
+                                border-radius:10px;padding:0.9rem 1rem;text-align:center;">
+                        <div style="font-size:1.6rem;font-weight:700;color:#60A5FA;">{value}</div>
+                        <div style="font-size:0.75rem;color:#94A3B8;margin-top:0.2rem;">{label}</div>
                     </div>
                     """,
                     unsafe_allow_html=True,
@@ -185,15 +185,15 @@ def render(current_user: dict) -> None:
 
         # Artifact list in package
         st.markdown(
-            "<div style='font-size:0.78rem;color:#8B9CBD;margin-bottom:0.5rem;'>"
+            "<div style='font-size:0.78rem;color:#94A3B8;margin-bottom:0.5rem;'>"
             "Included artifacts:</div>",
             unsafe_allow_html=True,
         )
         for a in artifacts:
             st.markdown(
-                f"<div style='font-size:0.82rem;color:#F0F4F8;padding:0.2rem 0;'>"
+                f"<div style='font-size:0.82rem;color:#F1F5F9;padding:0.2rem 0;'>"
                 f"· {a['module_name']} "
-                f"<span style='color:#8B9CBD;'>({a['knowledge_area']} · v{a['version']})</span>"
+                f"<span style='color:#94A3B8;'>({a['knowledge_area']} · v{a['version']})</span>"
                 f"</div>",
                 unsafe_allow_html=True,
             )
