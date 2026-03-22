@@ -345,7 +345,12 @@ def render(current_user: dict) -> None:
 
     # Full-width chat area
     for msg in messages:
-        _render_message(msg["role"], msg["content"])
+        if msg.get("is_saved_placeholder") or (
+            msg.get("role") == "system" and "saved successfully" in msg.get("content", "")
+        ):
+            st.success(msg["content"])
+        else:
+            _render_message(msg["role"], msg["content"])
 
     # ── Draft area — BUG-05: shown whenever a draft exists (not gated on existing_artifact) ──
     if st.session_state[draft_key]:
@@ -372,14 +377,14 @@ def render(current_user: dict) -> None:
                     # BUG-04: clear revise mode after successful save
                     st.session_state.pop(is_revising_key, None)
                     st.session_state.pop(draft_generated_key, None)  # BUG-05: reset flag
-                st.session_state[draft_key] = edited_draft
+                st.session_state.pop(draft_key, None)
                 ver = result.get("version", "?")
-                # BUG-07: toast with icon and ✓ prefix
-                st.toast(f"✓ Artifact saved — {module['name']} v{ver}", icon="✓")
+                # BUG-07: toast with icon and ✅ prefix
+                st.toast(f"✅ Artifact saved — {module['name']} v{ver}", icon="✅")
                 # BUG-08: persist system confirmation message in chat
-                system_msg = f"✓ {module['name']} v{ver} saved successfully."
+                system_msg = f"✅ {module['name']} v{ver} saved successfully."
                 save_message(project_id, module_id, "system", system_msg)
-                messages.append({"role": "system", "content": system_msg})
+                messages.append({"role": "system", "content": system_msg, "is_saved_placeholder": True})
                 st.session_state[session_key] = messages
                 # ENH-05: trigger background opening question regeneration for remaining modules
                 import threading

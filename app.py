@@ -12,6 +12,18 @@ from components.ui import inject_css, render_sidebar
 
 # Bootstrap — only runs on first load / refresh
 if "page" not in st.session_state:
+    # Rehydrate session token from query params before checking session state.
+    # This restores the session after a browser refresh without requiring re-login.
+    if not st.session_state.get("session_token"):
+        from components.auth import _get_query_param_token, _get_user_by_token, _remove_query_param_token
+        query_token = _get_query_param_token()
+        if query_token:
+            restored_user = _get_user_by_token(query_token)
+            if restored_user is not None:
+                st.session_state["session_token"] = query_token
+            else:
+                _remove_query_param_token()
+
     user = get_current_user()
     if user:
         st.session_state["_user"] = user
