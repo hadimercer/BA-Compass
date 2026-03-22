@@ -16,34 +16,11 @@ Respond ONLY with valid JSON in this exact structure:
   "overall_assessment": "2-3 sentence summary of the engagement's completeness and quality.",
   "completeness_score": <integer 0-100>,
   "score_breakdown": {
-    "base_score": 100,
-    "deductions": [
-      {
-        "category": "Missing modules",
-        "instances": <int>,
-        "points_per_instance": 5,
-        "total_deducted": <int>
-      },
-      {
-        "category": "Incomplete artifact findings",
-        "instances": <int>,
-        "points_per_instance": 3,
-        "total_deducted": <int>
-      },
-      {
-        "category": "Inconsistency findings",
-        "instances": <int>,
-        "points_per_instance": 4,
-        "total_deducted": <int>
-      },
-      {
-        "category": "Recommended enhancements",
-        "instances": <int>,
-        "points_per_instance": 1,
-        "total_deducted": <int>
-      }
-    ],
-    "final_score": <int>
+    "completion_score": <int 0-25>,
+    "quality_score": <int 0-25>,
+    "consistency_score": <int 0-25>,
+    "coverage_score": <int 0-25>,
+    "total_score": <int 0-100>
   },
   "findings": [
     {
@@ -56,14 +33,37 @@ Respond ONLY with valid JSON in this exact structure:
   ]
 }
 
-Scoring rules for score_breakdown:
-- Start at base_score = 100
-- Deduct 5 points per missing module (gap_type = "missing")
-- Deduct 3 points per incomplete artifact finding (gap_type = "incomplete")
-- Deduct 4 points per inconsistency finding (gap_type = "inconsistent")
-- Deduct 1 point per recommended enhancement (gap_type = "recommended")
-- final_score must equal base_score minus sum of all total_deducted values, minimum 0
-- completeness_score must equal final_score
+Scoring rules — positive weighted composite (maximum 100):
+
+COMPLETION SCORE (0-25): What proportion of the expected modules for this engagement type and scale have saved artifacts?
+- 0-10% of expected modules complete = 0-5 pts
+- 11-25% complete = 6-10 pts
+- 26-50% complete = 11-16 pts
+- 51-75% complete = 17-21 pts
+- 76-100% complete = 22-25 pts
+
+QUALITY SCORE (0-25): How thorough and specific are the artifacts that have been saved? Assess based on: presence of quantified metrics, stakeholder specificity, evidence-based findings, and absence of generic boilerplate content.
+- Artifacts are mostly generic/thin = 0-8 pts
+- Artifacts are adequate with some specificity = 9-16 pts
+- Artifacts are thorough and evidence-based = 17-25 pts
+
+CONSISTENCY SCORE (0-25): How consistent is the information across saved artifacts? Check all numerical targets, dates, metrics, and named figures that appear in more than one artifact. Start at 25 and deduct for each confirmed inconsistency found.
+- No inconsistencies found = 25 pts
+- 1 inconsistency = 20 pts
+- 2 inconsistencies = 15 pts
+- 3+ inconsistencies = 0-10 pts
+
+COVERAGE SCORE (0-25): How many of the 6 BABOK knowledge areas are represented by at least one saved artifact?
+- 1 knowledge area represented = 4 pts
+- 2 knowledge areas = 8 pts
+- 3 knowledge areas = 13 pts
+- 4 knowledge areas = 18 pts
+- 5 knowledge areas = 22 pts
+- All 6 knowledge areas = 25 pts
+
+total_score = completion_score + quality_score + consistency_score + coverage_score
+completeness_score must equal total_score
+total_score is always between 0 and 100 — it cannot be negative
 
 Gap type definitions:
 - missing: An expected artifact or section is entirely absent
@@ -76,11 +76,24 @@ Severity guidelines:
 - medium: Reduces quality and professionalism but does not block delivery
 - low: Nice-to-have improvement, minor polish
 
-Evidence requirement for "incomplete" findings:
-When flagging any artifact as incomplete, truncated, or missing content, you must quote
-the specific passage from the artifact that supports your finding. Do not flag an artifact
-as incomplete unless you can identify and quote the exact location where content is missing
-or ends abruptly. If you cannot quote specific evidence, do not include the finding.
+Evidence requirement — applies to ALL findings at ALL severity levels:
+
+Every finding in the findings array must be grounded in specific evidence from the artifacts or roadmap provided. Apply these rules without exception:
+
+For gap_type "incomplete": Quote the specific passage where content is missing or ends abruptly. Do not flag an artifact as incomplete unless you can identify the exact location of the gap. If you cannot quote specific evidence, do not include the finding.
+
+For gap_type "inconsistent": Quote both conflicting passages — the value from artifact A and the conflicting value from artifact B. State which artifact each quote comes from. If you cannot identify both conflicting passages, do not include the finding.
+
+For gap_type "missing": Name the specific module or section that is absent and explain why it is expected for this engagement type and scale tier. Reference the engagement type in your explanation — do not produce generic "this module is important" statements.
+
+For gap_type "recommended" at any severity level: Recommendations must be specific to this project's context. Reference at least one specific artifact, stakeholder group, metric, or decision already captured in this engagement. Generic recommendations that could apply to any project are not permitted.
+Examples of prohibited generic recommendations:
+- "Consider developing a communication plan" (generic)
+- "Ensure stakeholder engagement is sufficient" (generic)
+- "Add more detail to this section" (generic)
+Examples of acceptable specific recommendations:
+- "The COO's 9-month go-live constraint (Problem Statement) is not reflected in the Stakeholder Engagement Planning cadence — add a milestone review at month 4 and 7"
+- "The $180k reconciliation cost metric (Problem Statement) has no corresponding success metric in the Current State Assessment — add a target reduction figure"
 
 Cross-artifact consistency check:
 Perform a cross-artifact consistency check on all numerical targets, dates, metrics, and
@@ -114,7 +127,7 @@ def build_gap_analysis_messages(
     for a in artifacts:
         content = a.get("content", {})
         text = content.get("text", "") if isinstance(content, dict) else str(content)
-        excerpt = text[:1200].replace("\n", " ") if text else "(empty)"
+        excerpt = text[:6000] if text else "(empty)"
         artifact_lines.append(
             f"\n### {a['module_name']} (v{a['version']})\n{excerpt}"
         )

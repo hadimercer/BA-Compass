@@ -186,49 +186,47 @@ def render(current_user: dict) -> None:
                     unsafe_allow_html=True,
                 )
 
-                # ENH-12: score breakdown table
+                # Score breakdown table — four positive dimensions
                 breakdown = result.get("score_breakdown")
                 if breakdown:
-                    deductions = breakdown.get("deductions", [])
-                    has_deductions = any(d.get("total_deducted", 0) > 0 for d in deductions)
-                    if has_deductions:
-                        rows_html = ""
-                        for d in deductions:
-                            if d.get("total_deducted", 0) > 0:
-                                rows_html += (
-                                    f"<tr>"
-                                    f"<td style='padding:0.2rem 0.5rem;color:#94A3B8;'>{d['category']}</td>"
-                                    f"<td style='padding:0.2rem 0.5rem;color:#F1F5F9;text-align:center;'>"
-                                    f"{d['instances']} × {d['points_per_instance']}pts</td>"
-                                    f"<td style='padding:0.2rem 0.5rem;color:#EF4444;text-align:right;'>"
-                                    f"−{d['total_deducted']}</td>"
-                                    f"</tr>"
-                                )
-                        final = breakdown.get("final_score", score)
-                        st.markdown(
-                            f"""
-                            <div style="background:rgba(17,24,39,0.75);border:1px solid rgba(255,255,255,0.09);
-                                        border-radius:10px;padding:0.8rem 1rem;margin-bottom:1rem;">
-                                <div style="font-size:0.7rem;color:#60A5FA;letter-spacing:0.07em;
-                                             text-transform:uppercase;margin-bottom:0.5rem;">Score Breakdown</div>
-                                <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
-                                    <tr>
-                                        <td style='padding:0.2rem 0.5rem;color:#94A3B8;'>Base score</td>
-                                        <td></td>
-                                        <td style='padding:0.2rem 0.5rem;color:#F1F5F9;text-align:right;'>100</td>
-                                    </tr>
-                                    {rows_html}
-                                    <tr style="border-top:1px solid rgba(255,255,255,0.12);">
-                                        <td style='padding:0.3rem 0.5rem;color:#F1F5F9;font-weight:600;'>Final score</td>
-                                        <td></td>
-                                        <td style='padding:0.3rem 0.5rem;font-weight:700;text-align:right;
-                                                    color:{score_color};'>{final}</td>
-                                    </tr>
-                                </table>
-                            </div>
-                            """,
-                            unsafe_allow_html=True,
-                        )
+                    comp  = breakdown.get("completion_score", "—")
+                    qual  = breakdown.get("quality_score", "—")
+                    cons  = breakdown.get("consistency_score", "—")
+                    cov   = breakdown.get("coverage_score", "—")
+                    total = breakdown.get("total_score", score)
+                    st.markdown(
+                        f"""
+                        <div style="background:rgba(17,24,39,0.75);border:1px solid rgba(255,255,255,0.09);
+                                    border-radius:10px;padding:0.8rem 1rem;margin-bottom:1rem;">
+                            <div style="font-size:0.7rem;color:#60A5FA;letter-spacing:0.07em;
+                                         text-transform:uppercase;margin-bottom:0.5rem;">Score Breakdown</div>
+                            <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
+                                <tr>
+                                    <td style='padding:0.2rem 0.5rem;color:#94A3B8;'>Completion</td>
+                                    <td style='padding:0.2rem 0.5rem;color:#F1F5F9;text-align:right;'>{comp}/25</td>
+                                </tr>
+                                <tr>
+                                    <td style='padding:0.2rem 0.5rem;color:#94A3B8;'>Quality</td>
+                                    <td style='padding:0.2rem 0.5rem;color:#F1F5F9;text-align:right;'>{qual}/25</td>
+                                </tr>
+                                <tr>
+                                    <td style='padding:0.2rem 0.5rem;color:#94A3B8;'>Consistency</td>
+                                    <td style='padding:0.2rem 0.5rem;color:#F1F5F9;text-align:right;'>{cons}/25</td>
+                                </tr>
+                                <tr>
+                                    <td style='padding:0.2rem 0.5rem;color:#94A3B8;'>Coverage</td>
+                                    <td style='padding:0.2rem 0.5rem;color:#F1F5F9;text-align:right;'>{cov}/25</td>
+                                </tr>
+                                <tr style="border-top:1px solid rgba(255,255,255,0.12);">
+                                    <td style='padding:0.3rem 0.5rem;color:#F1F5F9;font-weight:600;'>Total</td>
+                                    <td style='padding:0.3rem 0.5rem;font-weight:700;text-align:right;
+                                                color:{score_color};'>{total}/100</td>
+                                </tr>
+                            </table>
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
 
                 if not findings:
                     st.success("No significant gaps found. Your engagement package looks complete.")
