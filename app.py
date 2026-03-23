@@ -37,6 +37,9 @@ if "page" not in st.session_state:
                     pid = None
             if pid:
                 st.session_state["active_project_id"] = str(pid)
+        # Write token back to URL so the next refresh can rehydrate the session.
+        if st.session_state.get("session_token"):
+            st.query_params["token"] = st.session_state["session_token"]
     else:
         st.session_state["page"] = "login"
 

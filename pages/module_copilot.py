@@ -216,7 +216,11 @@ def render(current_user: dict) -> None:
         st.session_state[session_key] = loaded
 
     if draft_key not in st.session_state:
-        if existing_artifact:
+        if st.session_state.pop(f"just_saved_{module_id}", False):
+            # Skip draft reload for the single rerun immediately after a save.
+            # On the next rerun this flag is gone and normal behaviour resumes.
+            st.session_state[draft_key] = ""
+        elif existing_artifact:
             content = existing_artifact.get("content", {})
             st.session_state[draft_key] = content.get("text", "") if isinstance(content, dict) else str(content)
         else:
@@ -407,6 +411,7 @@ def render(current_user: dict) -> None:
                     st.session_state.pop(is_revising_key, None)
                     st.session_state.pop(draft_generated_key, None)  # BUG-05: reset flag
                 st.session_state.pop(draft_key, None)
+                st.session_state[f"just_saved_{module_id}"] = True
                 ver = result.get("version", "?")
                 # BUG-07: toast with icon and ✅ prefix
                 st.toast(f"✅ Artifact saved — {module['name']} v{ver}", icon="✅")
