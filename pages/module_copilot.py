@@ -190,28 +190,24 @@ def render(current_user: dict) -> None:
         loaded = [{"role": r["role"], "content": r["content"]} for r in db_history]
 
         if not loaded:
-            # ENH-05: use pre-generated context-aware opening question if available
-            stored_question = get_opening_question(project_id, module_id)
-            if stored_question:
-                save_message(project_id, module_id, "assistant", stored_question)
-                loaded = [{"role": "assistant", "content": stored_question}]
-            else:
-                with st.spinner("Starting module..."):
-                    sys_prompt = build_copilot_system(
-                        module, project, dimensions, prior_artifacts,
-                        current_artifact_text=_current_artifact_text,
+            # Always generate live — stored questions may be stale if artifacts were
+            # saved after pre-generation. Live generation reflects current prior artifacts.
+            with st.spinner("Starting module..."):
+                sys_prompt = build_copilot_system(
+                    module, project, dimensions, prior_artifacts,
+                    current_artifact_text=_current_artifact_text,
+                )
+                try:
+                    first_q = call_openai(
+                        [{"role": "system", "content": sys_prompt},
+                         {"role": "user", "content": f"Start the {module['name']} module. Ask your opening question now. Be concise."}],
+                        temperature=0.3,
                     )
-                    try:
-                        first_q = call_openai(
-                            [{"role": "system", "content": sys_prompt},
-                             {"role": "user", "content": f"Start the {module['name']} module. Ask your opening question now. Be concise."}],
-                            temperature=0.3,
-                        )
-                        first_q = _fix_list_spacing(first_q)
-                        save_message(project_id, module_id, "assistant", first_q)
-                        loaded = [{"role": "assistant", "content": first_q}]
-                    except RuntimeError:
-                        loaded = []
+                    first_q = _fix_list_spacing(first_q)
+                    save_message(project_id, module_id, "assistant", first_q)
+                    loaded = [{"role": "assistant", "content": first_q}]
+                except RuntimeError:
+                    loaded = []
 
         st.session_state[session_key] = loaded
 
