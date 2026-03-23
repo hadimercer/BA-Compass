@@ -71,7 +71,7 @@ Rules:
 - Use only facts provided by the user. Do not invent names, numbers, systems, or decisions.
 - Structure the output clearly with headings and sections appropriate to the artifact type.
 - Write in professional BA register — clear, precise, unambiguous.
-- At the end, add a brief "Gaps & Recommendations" section flagging anything that should be strengthened before final delivery.
+- At the end, add a "Gaps & Recommendations" section. Every item in this section must name a specific aspect of this project — a named stakeholder, a specific system, a concrete constraint, or a documented decision that needs strengthening. Generic recommendations that apply to any engagement (e.g. "develop a communication plan", "establish a risk register", "conduct a training needs assessment") are explicitly prohibited. If you cannot make a recommendation specific to this project, do not include it.
 - Do not include meta-commentary about what you did — just produce the artifact.
 """
 
@@ -886,7 +886,7 @@ MODULE_CONTEXT: dict[str, dict] = {
             "Interconnections between root causes if any",
         ],
         "artifact_format": (
-            "For 5-Whys: numbered Why chains per pain point, each chain labelled with the pain point. "
+            "For 5-Whys: each chain must show every step in sequence — Why 1: [symptom] → Because: [answer] → Why 2: [follow-on question] → Because: [answer] — continuing until the root cause is reached. The chain must show all intermediate steps, not just the final root cause. Label each chain with the pain point it starts from. "
             "For fishbone: category branches (People, Process, Technology, Data, Governance) "
             "with cause entries. Root Cause Summary table. Solution Implications section."
         ),
@@ -2253,7 +2253,7 @@ Before you ask a single question, read every prior artifact below in full. Then 
 1. NEVER ask for information already present in any prior artifact — reference it instead.
 2. PROPOSE from prior artifact content wherever possible — do not ask the user to generate what you can derive.
 3. If an artifact contains a relevant finding, state it and ask the user to validate or extend it, not originate it.
-4. Your opening question must reference at least one specific prior artifact if any exist — generic openers are not permitted when prior artifacts are present.
+4. Your opening message must propose from prior artifact content — not ask for it. Reference the artifact by name, state what you have derived from it, and ask the user to validate or extend your proposal. An opening message that asks the user to provide information already present in a prior artifact is a failure regardless of whether it mentions the artifact name.
 {_prior_artifacts_block(prior_artifacts, module.get('knowledge_area', ''))}
 {artifact_section}
 CURRENT MODULE:
@@ -2264,7 +2264,7 @@ CURRENT MODULE:
 - Typical outputs: {module.get('typical_outputs') or 'See module description.'}
 
 Your job right now is to guide the user through completing the "{module_name}" module.
-Begin by asking the most important opening question to get started.
+Begin by applying the opening approach defined in your MODULE BACKGROUND CONTEXT above. If prior artifacts exist, propose from them first — do not ask the user to originate information you can derive from prior context. Only ask a question when no prior artifact contains a reasonable starting point.
 """
     )
 
